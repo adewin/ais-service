@@ -1,0 +1,28 @@
+plugins {
+    id "scala"
+    id "application"
+}
+
+repositories {
+    mavenCentral()
+}
+
+application {
+    mainClassName = "uk.gov.ukho.ais.raster.Main"
+}
+
+jar {
+    manifest {
+        attributes "Main-Class": application.mainClassName
+    }
+
+    from {
+        configurations
+            .compileClasspath
+            .collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}
+
+dependencies {
+    implementation "org.scala-lang:scala-library:2.11.12"
+}
