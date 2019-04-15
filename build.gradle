@@ -11,12 +11,15 @@ plugins {
     id "application"
 }
 
+group "uk.gov.ukho"
+version "0.8-SNAPSHOT"
+
 repositories {
     mavenCentral()
 }
 
 application {
-    mainClassName = "uk.gov.ukho.ais.raster.Main"
+    mainClassName = "uk.gov.ukho.ais.rasters.Main"
 }
 
 jar {
