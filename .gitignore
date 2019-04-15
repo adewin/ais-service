@@ -1,4 +1,8 @@
 .gradle/
+.gradletasknamecache
 build/
+
+.idea/
+*.iml
 
 *.swp
