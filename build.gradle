@@ -1,3 +1,11 @@
+buildscript {
+    ext {
+        scala_compat_version = "2.11"
+        scala_version = "$scala_compat_version.12"
+        spark_version = "2.4.1"
+    }
+}
+
 plugins {
     id "scala"
     id "application"
@@ -18,11 +26,14 @@ jar {
 
     from {
         configurations
-            .compileClasspath
-            .collect { it.isDirectory() ? it : zipTree(it) }
+                .compileClasspath
+                .collect { it.isDirectory() ? it : zipTree(it) }
     }
 }
 
 dependencies {
-    implementation "org.scala-lang:scala-library:2.11.12"
+    implementation "org.scala-lang:scala-library:$scala_version"
+
+    runtimeOnly "org.apache.spark:spark-core_$scala_compat_version:$spark_version"
+    runtimeOnly "org.apache.spark:spark-sql_$scala_compat_version:$spark_version"
 }
