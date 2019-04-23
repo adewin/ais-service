@@ -1,8 +1,5 @@
 image: gradle:5.4-alpine
 
-variables:
-  GRADLE_OPTS: "-Dorg.gradle.daemon=false"
-
 build:
   stage: build
   script:
