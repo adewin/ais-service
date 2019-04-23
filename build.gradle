@@ -3,6 +3,7 @@ buildscript {
         scala_compat_version = "2.11"
         scala_version = "$scala_compat_version.12"
         spark_version = "2.4.1"
+        geotrellis_version = "2.2.0"
     }
 }
 
@@ -15,21 +16,33 @@ group "uk.gov.ukho"
 version "0.8-SNAPSHOT"
 
 repositories {
+    maven {
+        url "https://repo.boundlessgeo.com/main/"
+    }
+    maven {
+        url "http://maven.geomajas.org/"
+    }
     mavenCentral()
 }
 
+configurations {
+    provided
+    implementation.extendsFrom provided
+}
+
 application {
-    mainClassName = "uk.gov.ukho.ais.rasters.Main"
+    mainClassName = "uk.gov.ukho.ais.rasters.AisToRaster"
 }
 
 jar {
+    zip64 = true
+
     manifest {
         attributes "Main-Class": application.mainClassName
     }
 
     from {
-        configurations
-                .compileClasspath
+        (configurations.runtimeClasspath - configurations.provided)
                 .collect { it.isDirectory() ? it : zipTree(it) }
     }
 }
@@ -37,6 +50,9 @@ jar {
 dependencies {
     implementation "org.scala-lang:scala-library:$scala_version"
 
-    runtimeOnly "org.apache.spark:spark-core_$scala_compat_version:$spark_version"
-    runtimeOnly "org.apache.spark:spark-sql_$scala_compat_version:$spark_version"
+    implementation "org.locationtech.geotrellis:geotrellis-spark_$scala_compat_version:$geotrellis_version"
+    implementation "org.locationtech.geotrellis:geotrellis-shapefile_$scala_compat_version:$geotrellis_version"
+
+    provided "org.apache.spark:spark-core_$scala_compat_version:$spark_version"
+    provided "org.apache.spark:spark-sql_$scala_compat_version:$spark_version"
 }
