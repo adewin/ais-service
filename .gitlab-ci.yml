@@ -1,14 +1,14 @@
-image: gradle:alpine
+image: gradle:5.4-alpine
 
 variables:
   GRADLE_OPTS: "-Dorg.gradle.daemon=false"
 
-test:
-  stage: test
-  script:
-    - ./gradlew clean check test
-
 build:
   stage: build
   script:
-    - ./gradlew clean assemble
+    - gradle clean assemble
+
+test:
+  stage: test
+  script:
+    - gradle clean check test
