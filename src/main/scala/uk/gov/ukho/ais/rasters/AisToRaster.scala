@@ -27,9 +27,9 @@ object AisToRaster {
 
     val rasterMatrix = IntArrayTile.fill(0, RASTER_EXTENT.cols, RASTER_EXTENT.rows)
 
-    val spark = SparkSession.builder()
-      .appName("AISRaster")
-      .master("local[*]")
+    val spark = SparkSession
+      .builder()
+      .appName("AIS to Raster")
       .config("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
       .getOrCreate()
 

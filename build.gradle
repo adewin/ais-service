@@ -10,6 +10,7 @@ buildscript {
 plugins {
     id "scala"
     id "application"
+    id "com.github.johnrengelman.shadow" version "5.0.0"
 }
 
 group "uk.gov.ukho"
@@ -25,25 +26,21 @@ repositories {
     mavenCentral()
 }
 
-configurations {
-    provided
-    implementation.extendsFrom provided
-}
-
 application {
     mainClassName = "uk.gov.ukho.ais.rasters.AisToRaster"
+    applicationDefaultJvmArgs = ["-Dspark.master=local[*]"]
 }
 
-jar {
+shadowJar {
     zip64 = true
 
     manifest {
         attributes "Main-Class": application.mainClassName
     }
 
-    from {
-        (configurations.runtimeClasspath - configurations.provided)
-                .collect { it.isDirectory() ? it : zipTree(it) }
+    minimize()
+    dependencies {
+        exclude(dependency("org.apache.spark:.*"))
     }
 }
 
@@ -53,6 +50,6 @@ dependencies {
     implementation "org.locationtech.geotrellis:geotrellis-spark_$scala_compat_version:$geotrellis_version"
     implementation "org.locationtech.geotrellis:geotrellis-shapefile_$scala_compat_version:$geotrellis_version"
 
-    provided "org.apache.spark:spark-core_$scala_compat_version:$spark_version"
-    provided "org.apache.spark:spark-sql_$scala_compat_version:$spark_version"
+    implementation "org.apache.spark:spark-core_$scala_compat_version:$spark_version"
+    implementation "org.apache.spark:spark-sql_$scala_compat_version:$spark_version"
 }
