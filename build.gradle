@@ -14,7 +14,7 @@ plugins {
 }
 
 group "uk.gov.ukho"
-version "0.8-SNAPSHOT"
+version "0.9-SNAPSHOT"
 
 repositories {
     maven {
@@ -38,7 +38,6 @@ shadowJar {
         attributes "Main-Class": application.mainClassName
     }
 
-    minimize()
     dependencies {
         exclude(dependency("org.apache.spark:.*"))
     }
@@ -48,7 +47,7 @@ dependencies {
     implementation "org.scala-lang:scala-library:$scala_version"
 
     implementation "org.locationtech.geotrellis:geotrellis-spark_$scala_compat_version:$geotrellis_version"
-    implementation "org.locationtech.geotrellis:geotrellis-shapefile_$scala_compat_version:$geotrellis_version"
+    implementation "org.locationtech.geotrellis:geotrellis-s3_$scala_compat_version:$geotrellis_version"
 
     implementation "org.apache.spark:spark-core_$scala_compat_version:$spark_version"
     implementation "org.apache.spark:spark-sql_$scala_compat_version:$spark_version"
