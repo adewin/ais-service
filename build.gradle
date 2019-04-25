@@ -12,18 +12,15 @@ plugins {
     id "application"
     id "com.github.johnrengelman.shadow" version "5.0.0"
     id "com.diffplug.gradle.spotless" version "3.23.0"
+    id "cz.augi.gradle.wartremover" version "0.9.6"
 }
 
 group "uk.gov.ukho"
 version "1.0-SNAPSHOT"
 
 repositories {
-    maven {
-        url "https://repo.boundlessgeo.com/main/"
-    }
-    maven {
-        url "http://maven.geomajas.org/"
-    }
+    maven { url "https://repo.boundlessgeo.com/main/" }
+    maven { url "http://maven.geomajas.org/" }
     mavenCentral()
 }
 
@@ -35,9 +32,7 @@ application {
 shadowJar {
     zip64 = true
 
-    manifest {
-        attributes "Main-Class": application.mainClassName
-    }
+    manifest { attributes "Main-Class": application.mainClassName }
 
     dependencies {
         exclude(dependency("org.apache.spark:.*"))
@@ -46,13 +41,16 @@ shadowJar {
 
 
 spotless {
-    scala {
-        scalafmt()
-    }
+    groovyGradle { greclipse().configFile('greclipse.properties') }
+    scala { scalafmt() }
 }
 
+wartremover { warningWarts = warningWarts - "NonUnitStatements" }
+
 dependencies {
-    implementation "org.scala-lang:scala-library:$scala_version"
+    def scala_library = "org.scala-lang:scala-library:$scala_version"
+    implementation scala_library
+    compile scala_library // required for wartremover 0.9.6 to detect the version of scala
 
     implementation "com.github.scopt:scopt_$scala_compat_version:4.0.0-RC2"
 

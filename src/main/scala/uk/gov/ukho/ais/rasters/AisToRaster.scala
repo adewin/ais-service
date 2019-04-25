@@ -17,20 +17,18 @@ object AisToRaster {
 
   val OUTPUT_CRS: CRS = CRS.fromName("EPSG:4326")
 
-  def main(args: Array[String]) {
-
-    val config: Config = Config.parse(args) match {
-      case Some(value) => value
-      case _           => System.exit(1); return
+  def main(args: Array[String]): Unit = {
+    Config.parse(args) match {
+      case Some(config) => generate(config)
+      case _            => System.exit(1)
     }
+  }
 
+  def generate(config: Config): Unit = {
     val rasterExtent: RasterExtent = {
       val extent = Extent(-180, -90, 180, 90)
       RasterExtent(extent, CellSize(config.resolution, config.resolution))
     }
-
-    val rasterMatrix =
-      IntArrayTile.fill(0, rasterExtent.cols, rasterExtent.rows)
 
     val spark = SparkSession
       .builder()
@@ -43,13 +41,12 @@ object AisToRaster {
       .option("sep", "\t")
       .csv(config.inputPath)
 
+    val rasterMatrix =
+      IntArrayTile.fill(0, rasterExtent.cols, rasterExtent.rows)
+
     val geoPoints = shipPoints
       .select("lat", "lon")
       .rdd
-      .filter { row =>
-        !row.isNullAt(row.fieldIndex("lat")) && !row.isNullAt(
-          row.fieldIndex("lon"))
-      }
       .map {
         case Row(lat: Double, lon: Double) =>
           (lat, lon)

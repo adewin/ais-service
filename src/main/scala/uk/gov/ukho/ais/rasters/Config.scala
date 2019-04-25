@@ -2,10 +2,10 @@ package uk.gov.ukho.ais.rasters
 
 import scopt.OParser
 
-case class Config(inputPath: String = "",
-                  outputDirectory: String = "",
-                  isLocal: Boolean = false,
-                  resolution: Double = 1)
+case class Config(inputPath: String,
+                  outputDirectory: String,
+                  isLocal: Boolean,
+                  resolution: Double)
 
 object Config {
   private val PARSER = {
@@ -43,5 +43,14 @@ object Config {
   }
 
   def parse(args: Array[String]): Option[Config] =
-    OParser.parse(PARSER, args, Config())
+    OParser.parse(
+      PARSER,
+      args,
+      Config(
+        inputPath = "",
+        outputDirectory = "",
+        isLocal = false,
+        resolution = 1
+      )
+    )
 }
