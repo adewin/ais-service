@@ -21,7 +21,7 @@ object AisToRaster {
 
     val config: Config = Config.parse(args) match {
       case Some(value) => value
-      case _ => System.exit(1); return
+      case _           => System.exit(1); return
     }
 
     val rasterExtent: RasterExtent = {
@@ -29,7 +29,8 @@ object AisToRaster {
       RasterExtent(extent, CellSize(config.resolution, config.resolution))
     }
 
-    val rasterMatrix = IntArrayTile.fill(0, rasterExtent.cols, rasterExtent.rows)
+    val rasterMatrix =
+      IntArrayTile.fill(0, rasterExtent.cols, rasterExtent.rows)
 
     val spark = SparkSession
       .builder()
@@ -37,8 +38,7 @@ object AisToRaster {
       .config("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
       .getOrCreate()
 
-    val shipPoints = spark
-      .read
+    val shipPoints = spark.read
       .schema(Schema.AIS_SCHEMA)
       .option("sep", "\t")
       .csv(config.inputPath)
@@ -47,42 +47,57 @@ object AisToRaster {
       .select("lat", "lon")
       .rdd
       .filter { row =>
-        !row.isNullAt(row.fieldIndex("lat")) && !row.isNullAt(row.fieldIndex("lon"))
+        !row.isNullAt(row.fieldIndex("lat")) && !row.isNullAt(
+          row.fieldIndex("lon"))
       }
-      .map { case Row(lat: Double, lon: Double) =>
-        (lat, lon)
+      .map {
+        case Row(lat: Double, lon: Double) =>
+          (lat, lon)
       }
 
     geoPoints
-      .keyBy { case (lat, lon) =>
-        rasterExtent.mapToGrid(lon, lat)
+      .keyBy {
+        case (lat, lon) =>
+          rasterExtent.mapToGrid(lon, lat)
       }
       .aggregateByKey(0)(
         (count, _) => count + 1,
         (count1, count2) => count1 + count2
       )
       .collect()
-      .foreach { case ((col, row), count) =>
-        rasterMatrix.set(col, row, count)
+      .foreach {
+        case ((col, row), count) =>
+          rasterMatrix.set(col, row, count)
       }
 
     val geoTiff = GeoTiff(rasterMatrix, rasterExtent.extent, OUTPUT_CRS)
-    val cm = ColorMap.fromQuantileBreaks(rasterMatrix.histogram, ColorRamps.BlueToRed)
+    val cm =
+      ColorMap.fromQuantileBreaks(rasterMatrix.histogram, ColorRamps.BlueToRed)
 
     val timestamp = Instant.now()
 
     val tifName = s"raster-$timestamp.tif"
     val pngName = s"raster-$timestamp.png"
 
-    val localTifPath = if (config.isLocal) s"${config.outputDirectory}/$tifName" else s"/tmp/$tifName"
-    val localPngPath = if (config.isLocal) s"${config.outputDirectory}/$pngName" else s"/tmp/$pngName"
+    val localTifPath =
+      if (config.isLocal) s"${config.outputDirectory}/$tifName"
+      else s"/tmp/$tifName"
+    val localPngPath =
+      if (config.isLocal) s"${config.outputDirectory}/$pngName"
+      else s"/tmp/$pngName"
 
     GeoTiffWriter.write(geoTiff, localTifPath)
     rasterMatrix.renderPng(cm).write(localPngPath)
 
     if (!config.isLocal) {
-      S3Client.DEFAULT.putObject(new PutObjectRequest(config.outputDirectory, tifName, new File(localTifPath)))
-      S3Client.DEFAULT.putObject(new PutObjectRequest(config.outputDirectory, pngName, new File(localPngPath)))
+      S3Client.DEFAULT.putObject(
+        new PutObjectRequest(config.outputDirectory,
+                             tifName,
+                             new File(localTifPath)))
+      S3Client.DEFAULT.putObject(
+        new PutObjectRequest(config.outputDirectory,
+                             pngName,
+                             new File(localPngPath)))
     }
   }
 }

@@ -2,7 +2,10 @@ package uk.gov.ukho.ais.rasters
 
 import scopt.OParser
 
-case class Config(inputPath: String = "", outputDirectory: String = "", isLocal: Boolean = false, resolution: Double = 1)
+case class Config(inputPath: String = "",
+                  outputDirectory: String = "",
+                  isLocal: Boolean = false,
+                  resolution: Double = 1)
 
 object Config {
   private val PARSER = {
@@ -10,7 +13,8 @@ object Config {
     import builder._
     OParser.sequence(
       programName("ais-to-raster"),
-      head("AIS to Raster", "Generates a global raster in GeoTiff and PNG formats using WGS84"),
+      head("AIS to Raster",
+           "Generates a global raster in GeoTiff and PNG formats using WGS84"),
       help('h', "help"),
       opt[String]('i', "input")
         .required()
@@ -33,7 +37,7 @@ object Config {
         .text("cell size for resulting raster")
         .validate {
           case resolution if resolution > 0 => success
-          case _ => failure("")
+          case _                            => failure("")
         }
     )
   }
