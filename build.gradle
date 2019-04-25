@@ -14,7 +14,7 @@ plugins {
 }
 
 group "uk.gov.ukho"
-version "0.9-SNAPSHOT"
+version "1.0-SNAPSHOT"
 
 repositories {
     maven {
@@ -45,6 +45,8 @@ shadowJar {
 
 dependencies {
     implementation "org.scala-lang:scala-library:$scala_version"
+
+    implementation "com.github.scopt:scopt_$scala_compat_version:4.0.0-RC2"
 
     implementation "org.locationtech.geotrellis:geotrellis-spark_$scala_compat_version:$geotrellis_version"
     implementation "org.locationtech.geotrellis:geotrellis-s3_$scala_compat_version:$geotrellis_version"
