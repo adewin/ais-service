@@ -1,0 +1,33 @@
+version: 2
+
+jobs:
+  
+  build:
+    docker:
+      - image: circleci/openjdk:11-jdk
+    steps:
+      - checkout
+      - run: ./gradlew clean assemble
+  
+  check:
+    docker:
+      - image: circleci/openjdk:11-jdk
+    steps:
+      - checkout
+      - run: ./gradlew clean check
+
+  test:
+    docker:
+      - image: circleci/openjdk:11-jdk
+    steps:
+      - checkout
+      - run: ./gradlew clean test
+
+workflows:
+  version: 2
+
+  ci:
+    jobs:
+      - build
+      - check
+      - test
