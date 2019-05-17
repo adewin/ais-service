@@ -6,3 +6,7 @@ build/
 *.iml
 
 *.swp
+
+*.secret.*
+
+.terraform/
