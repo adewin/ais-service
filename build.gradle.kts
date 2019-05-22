@@ -2,22 +2,23 @@ import com.diffplug.gradle.spotless.SpotlessExtension
 
 plugins {
     id("com.diffplug.gradle.spotless")
+    id("terraform")
 }
 
 allprojects {
-    apply(plugin = "com.diffplug.gradle.spotless")
+    apply { plugin("com.diffplug.gradle.spotless") }
 
     group = "uk.gov.ukho"
     version = "1.1-SNAPSHOT"
 
-    extensions.getByType<SpotlessExtension>().apply {
+    configure<SpotlessExtension> {
         kotlinGradle {
             ktlint()
         }
     }
 }
 
-extensions.getByType<SpotlessExtension>().apply {
+configure<SpotlessExtension> {
     format("markdown") {
         target("README.md")
         trimTrailingWhitespace()
@@ -31,4 +32,24 @@ extensions.getByType<SpotlessExtension>().apply {
         indentWithSpaces(2)
         endWithNewline()
     }
+
+    format("terraform") {
+        target("src/main/terraform/**/*.tf")
+        custom("terraform") { fileContents ->
+            execTerraform {
+                args("fmt", "-")
+                stdin(fileContents)
+            }
+        }
+    }
+
+    kotlin {
+        target("buildSrc/src/main/kotlin/**/*.kt")
+        ktlint()
+    }
+}
+
+afterEvaluate {
+    tasks.getByName("spotlessTerraformCheck").dependsOn("downloadTerraform")
+    tasks.getByName("spotlessTerraformApply").dependsOn("downloadTerraform")
 }

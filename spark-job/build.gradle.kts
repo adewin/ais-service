@@ -47,12 +47,12 @@ tasks.withType<ShadowJar> {
     }
 }
 
-extensions.getByType<SpotlessExtension>().apply {
+configure<SpotlessExtension> {
     scala {
         scalafmt()
     }
 }
 
-extensions.getByType<WartremoverExtension>().apply {
+configure<WartremoverExtension> {
     warningWarts = warningWarts - "NonUnitStatements"
 }
