@@ -6,6 +6,8 @@ data "external" "secrets" {
     "enc",
     "-aes-256-cbc",
     "-d",
+    "-md",
+    "md5",
     "-k",
     "${var.PASSWORD}",
     "-in",

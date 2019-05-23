@@ -5,7 +5,7 @@ echo "This is stored in AWS SSM under 'ais_to_heatmaps_parameters_password'"
 
 read -s AIS_TO_HEATMAPS_PARAMETERS_PASSWORD
 
-openssl enc -aes-256-cbc -k $AIS_TO_HEATMAPS_PARAMETERS_PASSWORD -in parameters.secret.json -out parameters.json.enc
+openssl enc -aes-256-cbc -md md5 -k $AIS_TO_HEATMAPS_PARAMETERS_PASSWORD -in parameters.secret.json -out parameters.json.enc
 
 cat <<EOF
      __ __                                   __           __
