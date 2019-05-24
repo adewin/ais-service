@@ -24,6 +24,7 @@ resource "aws_lambda_function" "emr_lambda" {
   role          = "${aws_iam_role.iam_for_emr_lambda.arn}"
   handler       = "uk.gov.ukho.aisbatchlambda.AisBatchLambdaHandler"
   runtime       = "java8"
+  memory_size   = 256
 }
 
 resource "aws_cloudwatch_log_group" "emr_lambda_log_group" {
@@ -54,4 +55,9 @@ EOF
 resource "aws_iam_role_policy_attachment" "lambda_logs" {
   role       = "${aws_iam_role.iam_for_emr_lambda.name}"
   policy_arn = "${aws_iam_policy.emr_lambda_logging.arn}"
+}
+
+resource "aws_iam_role_policy_attachment" "emr_access" {
+  role       = "${aws_iam_role.iam_for_emr_lambda.name}"
+  policy_arn = "arn:aws:iam::aws:policy/AmazonElasticMapReduceFullAccess"
 }

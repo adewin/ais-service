@@ -16,6 +16,7 @@ module "s3_buckets" {
   jobs_bucket    = "${data.external.secrets.result["jobs_bucket"]}"
   ais_bucket     = "${data.external.secrets.result["ais_bucket"]}"
   heatmap_bucket = "${data.external.secrets.result["heatmap_bucket"]}"
+  emr_log_bucket = "${data.external.secrets.result["emr_log_bucket"]}"
 }
 
 module "emr_lambda" {
