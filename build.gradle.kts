@@ -27,7 +27,7 @@ configure<SpotlessExtension> {
     }
 
     format("yml") {
-        target(".circleci/config.yml")
+        target(".circleci/config.yml", "azure-pipelines.yml")
         trimTrailingWhitespace()
         indentWithSpaces(2)
         endWithNewline()

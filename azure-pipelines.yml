@@ -1,0 +1,22 @@
+resources:
+  containers:
+    - container: jdk
+      image: openjdk:11
+
+stages:
+  - stage: CI
+    jobs:
+      - job: build
+        container: jdk
+        steps:
+          - script: ./gradlew clean assemble
+
+      - job: check
+        container: jdk
+        steps:
+          - script: ./gradlew clean check
+
+      - job: test
+        container: jdk
+        steps:
+          - script: ./gradlew clean test
