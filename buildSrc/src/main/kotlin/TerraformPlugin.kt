@@ -6,7 +6,13 @@ import java.io.ByteArrayOutputStream
 import java.io.File
 
 const val terraformVersion = "0.11.14"
-const val terraformBinaryUrl = "https://releases.hashicorp.com/terraform/$terraformVersion/terraform_${terraformVersion}_linux_amd64.zip"
+val terraformBinaryUrl = "https://releases.hashicorp.com/terraform/$terraformVersion/terraform_${terraformVersion}_${getOsName()}_amd64.zip"
+
+fun getOsName(): String = if (System.getProperty("os.name").toLowerCase().contains("windows")) {
+    "windows"
+} else {
+    "linux"
+}
 
 val Project.terraformBinary
     get() = File(buildDir, "bin/terraform")

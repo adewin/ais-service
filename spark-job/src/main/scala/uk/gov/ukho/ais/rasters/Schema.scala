@@ -2,6 +2,7 @@ package uk.gov.ukho.ais.rasters
 
 import org.apache.spark.sql.types.{
   DoubleType,
+  IntegerType,
   StringType,
   StructField,
   StructType,
@@ -17,7 +18,7 @@ object Schema {
       StructField("lon", DoubleType, nullable = false),
       StructField("lat", DoubleType, nullable = false),
       StructField("vessel_class", StringType, nullable = false),
-      StructField("message_type_id", StringType, nullable = false),
+      StructField("message_type_id", IntegerType, nullable = false),
       StructField("navigational_status", StringType, nullable = false),
       StructField("rot", StringType, nullable = false),
       StructField("sog", StringType, nullable = false),

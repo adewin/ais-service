@@ -1,7 +1,9 @@
 package uk.gov.ukho.ais.rasters
 
 import java.io.File
-import java.time.Instant
+import java.time.{Instant, ZoneId}
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 import com.amazonaws.services.s3.model.PutObjectRequest
 import geotrellis.proj4.CRS
@@ -16,6 +18,11 @@ import org.apache.spark.sql.{Row, SparkSession}
 object AisToRaster {
 
   val OUTPUT_CRS: CRS = CRS.fromName("EPSG:4326")
+  val VALID_MESSAGE_TYPES: List[Int] = List(1, 2, 3, 18, 19)
+  val FILENAME_TIMESTAMP_FORMATTER: DateTimeFormatter = DateTimeFormatter
+    .ofPattern("YYYY-MM-dd'T'HH.mm.ss.SSSZ")
+    .withLocale(Locale.UK)
+    .withZone(ZoneId.of("UTC"))
 
   def main(args: Array[String]): Unit = {
     Config.parse(args) match {
@@ -45,10 +52,14 @@ object AisToRaster {
       IntArrayTile.fill(0, rasterExtent.cols, rasterExtent.rows)
 
     val geoPoints = shipPoints
-      .select("lat", "lon")
+      .select("lat", "lon", "message_type_id")
       .rdd
+      .filter {
+        case Row(_: Double, _: Double, msgType: Int) =>
+          VALID_MESSAGE_TYPES.contains(msgType)
+      }
       .map {
-        case Row(lat: Double, lon: Double) =>
+        case Row(lat: Double, lon: Double, _: Int) =>
           (lat, lon)
       }
 
@@ -71,7 +82,7 @@ object AisToRaster {
     val cm =
       ColorMap.fromQuantileBreaks(rasterMatrix.histogram, ColorRamps.BlueToRed)
 
-    val timestamp = Instant.now()
+    val timestamp = FILENAME_TIMESTAMP_FORMATTER.format(Instant.now())
 
     val tifName = s"raster-$timestamp.tif"
     val pngName = s"raster-$timestamp.png"

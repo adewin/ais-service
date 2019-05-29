@@ -10,3 +10,5 @@ build/
 *.secret.*
 
 .terraform/
+
+*/out/*

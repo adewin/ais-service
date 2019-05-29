@@ -28,6 +28,7 @@ dependencies {
 
     implementation("org.apache.spark:spark-core_${Versions.scalaCompat}:${Versions.spark}")
     implementation("org.apache.spark:spark-sql_${Versions.scalaCompat}:${Versions.spark}")
+    testImplementation("junit:junit:${Versions.junit}")
 }
 
 application {
@@ -45,6 +46,11 @@ tasks.withType<ShadowJar> {
     dependencies {
         exclude(dependency("org.apache.spark:.*"))
     }
+}
+
+// Required for intellij to compile source as embedded scalac is older version
+tasks.withType<ScalaCompile> {
+    targetCompatibility = "1.8"
 }
 
 configure<SpotlessExtension> {
