@@ -5,6 +5,7 @@ import java.nio.file.{Files, Path, StandardCopyOption}
 
 import geotrellis.raster.io.geotiff.reader.GeoTiffReader
 import org.apache.commons.io.FileUtils
+import org.apache.spark.SparkException
 import org.apache.spark.sql.SparkSession
 import org.junit.{After, Before, Test}
 
@@ -115,6 +116,37 @@ class ComponentTest {
     assertPngBeenCreated()
   }
 
+  @Test
+  def whenFileIsANotDelimitedByTabsThenSparkExceptionThrown(): Unit = {
+    try {
+      generateTiffForInputFile("not_tsv.txt")
+    } catch {
+      case sparkException: SparkException =>
+        System.err.println(sparkException.getMessage)
+      case otherException: Exception =>
+        System.err.println(
+          s"Not of type: SparkException: ${otherException.getClass.getCanonicalName}, " +
+            s"message: ${otherException.getMessage}")
+        assert(false)
+    }
+  }
+
+  @Test
+  def whenCorruptZipFileIsIngestedThenSparkExceptionThrown(): Unit = {
+    try {
+      generateTiffForInputFile("corrupted_ais_1M_approx_2_hours.txt.gz")
+    } catch {
+      case sparkException: SparkException =>
+        System.err.println(sparkException.getMessage)
+        assert(sparkException.getCause.getClass == classOf[IOException])
+      case otherException: Exception =>
+        System.err.println(
+          s"Not of type: SparkException: ${otherException.getClass.getCanonicalName}, " +
+            s"message: ${otherException.getMessage}")
+        assert(false)
+    }
+  }
+
   private def assertPngBeenCreated(): Unit = {
     val pngFile = findGeneratedFile("png")
     assert(pngFile.exists())
@@ -131,7 +163,9 @@ class ComponentTest {
       .listFiles(tempOutputDir, Array(fileExtension), false)
       .stream()
       .findFirst()
-      .orElseThrow(() => { new IllegalArgumentException() })
+      .orElseThrow(() => {
+        new IllegalArgumentException()
+      })
   }
 
   private def generateTiffForInputFile(filename: String): Unit = {
