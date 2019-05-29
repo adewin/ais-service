@@ -1,3 +1,4 @@
+
 import com.diffplug.gradle.spotless.SpotlessExtension
 
 plugins {
@@ -14,6 +15,17 @@ allprojects {
     configure<SpotlessExtension> {
         kotlinGradle {
             ktlint()
+        }
+    }
+
+    if (plugins.hasPlugin("java")) {
+        apply { plugin("org.gradle.checkstyle") }
+
+        configure<SpotlessExtension> {
+            java {
+                googleJavaFormat()
+                indentWithSpaces(4)
+            }
         }
     }
 }

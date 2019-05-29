@@ -4,4 +4,4 @@ variable "ais_bucket" {}
 
 variable "heatmap_bucket" {}
 
-variable "emr_log_bucket" {}
+variable "emr_logs_bucket" {}
