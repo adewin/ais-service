@@ -120,6 +120,8 @@ class ComponentTest {
   def whenFileIsANotDelimitedByTabsThenSparkExceptionThrown(): Unit = {
     try {
       generateTiffForInputFile("not_tsv.txt")
+      System.err.println("Expected a SparkException to be thrown")
+      assert(false)
     } catch {
       case sparkException: SparkException =>
         System.err.println(sparkException.getMessage)
@@ -135,6 +137,8 @@ class ComponentTest {
   def whenCorruptZipFileIsIngestedThenSparkExceptionThrown(): Unit = {
     try {
       generateTiffForInputFile("corrupted_ais_1M_approx_2_hours.txt.gz")
+      System.err.println("Expected a SparkException to be thrown")
+      assert(false)
     } catch {
       case sparkException: SparkException =>
         System.err.println(sparkException.getMessage)
