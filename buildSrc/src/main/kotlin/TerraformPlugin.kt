@@ -5,7 +5,7 @@ import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.File
 
-const val terraformVersion = "0.11.14"
+const val terraformVersion = "0.12.0"
 val terraformBinaryUrl = "https://releases.hashicorp.com/terraform/$terraformVersion/terraform_${terraformVersion}_${getOsName()}_amd64.zip"
 
 fun getOsName(): String = if (System.getProperty("os.name").toLowerCase().contains("windows")) {

@@ -24,7 +24,7 @@ jobs:
 
   deploy-infra:
     docker:
-      - image: hashicorp/terraform:0.11.14
+      - image: hashicorp/terraform:0.12.0
     steps:
       - checkout
       - run:
