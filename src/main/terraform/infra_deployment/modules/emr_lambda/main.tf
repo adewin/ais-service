@@ -30,17 +30,19 @@ resource "aws_lambda_function" "emr_lambda" {
   environment {
     variables = {
       JOB_FULLY_QUALIFIED_CLASS_NAME = "uk.gov.ukho.ais.rasters.AisToRaster"
-      JOB_LOCATION = "s3://${var.jobs_bucket_name}/ais-rasters-1.1-SNAPSHOT-all.jar"
-      INPUT_LOCATION = "s3://${var.ais_bucket_name}/*"
+      JOB_LOCATION = "s3://${var.jobs_bucket_name}/spark-job-1.1-SNAPSHOT-all.jar"
+      INPUT_LOCATION = "s3://${var.ais_bucket_name}/*.bz2"
       OUTPUT_LOCATION = "${var.heatmap_bucket_name}"
-      RESOLUTION = "1"
-      INSTANCE_TYPE = "m4.large"
+      INSTANCE_TYPE_MASTER = "m4.4xlarge"
+      INSTANCE_TYPE_WORKER = "m4.2xlarge"
       LOG_URI = "s3://${var.emr_logs_bucket_name}/"
       SERVICE_ROLE = "EMR_DefaultRole"
       JOB_FLOW_ROLE = "EMR_EC2_DefaultRole"
       CLUSTER_NAME = "AIS Heatmap Cluster"
       EMR_VERSION = "emr-5.20.0"
       INSTANCE_COUNT = "3"
+      DRIVER_MEMORY = "50g"
+      EXECUTOR_MEMORY = "16g"
     }
   }
 }

@@ -29,6 +29,7 @@ dependencies {
     implementation("org.apache.spark:spark-core_${Versions.scalaCompat}:${Versions.spark}")
     implementation("org.apache.spark:spark-sql_${Versions.scalaCompat}:${Versions.spark}")
     testImplementation("junit:junit:${Versions.junit}")
+    testImplementation("org.assertj:assertj-core:${Versions.assertJ}")
 }
 
 application {
@@ -50,6 +51,7 @@ tasks.withType<ShadowJar> {
 
 // Required for intellij to compile source as embedded scalac is older version
 tasks.withType<ScalaCompile> {
+    sourceCompatibility = "1.8"
     targetCompatibility = "1.8"
 }
 

@@ -4,7 +4,8 @@ import geotrellis.raster.Tile
 import geotrellis.raster.io.geotiff.SinglebandGeoTiff
 import geotrellis.vector.Extent
 
-class CreatedTif(private val geoTiff: SinglebandGeoTiff) {
+class CreatedTif(private val geoTiff: SinglebandGeoTiff,
+                 final val tifFileName: String) {
 
   def tile: Tile = this.geoTiff.tile
 

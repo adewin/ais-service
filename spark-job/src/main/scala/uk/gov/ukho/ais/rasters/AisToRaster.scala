@@ -1,8 +1,8 @@
 package uk.gov.ukho.ais.rasters
 
 import java.io.File
-import java.time.{Instant, ZoneId}
 import java.time.format.DateTimeFormatter
+import java.time.{Instant, ZoneId}
 import java.util.Locale
 
 import com.amazonaws.services.s3.model.PutObjectRequest
@@ -13,12 +13,13 @@ import geotrellis.raster.render.{ColorMap, ColorRamps}
 import geotrellis.raster.{CellSize, IntArrayTile, RasterExtent}
 import geotrellis.spark.io.s3.S3Client
 import geotrellis.vector.Extent
-import org.apache.spark.sql.{Row, SparkSession}
+import org.apache.spark.rdd.RDD
+import org.apache.spark.sql.{DataFrame, Row, SparkSession}
+import uk.gov.ukho.ais.rasters.Filters.RDDFilters
 
 object AisToRaster {
 
   val OUTPUT_CRS: CRS = CRS.fromName("EPSG:4326")
-  val VALID_MESSAGE_TYPES: List[Int] = List(1, 2, 3, 18, 19)
   val FILENAME_TIMESTAMP_FORMATTER: DateTimeFormatter = DateTimeFormatter
     .ofPattern("YYYY-MM-dd'T'HH.mm.ss.SSSZ")
     .withLocale(Locale.UK)
@@ -32,10 +33,13 @@ object AisToRaster {
   }
 
   def generate(config: Config): Unit = {
-    val rasterExtent: RasterExtent = {
-      val extent = Extent(-180, -90, 180, 90)
-      RasterExtent(extent, CellSize(config.resolution, config.resolution))
-    }
+    val rasterExtent: RasterExtent = RasterExtent(
+      Extent(-180, -90, 180, 90),
+      CellSize(config.resolution, config.resolution)
+    )
+
+    val rasterMatrix =
+      IntArrayTile.fill(0, rasterExtent.cols, rasterExtent.rows)
 
     val spark = SparkSession
       .builder()
@@ -48,20 +52,7 @@ object AisToRaster {
       .option("sep", "\t")
       .csv(config.inputPath)
 
-    val rasterMatrix =
-      IntArrayTile.fill(0, rasterExtent.cols, rasterExtent.rows)
-
-    val geoPoints = shipPoints
-      .select("lat", "lon", "message_type_id")
-      .rdd
-      .filter {
-        case Row(_: Double, _: Double, msgType: Int) =>
-          VALID_MESSAGE_TYPES.contains(msgType)
-      }
-      .map {
-        case Row(lat: Double, lon: Double, _: Int) =>
-          (lat, lon)
-      }
+    val geoPoints = filterShipPings(shipPoints)
 
     geoPoints
       .keyBy {
@@ -82,30 +73,36 @@ object AisToRaster {
     val cm =
       ColorMap.fromQuantileBreaks(rasterMatrix.histogram, ColorRamps.BlueToRed)
 
-    val timestamp = FILENAME_TIMESTAMP_FORMATTER.format(Instant.now())
+    val filename = generateFilename(config.outputFilenamePrefix)
+    val directory = if (config.isLocal) config.outputDirectory else s"/tmp"
 
-    val tifName = s"raster-$timestamp.tif"
-    val pngName = s"raster-$timestamp.png"
-
-    val localTifPath =
-      if (config.isLocal) s"${config.outputDirectory}/$tifName"
-      else s"/tmp/$tifName"
-    val localPngPath =
-      if (config.isLocal) s"${config.outputDirectory}/$pngName"
-      else s"/tmp/$pngName"
-
-    GeoTiffWriter.write(geoTiff, localTifPath)
-    rasterMatrix.renderPng(cm).write(localPngPath)
+    GeoTiffWriter.write(geoTiff, s"$directory/$filename.tif")
+    rasterMatrix.renderPng(cm).write(s"$directory/$filename.png")
 
     if (!config.isLocal) {
       S3Client.DEFAULT.putObject(
         new PutObjectRequest(config.outputDirectory,
-                             tifName,
-                             new File(localTifPath)))
+                             s"$filename.tif",
+                             new File(s"$directory/$filename.tif")))
       S3Client.DEFAULT.putObject(
         new PutObjectRequest(config.outputDirectory,
-                             pngName,
-                             new File(localPngPath)))
+                             s"$filename.png",
+                             new File(s"$directory/$filename.png")))
     }
+  }
+
+  private def generateFilename(prefix: String): String = {
+    val timestamp = FILENAME_TIMESTAMP_FORMATTER.format(Instant.now())
+    s"$prefix-raster-$timestamp"
+  }
+
+  private def filterShipPings(shipPoints: DataFrame): RDD[(Double, Double)] = {
+    shipPoints
+      .select("lat", "lon", "message_type_id")
+      .rdd
+      .filterByValidMessageType()
+      .map {
+        case Row(lat: Double, lon: Double, _: Int) => (lat, lon)
+      }
   }
 }

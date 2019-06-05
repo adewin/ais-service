@@ -4,10 +4,13 @@ import scopt.OParser
 
 case class Config(inputPath: String,
                   outputDirectory: String,
+                  outputFilenamePrefix: String,
                   isLocal: Boolean,
                   resolution: Double)
 
 object Config {
+  private final val DEFAULT_FILENAME_PREFIX = "world"
+
   private val PARSER = {
     val builder = OParser.builder[Config]
     import builder._
@@ -19,26 +22,31 @@ object Config {
       opt[String]('i', "input")
         .required()
         .valueName("<input data path/S3 URI>")
-        .action((value, config) => config.copy(inputPath = value))
-        .text("path of input data"),
+        .text("path of input data")
+        .action((value, config) => config.copy(inputPath = value)),
       opt[String]('o', "output")
         .required()
         .valueName("<output directory/S3 bucket>")
-        .action((value, config) => config.copy(outputDirectory = value))
-        .text("location to output the resulting GeoTIFF and PNG"),
-      opt[Unit]('l', "local-mode")
-        .optional()
-        .action((_, config) => config.copy(isLocal = true))
-        .text("run in local mode"),
+        .text("location to output the resulting GeoTIFF and PNG")
+        .action((value, config) => config.copy(outputDirectory = value)),
       opt[Double]('r', "resolution")
         .required()
         .valueName("<decimal degrees>")
-        .action((value, config) => config.copy(resolution = value))
         .text("cell size for resulting raster")
+        .action((value, config) => config.copy(resolution = value))
         .validate {
           case resolution if resolution > 0 => success
           case _                            => failure("")
-        }
+        },
+      opt[String]('p', "prefix")
+        .optional()
+        .valueName("<output filename prefix>")
+        .text("prefix to be added to the output filename")
+        .action((value, config) => config.copy(outputFilenamePrefix = value)),
+      opt[Unit]('l', "local-mode")
+        .optional()
+        .text("run in local mode")
+        .action((_, config) => config.copy(isLocal = true))
     )
   }
 
@@ -46,11 +54,10 @@ object Config {
     OParser.parse(
       PARSER,
       args,
-      Config(
-        inputPath = "",
-        outputDirectory = "",
-        isLocal = false,
-        resolution = 1
-      )
+      Config(inputPath = "",
+             outputDirectory = "",
+             outputFilenamePrefix = DEFAULT_FILENAME_PREFIX,
+             isLocal = false,
+             resolution = 1)
     )
 }

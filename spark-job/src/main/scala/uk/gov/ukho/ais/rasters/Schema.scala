@@ -1,13 +1,6 @@
 package uk.gov.ukho.ais.rasters
 
-import org.apache.spark.sql.types.{
-  DoubleType,
-  IntegerType,
-  StringType,
-  StructField,
-  StructType,
-  TimestampType
-}
+import org.apache.spark.sql.types._
 
 object Schema {
   val AIS_SCHEMA = StructType(

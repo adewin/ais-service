@@ -3,21 +3,21 @@ version: 2.1
 jobs:
   build:
     docker:
-      - image: circleci/openjdk:11-jdk
+      - image: circleci/openjdk:8-jdk
     steps:
       - checkout
       - run: ./gradlew clean assemble
 
   check:
     docker:
-      - image: circleci/openjdk:11-jdk
+      - image: circleci/openjdk:8-jdk
     steps:
       - checkout
       - run: ./gradlew clean check
 
   test:
     docker:
-      - image: circleci/openjdk:11-jdk
+      - image: circleci/openjdk:8-jdk
     steps:
       - checkout
       - run: ./gradlew clean test

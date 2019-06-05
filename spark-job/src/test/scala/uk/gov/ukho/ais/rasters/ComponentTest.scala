@@ -7,6 +7,7 @@ import geotrellis.raster.io.geotiff.reader.GeoTiffReader
 import org.apache.commons.io.FileUtils
 import org.apache.spark.SparkException
 import org.apache.spark.sql.SparkSession
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.{After, Before, Test}
 
 class ComponentTest {
@@ -20,7 +21,10 @@ class ComponentTest {
   }
 
   private final val TEST_RESOLUTION = 1
-  private final val TOTAL_CELL_COUNT = 64800
+  private final val TOTAL_CELL_COUNT_WHOLE_WORLD_AT_1K = 64800
+  @SuppressWarnings(
+    Array("org.wartremover.warts.Var", "org.wartremover.warts.Null"))
+  var testConfig: Config = _
 
   @SuppressWarnings(
     Array("org.wartremover.warts.Var", "org.wartremover.warts.Null"))
@@ -30,6 +34,11 @@ class ComponentTest {
   def beforeEach(): Unit = {
     val path: Path = Files.createTempDirectory("aisrastertest")
     tempOutputDir = path.toFile
+    testConfig = Config("",
+                        tempOutputDir.getAbsolutePath,
+                        "test-prefix",
+                        isLocal = true,
+                        TEST_RESOLUTION)
   }
 
   @After
@@ -52,8 +61,10 @@ class ComponentTest {
 
     val (sum, count) = geoTiff.calculateSumAndCount()
 
-    assert(sum == 0)
-    assert(count == TOTAL_CELL_COUNT)
+    assertThat(sum).isEqualTo(0)
+    assertThat(count).isEqualTo(TOTAL_CELL_COUNT_WHOLE_WORLD_AT_1K)
+
+    assertTiffFileNameIsCorrect(geoTiff.tifFileName)
     assertPngBeenCreated()
   }
 
@@ -66,8 +77,10 @@ class ComponentTest {
 
     val (sum, count) = geoTiff.calculateSumAndCount()
 
-    assert(sum == expectedNumberOfPings)
-    assert(count == TOTAL_CELL_COUNT)
+    assertThat(sum).isEqualTo(expectedNumberOfPings)
+    assertThat(count).isEqualTo(TOTAL_CELL_COUNT_WHOLE_WORLD_AT_1K)
+
+    assertTiffFileNameIsCorrect(geoTiff.tifFileName)
     assertPngBeenCreated()
   }
 
@@ -80,9 +93,9 @@ class ComponentTest {
 
     val (sum, count) = geoTiff.calculateSumAndCount()
 
-    assert(sum == expectedNumberOfPings)
-    assert(count == TOTAL_CELL_COUNT)
-    assert(geoTiff.tile.findMinMax == (0, 2))
+    assertThat(sum).isEqualTo(expectedNumberOfPings)
+    assertThat(count).isEqualTo(TOTAL_CELL_COUNT_WHOLE_WORLD_AT_1K)
+    assertThat(geoTiff.tile.findMinMax).isEqualTo((0, 2))
 
     val sumPingsTopLeftCorner = geoTiff.getSumInRange(-180, 89.0, -179.0, 90.0)
     val sumPingsTopRightCorner = geoTiff.getSumInRange(178.9, 89.0, 180.0, 90.0)
@@ -92,12 +105,13 @@ class ComponentTest {
     val sumPingsBottomRightCorner =
       geoTiff.getSumInRange(179.0, -90.0, 180.0, -89.0)
 
-    assert(sumPingsTopLeftCorner == 1)
-    assert(sumPingsTopRightCorner == 1)
-    assert(sumPingsCentre == 1)
-    assert(sumPingsBottomLeftCorner == 1)
-    assert(sumPingsBottomRightCorner == 2)
+    assertThat(sumPingsTopLeftCorner).isEqualTo(1)
+    assertThat(sumPingsTopRightCorner).isEqualTo(1)
+    assertThat(sumPingsCentre).isEqualTo(1)
+    assertThat(sumPingsBottomLeftCorner).isEqualTo(1)
+    assertThat(sumPingsBottomRightCorner).isEqualTo(2)
 
+    assertTiffFileNameIsCorrect(geoTiff.tifFileName)
     assertPngBeenCreated()
   }
 
@@ -111,72 +125,59 @@ class ComponentTest {
 
     val (sum, count) = geoTiff.calculateSumAndCount()
 
-    assert(sum == expectedNumberOfValidMessages)
-    assert(count == TOTAL_CELL_COUNT)
+    assertThat(sum).isEqualTo(expectedNumberOfValidMessages)
+    assertThat(count).isEqualTo(TOTAL_CELL_COUNT_WHOLE_WORLD_AT_1K)
+    assertTiffFileNameIsCorrect(geoTiff.tifFileName)
     assertPngBeenCreated()
   }
 
-  @Test
+  @Test(expected = classOf[SparkException])
   def whenFileIsANotDelimitedByTabsThenSparkExceptionThrown(): Unit = {
-    try {
-      generateTiffForInputFile("not_tsv.txt")
-      System.err.println("Expected a SparkException to be thrown")
-      assert(false)
-    } catch {
-      case sparkException: SparkException =>
-        System.err.println(sparkException.getMessage)
-      case otherException: Exception =>
-        System.err.println(
-          s"Not of type: SparkException: ${otherException.getClass.getCanonicalName}, " +
-            s"message: ${otherException.getMessage}")
-        assert(false)
-    }
+    generateTiffForInputFile("not_tsv.txt")
   }
 
-  @Test
+  @Test(expected = classOf[SparkException])
   def whenCorruptZipFileIsIngestedThenSparkExceptionThrown(): Unit = {
-    try {
-      generateTiffForInputFile("corrupted_ais_1M_approx_2_hours.txt.gz")
-      System.err.println("Expected a SparkException to be thrown")
-      assert(false)
-    } catch {
-      case sparkException: SparkException =>
-        System.err.println(sparkException.getMessage)
-        assert(sparkException.getCause.getClass == classOf[IOException])
-      case otherException: Exception =>
-        System.err.println(
-          s"Not of type: SparkException: ${otherException.getClass.getCanonicalName}, " +
-            s"message: ${otherException.getMessage}")
-        assert(false)
-    }
+    generateTiffForInputFile("corrupted_ais_1M_approx_2_hours.txt.gz")
   }
 
   private def assertPngBeenCreated(): Unit = {
     val pngFile = findGeneratedFile("png")
-    assert(pngFile.exists())
+    assertThat(pngFile.exists()).isTrue
+
+    assertFileNameCorrectAndHasExtension(pngFile.getName, "png")
+  }
+
+  def assertTiffFileNameIsCorrect(geoTiffFilename: String): Unit = {
+    assertFileNameCorrectAndHasExtension(geoTiffFilename, "tif")
+  }
+
+  private def assertFileNameCorrectAndHasExtension(
+      fileName: String,
+      expectedExtension: String): Unit = {
+    assertThat(fileName).startsWith(
+      s"${testConfig.outputFilenamePrefix}-raster")
+    assertThat(fileName).endsWith(s".$expectedExtension")
   }
 
   private def getTiffFile = {
-    val geoTiffFilename = findGeneratedFile("tif")
-    new CreatedTif(
-      GeoTiffReader.readSingleband(geoTiffFilename.getAbsolutePath))
+    val geoTiffFile = findGeneratedFile("tif")
+    new CreatedTif(GeoTiffReader.readSingleband(geoTiffFile.getAbsolutePath),
+                   geoTiffFile.getName)
   }
 
-  private def findGeneratedFile(fileExtension: String) = {
+  private def findGeneratedFile(fileExtension: String): File = {
     FileUtils
       .listFiles(tempOutputDir, Array(fileExtension), false)
       .stream()
       .findFirst()
-      .orElseThrow(() => {
-        new IllegalArgumentException()
-      })
+      .get()
   }
 
-  private def generateTiffForInputFile(filename: String): Unit = {
-    val notEmptyFile = copyFileToFileSystem(filename)
-    val testConfig: Config =
-      Config(notEmptyFile, tempOutputDir.getAbsolutePath, true, TEST_RESOLUTION)
-    AisToRaster.generate(testConfig)
+  private def generateTiffForInputFile(fileOnClasspath: String): Unit = {
+    val savedLocalFile = copyFileToFileSystem(fileOnClasspath)
+
+    AisToRaster.generate(testConfig.copy(inputPath = savedLocalFile))
   }
 
   @SuppressWarnings(Array("org.wartremover.warts.Throw"))
