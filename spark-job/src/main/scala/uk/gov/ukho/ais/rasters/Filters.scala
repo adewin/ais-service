@@ -1,5 +1,7 @@
 package uk.gov.ukho.ais.rasters
 
+import java.sql.Timestamp
+
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.Row
 
@@ -18,7 +20,7 @@ object Filters {
 
     def filterByValidMessageType(): RDD[Row] = {
       rdd.filter {
-        case Row(_: Double, _: Double, msgType: Int) =>
+        case Row(_: String, _: Timestamp, _: Double, _: Double, msgType: Int) =>
           VALID_MESSAGE_TYPES.contains(msgType)
       }
     }

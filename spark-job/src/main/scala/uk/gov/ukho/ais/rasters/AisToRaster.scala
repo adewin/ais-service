@@ -1,6 +1,7 @@
 package uk.gov.ukho.ais.rasters
 
 import java.io.File
+import java.sql.Timestamp
 import java.time.format.DateTimeFormatter
 import java.time.{Instant, ZoneId}
 import java.util.Locale
@@ -47,17 +48,25 @@ object AisToRaster {
       .config("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
       .getOrCreate()
 
-    val shipPoints = spark.read
+    val shipPings = spark.read
       .schema(Schema.AIS_SCHEMA)
       .option("sep", "\t")
       .csv(config.inputPath)
 
-    val geoPoints = filterShipPings(shipPoints)
+    val filteredShipPings = filterShipPingsByMessageType(shipPings)
 
-    geoPoints
+    val interpolatedShipPings = filteredShipPings
+      .groupByKey()
+      .flatMap {
+        case (_: String, v: Seq[ShipPing]) => {
+          Interpolator.interpolatePings(v)
+        }
+      }
+
+    interpolatedShipPings
       .keyBy {
-        case (lat, lon) =>
-          rasterExtent.mapToGrid(lon, lat)
+        case ShipPing(_, _, latitude, longitude) =>
+          rasterExtent.mapToGrid(longitude, latitude)
       }
       .aggregateByKey(0)(
         (count, _) => count + 1,
@@ -96,13 +105,19 @@ object AisToRaster {
     s"$prefix-raster-$timestamp"
   }
 
-  private def filterShipPings(shipPoints: DataFrame): RDD[(Double, Double)] = {
+  private def filterShipPingsByMessageType(
+      shipPoints: DataFrame): RDD[(String, ShipPing)] = {
     shipPoints
-      .select("lat", "lon", "message_type_id")
+      .select("MMSI", "acquisition_time", "lat", "lon", "message_type_id")
       .rdd
       .filterByValidMessageType()
       .map {
-        case Row(lat: Double, lon: Double, _: Int) => (lat, lon)
+        case Row(mmsi: String,
+                 timestamp: Timestamp,
+                 lat: Double,
+                 lon: Double,
+                 _: Int) =>
+          (mmsi, ShipPing(mmsi, timestamp.getTime, lat, lon))
       }
   }
 }

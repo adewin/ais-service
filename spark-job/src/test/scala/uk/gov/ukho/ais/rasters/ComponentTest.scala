@@ -71,7 +71,24 @@ class ComponentTest {
   @Test
   def whenARepresentativeSampleIsInputtedThenATifIsProduced(): Unit = {
     generateTiffForInputFile("ais_1M_approx_2_hours.txt.gz")
-    val expectedNumberOfPings = 991266
+    val expectedNumberOfPings = 3345106
+
+    val geoTiff: CreatedTif = getTiffFile
+
+    val (sum, count) = geoTiff.calculateSumAndCount()
+
+    assertThat(sum).isEqualTo(expectedNumberOfPings)
+    assertThat(count).isEqualTo(TOTAL_CELL_COUNT_WHOLE_WORLD_AT_1K)
+
+    assertTiffFileNameIsCorrect(geoTiff.tifFileName)
+    assertPngBeenCreated()
+  }
+
+  @Test
+  def whenAGappySampleIsInputtedThenATifIsProducedWithInterpolatedPoints()
+    : Unit = {
+    generateTiffForInputFile("resampling_test.txt")
+    val expectedNumberOfPings = 6
 
     val geoTiff: CreatedTif = getTiffFile
 

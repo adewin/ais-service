@@ -1,5 +1,8 @@
 package uk.gov.ukho.ais.rasters
 
+import java.sql.Timestamp
+import java.time.Instant
+
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{Row, SparkSession}
 import org.assertj.core.api.Assertions.assertThat
@@ -20,25 +23,27 @@ class FiltersTest {
 
   @Test
   def whenFilteringOnMsgTypeThenInvalidTypesFilteredOut(): Unit = {
+    val timestamp = Timestamp.from(Instant.now())
+
     val expectedRows: Seq[Row] = Seq(
-      Row(1d, 1d, 1),
-      Row(2d, 2d, 2),
-      Row(3d, 3d, 3),
-      Row(18d, 18d, 18),
-      Row(19d, 19d, 19)
+      Row("mmsi1", timestamp, 1d, 1d, 1),
+      Row("mmsi1", timestamp, 2d, 2d, 2),
+      Row("mmsi1", timestamp, 3d, 3d, 3),
+      Row("mmsi1", timestamp, 18d, 18d, 18),
+      Row("mmsi1", timestamp, 19d, 19d, 19)
     )
 
     val rdd: RDD[Row] = spark.sparkContext.parallelize(
       Seq(
-        Row(0d, 0d, 0),
-        Row(1d, 1d, 1),
-        Row(2d, 2d, 2),
-        Row(3d, 3d, 3),
-        Row(4d, 4d, 4),
-        Row(17d, 17d, 17),
-        Row(18d, 18d, 18),
-        Row(19d, 19d, 19),
-        Row(20d, 20d, 20)
+        Row("mmsi1", timestamp, 0d, 0d, 0),
+        Row("mmsi1", timestamp, 1d, 1d, 1),
+        Row("mmsi1", timestamp, 2d, 2d, 2),
+        Row("mmsi1", timestamp, 3d, 3d, 3),
+        Row("mmsi1", timestamp, 4d, 4d, 4),
+        Row("mmsi1", timestamp, 17d, 17d, 17),
+        Row("mmsi1", timestamp, 18d, 18d, 18),
+        Row("mmsi1", timestamp, 19d, 19d, 19),
+        Row("mmsi1", timestamp, 20d, 20d, 20)
       ))
 
     val result: RDD[Row] = rdd.filterByValidMessageType()
