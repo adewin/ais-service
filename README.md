@@ -21,3 +21,14 @@ CircleCI requires an AWS IAM User to run the terraform so create an IAM User cal
 
 Terraform needs an S3 bucket and a DynamoDB table to manage remote state storage and locking.
 Create an S3 bucket called `ais-to-raster-terra-state` and a DynamoDb table called `ais-to-heatmap-terraform-lock-table` with a primary key of `LockID`
+
+
+# Data Ingest
+
+For filling out the appropriate minimum viable metadata, you're required to have the start and end datetimes of the AIS. Unfortunately there is no easy way to do this currently, therefore the script `get_dates.py` under `scripts/` has been provided. This can only currently be run on our VMs.
+
+To run the above:
+
+```
+python get_dates.py <your-ais-text-file-here>
+```
