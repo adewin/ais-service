@@ -22,22 +22,12 @@ jobs:
       - checkout
       - run: ./gradlew clean test
 
-  deploy-infra:
+  deploy:
     docker:
-      - image: hashicorp/terraform:0.12.0
+      - image: circleci/openjdk:8-jdk
     steps:
       - checkout
-      - run:
-          name: Install openssl
-          command: apk add --update openssl
-      - run:
-          working_directory: src/main/terraform/infra_deployment
-          name: Initialise Terraform
-          command: terraform init
-      - run:
-          working_directory: src/main/terraform/infra_deployment
-          name: Apply Terraform
-          command: terraform apply -auto-approve 2>&1 > /dev/null
+      - run: ./gradlew clean terraformApply --auto-approve
 
 workflows:
   version: 2
@@ -47,13 +37,9 @@ workflows:
       - build
       - check
       - test
-  deploy_infra:
+  deploy:
     jobs:
-      - hold:
-          type: approval
+      - deploy:
           filters:
             branches:
               only: master
-      - deploy-infra:
-          requires:
-            - hold

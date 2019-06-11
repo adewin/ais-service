@@ -1,11 +1,9 @@
 #!/bin/bash
 
-echo "Please enter the password needed to decrypt the parameters file"
+echo "Please ensure the password needed to decrypt the parameters file is in the TF_VAR_PASSWORD environment variable"
 echo "This is stored in AWS SSM under 'ais_to_heatmaps_parameters_password'"
 
-read -s AIS_TO_HEATMAPS_PARAMETERS_PASSWORD
-
-openssl enc -aes-256-cbc -md md5 -d -k $AIS_TO_HEATMAPS_PARAMETERS_PASSWORD -in parameters.json.enc -out parameters.secret.json
+openssl enc -aes-256-cbc -md md5 -d -k $TF_VAR_PASSWORD -in parameters.json.enc -out parameters.secret.json
 
 cat <<EOF
      __ __      __                           __           __

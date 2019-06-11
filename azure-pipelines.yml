@@ -1,7 +1,7 @@
 resources:
   containers:
     - container: jdk
-      image: openjdk:11
+      image: openjdk:8
 
 stages:
   - stage: CI

@@ -21,6 +21,7 @@ module "s3_buckets" {
 
 module "emr_lambda" {
   source               = "./modules/emr_lambda"
+  jar                  = "${var.AIS_BATCH_LAMBDA_JAR}"
   jobs_bucket_name     = "${data.external.secrets.result["jobs_bucket"]}"
   ais_bucket_name      = "${data.external.secrets.result["ais_bucket"]}"
   heatmap_bucket_name  = "${data.external.secrets.result["heatmap_bucket"]}"

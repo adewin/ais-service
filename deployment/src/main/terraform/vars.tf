@@ -14,3 +14,5 @@ data "external" "secrets" {
     "${path.module}/parameters.json.enc",
   ]
 }
+
+variable "AIS_BATCH_LAMBDA_JAR" {}

@@ -19,7 +19,7 @@ EOF
 }
 
 resource "aws_lambda_function" "emr_lambda" {
-  filename = "${path.module}/emr_dummy.zip"
+  filename = "${var.jar}"
   function_name = "emr_orchestration"
   role = "${aws_iam_role.iam_for_emr_lambda.arn}"
   handler = "uk.gov.ukho.aisbatchlambda.AisBatchLambdaHandler"

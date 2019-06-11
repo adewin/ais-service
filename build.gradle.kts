@@ -3,7 +3,6 @@ import com.diffplug.gradle.spotless.SpotlessExtension
 
 plugins {
     id("com.diffplug.gradle.spotless")
-    id("terraform")
 }
 
 allprojects {
@@ -45,23 +44,8 @@ configure<SpotlessExtension> {
         endWithNewline()
     }
 
-    format("terraform") {
-        target("src/main/terraform/**/*.tf")
-        custom("terraform") { fileContents ->
-            execTerraform {
-                args("fmt", "-")
-                stdin(fileContents)
-            }
-        }
-    }
-
     kotlin {
         target("buildSrc/src/main/kotlin/**/*.kt")
         ktlint()
     }
-}
-
-afterEvaluate {
-    tasks.getByName("spotlessTerraformCheck").dependsOn("downloadTerraform")
-    tasks.getByName("spotlessTerraformApply").dependsOn("downloadTerraform")
 }

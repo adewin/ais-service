@@ -1,3 +1,5 @@
+variable jar {}
+
 variable jobs_bucket_name {}
 
 variable ais_bucket_name {}

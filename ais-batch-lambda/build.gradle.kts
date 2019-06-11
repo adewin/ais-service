@@ -1,9 +1,7 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-import io.spring.gradle.dependencymanagement.dsl.DependencyManagementExtension
 
 plugins {
     java
-    id("io.spring.dependency-management")
     id("com.github.johnrengelman.shadow")
 }
 
@@ -20,13 +18,8 @@ repositories {
     mavenCentral()
 }
 
-configure<DependencyManagementExtension> {
-    imports {
-        mavenBom("com.amazonaws:aws-java-sdk-bom:${Versions.mavenAwsBom}")
-    }
-}
-
 dependencies {
+    implementation(platform("com.amazonaws:aws-java-sdk-bom:${Versions.mavenAwsBom}"))
     implementation("com.amazonaws:aws-java-sdk-emr")
     implementation("com.amazonaws:aws-lambda-java-core:${Versions.lambdaJavaCore}")
     implementation("com.amazonaws:aws-java-sdk-s3")
