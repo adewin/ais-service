@@ -58,9 +58,7 @@ object AisToRaster {
     val interpolatedShipPings = filteredShipPings
       .groupByKey()
       .flatMap {
-        case (_: String, v: Seq[ShipPing]) => {
-          Interpolator.interpolatePings(v)
-        }
+        case (_: String, v: Seq[ShipPing]) => Interpolator.interpolatePings(v)
       }
 
     interpolatedShipPings

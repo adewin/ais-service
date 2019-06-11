@@ -75,6 +75,7 @@ public class AisBatchLambdaHandler implements RequestHandler<Integer, String> {
         return new HadoopJarStepConfig()
                 .withJar("command-runner.jar")
                 .withArgs("spark-submit",
+                        "--conf", "spark.driver.maxResultSize=4g",
                         "--driver-memory", DRIVER_MEMORY,
                         "--executor-memory", EXECUTOR_MEMORY,
                         "--class", JOB_FULLY_QUALIFIED_CLASS_NAME,
