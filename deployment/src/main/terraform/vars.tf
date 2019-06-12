@@ -15,4 +15,8 @@ data "external" "secrets" {
   ]
 }
 
-variable "AIS_BATCH_LAMBDA_JAR" {}
+variable "AIS_BATCH_LAMBDA_JAR_PATH" {}
+
+variable "SPARK_JOB_JAR_PATH" {}
+
+variable "SPARK_JOB_JAR_NAME" {}

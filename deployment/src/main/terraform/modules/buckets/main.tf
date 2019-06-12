@@ -176,3 +176,9 @@ resource "aws_ssm_parameter" "emr_logs_bucket" {
   type = "SecureString"
   value = "${var.emr_logs_bucket}"
 }
+
+resource "aws_s3_bucket_object" "spark_s3_job" {
+  bucket = "${aws_s3_bucket.jobs_bucket.bucket}"
+  key = "${var.spark_job_jar_name}"
+  source = "${var.spark_job_jar_path}"
+}

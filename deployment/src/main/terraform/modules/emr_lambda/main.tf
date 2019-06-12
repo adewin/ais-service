@@ -30,7 +30,7 @@ resource "aws_lambda_function" "emr_lambda" {
   environment {
     variables = {
       JOB_FULLY_QUALIFIED_CLASS_NAME = "uk.gov.ukho.ais.rasters.AisToRaster"
-      JOB_LOCATION = "s3://${var.jobs_bucket_name}/spark-job-1.1-SNAPSHOT-all.jar"
+      JOB_LOCATION = "s3://${var.jobs_bucket_name}/${var.spark_job_jar_name}"
       INPUT_LOCATION = "s3://${var.ais_bucket_name}/*.bz2"
       OUTPUT_LOCATION = "${var.heatmap_bucket_name}"
       INSTANCE_TYPE_MASTER = "m4.4xlarge"
