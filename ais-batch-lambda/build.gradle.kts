@@ -3,6 +3,7 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 plugins {
     java
     id("com.github.johnrengelman.shadow")
+    id("org.owasp.dependencycheck")
 }
 
 tasks.withType<JavaCompile> {
@@ -25,4 +26,13 @@ dependencies {
     implementation("com.amazonaws:aws-java-sdk-s3")
     testImplementation("junit:junit:${Versions.junit}")
     testImplementation("org.assertj:assertj-core:${Versions.assertJ}")
+}
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.owasp:dependency-check-gradle:${Versions.dependencyCheckGradle}")
+    }
 }

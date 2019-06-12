@@ -9,6 +9,7 @@ object Versions {
     const val geotrellis = "2.3.1"
     const val mavenAwsBom = "1.11.563"
     const val lambdaJavaCore = "1.2.0"
+    const val dependencyCheckGradle = "5.0.0"
 
     // Test dependencies
     const val junit = "4.12"

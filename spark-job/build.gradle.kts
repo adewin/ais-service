@@ -8,12 +8,22 @@ plugins {
     application
     id("com.github.johnrengelman.shadow")
     id("cz.augi.gradle.wartremover")
+    id("org.owasp.dependencycheck")
 }
 
 repositories {
     maven { url = URI("https://repo.boundlessgeo.com/main/") }
     maven { url = URI("http://maven.geomajas.org/") }
     mavenCentral()
+}
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.owasp:dependency-check-gradle:${Versions.dependencyCheckGradle}")
+    }
 }
 
 dependencies {
