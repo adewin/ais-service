@@ -8,7 +8,6 @@ plugins {
     application
     id("com.github.johnrengelman.shadow")
     id("cz.augi.gradle.wartremover")
-    id("org.owasp.dependencycheck")
 }
 
 repositories {
@@ -17,17 +16,11 @@ repositories {
     mavenCentral()
 }
 
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath("org.owasp:dependency-check-gradle:${Versions.dependencyCheckGradle}")
-    }
-}
-
 dependencies {
     val scalaLibrary = "org.scala-lang:scala-library:${Versions.scala}"
+    val sparkCoreDependency = "org.apache.spark:spark-core_${Versions.scalaCompat}:${Versions.spark}"
+    val sparkSqlDependency = "org.apache.spark:spark-sql_${Versions.scalaCompat}:${Versions.spark}"
+
     implementation(scalaLibrary)
     compile(scalaLibrary) // required for wartremover 0.9.6 to detect the Versions of scala
 
@@ -36,8 +29,11 @@ dependencies {
     implementation("org.locationtech.geotrellis:geotrellis-spark_${Versions.scalaCompat}:${Versions.geotrellis}")
     implementation("org.locationtech.geotrellis:geotrellis-s3_${Versions.scalaCompat}:${Versions.geotrellis}")
 
-    implementation("org.apache.spark:spark-core_${Versions.scalaCompat}:${Versions.spark}")
-    implementation("org.apache.spark:spark-sql_${Versions.scalaCompat}:${Versions.spark}")
+    compileOnly(sparkCoreDependency)
+    compileOnly(sparkSqlDependency)
+
+    testImplementation(sparkCoreDependency)
+    testImplementation(sparkSqlDependency)
     testImplementation("junit:junit:${Versions.junit}")
     testImplementation("org.assertj:assertj-core:${Versions.assertJ}")
 }

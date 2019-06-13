@@ -1,15 +1,17 @@
 
 import com.diffplug.gradle.spotless.SpotlessExtension
+import org.owasp.dependencycheck.gradle.extension.DependencyCheckExtension
 
 plugins {
     id("com.diffplug.gradle.spotless")
+    id("org.owasp.dependencycheck") apply false
 }
 
 allprojects {
     apply { plugin("com.diffplug.gradle.spotless") }
 
     group = "uk.gov.ukho"
-    version = "1.2-SNAPSHOT"
+    version = "1.3-SNAPSHOT"
 
     configure<SpotlessExtension> {
         kotlinGradle {
@@ -17,15 +19,23 @@ allprojects {
         }
     }
 
-    if (plugins.hasPlugin("java")) {
-        apply { plugin("org.gradle.checkstyle") }
+    pluginManager.withPlugin("java") {
+        apply(plugin = "org.owasp.dependencycheck")
 
         configure<SpotlessExtension> {
             java {
+                removeUnusedImports()
                 googleJavaFormat()
                 indentWithSpaces(4)
             }
         }
+
+        configure<DependencyCheckExtension> {
+            failBuildOnCVSS = 0.0f
+            scanConfigurations = listOf("implementation")
+        }
+
+        tasks.getByName("check").dependsOn("dependencyCheckAnalyze")
     }
 }
 

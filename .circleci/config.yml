@@ -22,7 +22,7 @@ jobs:
       - checkout
       - run: ./gradlew clean test
 
-  dependencyCheck:
+  dependencyCheckReports:
     docker:
       - image: circleci/openjdk:8-jdk
     steps:
@@ -52,13 +52,24 @@ workflows:
       - build
       - check
       - test
-      - dependencyCheck
+      - dependencyCheckReports
       - deploy:
           requires:
             - build
             - check
             - test
-            - dependencyCheck
+            - dependencyCheckReports
           filters:
             branches:
               only: master
+
+  nightly:
+    triggers:
+      - schedule:
+          cron: "0 0 * * *"
+          filters:
+            branches:
+              only:
+                - master
+    jobs:
+      - dependencyCheckReports
