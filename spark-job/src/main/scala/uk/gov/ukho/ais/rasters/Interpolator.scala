@@ -1,7 +1,6 @@
 package uk.gov.ukho.ais.rasters
 
 import geotrellis.util.Haversine
-import geotrellis.vector.Point
 
 import scala.collection.mutable
 
@@ -14,10 +13,8 @@ import scala.collection.mutable
 object Interpolator {
 
   private final val TIME_STEP: Long = 3 * 60 * 1000
-  private final val TIME_STEP_THRESHOLD: Long = 6 * 60 * 60 * 1000
-  private final val DISTANCE_THRESHOLD = 30000
 
-  def interpolatePings(pings: Seq[ShipPing]): Seq[ShipPing] = {
+  def interpolatePings(pings: Seq[ShipPing], config: Config): Seq[ShipPing] = {
 
     val outputPings: mutable.MutableList[ShipPing] = mutable.MutableList()
     var prevPing: ShipPing = null
@@ -35,7 +32,8 @@ object Interpolator {
           outputPings ++= interpolateBetweenPingsFromTime(
             prevPing,
             currPing,
-            outputPings.last.acquisitionTime
+            outputPings.last.acquisitionTime,
+            config
           )
         }
 
@@ -47,31 +45,42 @@ object Interpolator {
 
   private def interpolateBetweenPingsFromTime(prevPing: ShipPing,
                                               currPing: ShipPing,
-                                              fromTime: Long): List[ShipPing] =
-    if (shouldInterpolateBetweenPings(prevPing, currPing)) {
+                                              fromTime: Long,
+                                              config: Config): List[ShipPing] =
+    if (shouldInterpolateBetweenPings(prevPing, currPing, config)) {
       addInterpolatedPings(prevPing, currPing, fromTime)
     } else {
       List(currPing)
     }
 
   private def shouldInterpolateBetweenPings(prevPing: ShipPing,
-                                            currPing: ShipPing): Boolean = {
-    isTimeBetweenPingsWithinTheshold(prevPing, currPing) &&
-    isDistanceBetweenPingsWithinThreshold(prevPing, currPing)
+                                            currPing: ShipPing,
+                                            config: Config): Boolean = {
+    isTimeBetweenPingsWithinThreshold(
+      prevPing,
+      currPing,
+      config.interpolationTimeThresholdMilliseconds) &&
+    isDistanceBetweenPingsWithinThreshold(
+      prevPing,
+      currPing,
+      config.interpolationDistanceThresholdMeters)
   }
 
   private def isDistanceBetweenPingsWithinThreshold(
       prevPing: ShipPing,
-      currPing: ShipPing): Boolean = {
+      currPing: ShipPing,
+      distanceThreshold: Long): Boolean = {
     Haversine(prevPing.longitude,
               prevPing.latitude,
               currPing.longitude,
-              currPing.latitude) <= DISTANCE_THRESHOLD
+              currPing.latitude) <= distanceThreshold
   }
 
-  private def isTimeBetweenPingsWithinTheshold(prevPing: ShipPing,
-                                               currPing: ShipPing): Boolean = {
-    currPing.acquisitionTime - prevPing.acquisitionTime <= TIME_STEP_THRESHOLD
+  private def isTimeBetweenPingsWithinThreshold(
+      prevPing: ShipPing,
+      currPing: ShipPing,
+      timeThreshold: Long): Boolean = {
+    currPing.acquisitionTime - prevPing.acquisitionTime <= timeThreshold
   }
 
   private def addInterpolatedPings(prevPing: ShipPing,

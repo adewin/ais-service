@@ -89,7 +89,11 @@ public class AisBatchLambdaHandler implements RequestHandler<Integer, String> {
             "-p",
             job.getPrefix(),
             "-r",
-            job.getResolution().toString());
+            job.getResolution().toString(),
+            "-d",
+            String.valueOf(job.getDistanceInterpolationThreshold()),
+            "-t",
+            String.valueOf(job.getTimeInterpolationThreshold()));
   }
 
   private RunJobFlowRequest buildJobFlowRequest(

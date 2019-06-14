@@ -38,7 +38,9 @@ class ComponentTest {
                         tempOutputDir.getAbsolutePath,
                         "test-prefix",
                         isLocal = true,
-                        TEST_RESOLUTION)
+                        TEST_RESOLUTION,
+                        6 * 60 * 60 * 1000,
+                        30000)
   }
 
   @After
@@ -85,10 +87,47 @@ class ComponentTest {
   }
 
   @Test
-  def whenAGappySampleIsInputtedThenATifIsProducedWithInterpolatedPoints()
+  def whenAGappySampleIsInputtedWithDefaultTimeAndDistanceThresholdsThenATifIsProducedWithInterpolatedPoints()
     : Unit = {
     generateTiffForInputFile("resampling_test.txt")
     val expectedNumberOfPings = 6
+
+    val geoTiff: CreatedTif = getTiffFile
+
+    val (sum, count) = geoTiff.calculateSumAndCount()
+
+    assertThat(sum).isEqualTo(expectedNumberOfPings)
+    assertThat(count).isEqualTo(TOTAL_CELL_COUNT_WHOLE_WORLD_AT_1K)
+
+    assertTiffFileNameIsCorrect(geoTiff.tifFileName)
+    assertPngBeenCreated()
+  }
+
+  @Test
+  def whenAGappySampleIsInputtedWithGivenTimeThresholdThenATifIsProducedWithInterpolatedPoints()
+    : Unit = {
+    testConfig = testConfig.copy(
+      interpolationTimeThresholdMilliseconds = (6 * 60 - 1) * 1000)
+    generateTiffForInputFile("resampling_test.txt")
+    val expectedNumberOfPings = 4
+
+    val geoTiff: CreatedTif = getTiffFile
+
+    val (sum, count) = geoTiff.calculateSumAndCount()
+
+    assertThat(sum).isEqualTo(expectedNumberOfPings)
+    assertThat(count).isEqualTo(TOTAL_CELL_COUNT_WHOLE_WORLD_AT_1K)
+
+    assertTiffFileNameIsCorrect(geoTiff.tifFileName)
+    assertPngBeenCreated()
+  }
+
+  @Test
+  def whenAGappySampleIsInputtedWithGivenDistanceThresholdThenATifIsProducedWithInterpolatedPoints()
+    : Unit = {
+    testConfig = testConfig.copy(interpolationDistanceThresholdMeters = 1000)
+    generateTiffForInputFile("resampling_test_distance_threshold.txt")
+    val expectedNumberOfPings = 5
 
     val geoTiff: CreatedTif = getTiffFile
 

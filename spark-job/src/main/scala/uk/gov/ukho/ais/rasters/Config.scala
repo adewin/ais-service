@@ -6,13 +6,20 @@ case class Config(inputPath: String,
                   outputDirectory: String,
                   outputFilenamePrefix: String,
                   isLocal: Boolean,
-                  resolution: Double)
-
+                  resolution: Double,
+                  interpolationTimeThresholdMilliseconds: Long,
+                  interpolationDistanceThresholdMeters: Long)
 object Config {
-  private final val DEFAULT_FILENAME_PREFIX = "world"
 
   private val PARSER = {
     val builder = OParser.builder[Config]
+
+    def validatePositive: AnyVal => Either[String, Unit] = {
+      case value: Double if value > 0 => builder.success
+      case value: Long if value > 0   => builder.success
+      case _                          => builder.failure("Negative values are not allowed")
+    }
+
     import builder._
     OParser.sequence(
       programName("ais-to-raster"),
@@ -34,12 +41,23 @@ object Config {
         .valueName("<decimal degrees>")
         .text("cell size for resulting raster")
         .action((value, config) => config.copy(resolution = value))
-        .validate {
-          case resolution if resolution > 0 => success
-          case _                            => failure("")
-        },
+        .validate(validatePositive),
+      opt[Long]('t', "timeThreshold")
+        .required()
+        .valueName("<milliseconds>")
+        .text("threshold of time between pings in which interpolation will not occur")
+        .action((value, config) =>
+          config.copy(interpolationTimeThresholdMilliseconds = value))
+        .validate(validatePositive),
+      opt[Long]('d', "distanceThreshold")
+        .required()
+        .valueName("<meters>")
+        .text("threshold of distance between pings in which interpolation will not occur")
+        .action((value, config) =>
+          config.copy(interpolationDistanceThresholdMeters = value))
+        .validate(validatePositive),
       opt[String]('p', "prefix")
-        .optional()
+        .required()
         .valueName("<output filename prefix>")
         .text("prefix to be added to the output filename")
         .action((value, config) => config.copy(outputFilenamePrefix = value)),
@@ -54,10 +72,14 @@ object Config {
     OParser.parse(
       PARSER,
       args,
-      Config(inputPath = "",
-             outputDirectory = "",
-             outputFilenamePrefix = DEFAULT_FILENAME_PREFIX,
-             isLocal = false,
-             resolution = 1)
+      Config(
+        inputPath = "",
+        outputDirectory = "",
+        outputFilenamePrefix = "",
+        isLocal = false,
+        resolution = 1,
+        interpolationTimeThresholdMilliseconds = 0,
+        interpolationDistanceThresholdMeters = 0
+      )
     )
 }

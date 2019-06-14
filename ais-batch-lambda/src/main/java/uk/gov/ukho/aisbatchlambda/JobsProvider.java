@@ -20,6 +20,7 @@ public class JobsProvider {
   }
 
   public List<Job> getJobs() {
-    return Arrays.asList(new Job(DEGREES_AT_EQUATOR_FOR_1KM_RESOLUTION, "world-1k"));
+    return Arrays.asList(
+        new Job(DEGREES_AT_EQUATOR_FOR_1KM_RESOLUTION, "world-1k", 30000L, 6L * 60 * 60 * 1000));
   }
 }

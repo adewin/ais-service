@@ -4,13 +4,17 @@ import java.util.Comparator
 
 import org.apache.commons.math3.util.Precision
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.Test
+import org.junit.{Before, Test}
 
 import scala.collection.JavaConverters._
 
 class InterpolatorTest {
 
-  private final val DOUBLE_COMPARISON_PRECISION = 0.00000000000000001
+  private final val DOUBLE_COMPARISON_PRECISION: Double = 0.00000000000000001
+  private final val TIME_THRESHOLD: Long = 6 * 60 * 60 * 1000
+  private final val DISTANCE_THRESHOLD: Long = 30000
+  private final val TEST_CONFIG: Config =
+    new Config("", "", "", true, 0, TIME_THRESHOLD, DISTANCE_THRESHOLD)
 
   private val doubleComparator: Comparator[Double] = new Comparator[Double] {
     override def compare(a: Double, b: Double): Int =
@@ -19,7 +23,8 @@ class InterpolatorTest {
 
   @Test
   def whenInterpolationOfNoPingsThenNoPingsReturned(): Unit = {
-    val outPings: Seq[ShipPing] = Interpolator.interpolatePings(Seq[ShipPing]())
+    val outPings: Seq[ShipPing] =
+      Interpolator.interpolatePings(Seq[ShipPing](), TEST_CONFIG)
 
     assertThat(outPings.size).isEqualTo(0)
   }
@@ -29,7 +34,8 @@ class InterpolatorTest {
     val inPings: Seq[ShipPing] = createPings(Seq((3, 1, 1)))
     val expectedPings: Seq[ShipPing] = createPings(Seq((3, 1, 1)))
 
-    val outPings: Seq[ShipPing] = Interpolator.interpolatePings(inPings)
+    val outPings: Seq[ShipPing] =
+      Interpolator.interpolatePings(inPings, TEST_CONFIG)
 
     assertThatOutPingsMatchesExpectedPings(expectedPings, outPings)
   }
@@ -41,7 +47,8 @@ class InterpolatorTest {
     val expectedPings: Seq[ShipPing] = createPings(
       Seq((0, 0, 0), (3, 0.001, 0.001), (6, 0.002, 0.002)))
 
-    val outPings: Seq[ShipPing] = Interpolator.interpolatePings(inPings)
+    val outPings: Seq[ShipPing] =
+      Interpolator.interpolatePings(inPings, TEST_CONFIG)
 
     assertThatOutPingsMatchesExpectedPings(expectedPings, outPings)
   }
@@ -54,7 +61,8 @@ class InterpolatorTest {
     val expectedPings: Seq[ShipPing] = createPings(
       Seq((0, 0, 0), (3, 0.01, 0.01), (6, 0.02, 0.02), (9, 0.03, 0.03)))
 
-    val outPings: Seq[ShipPing] = Interpolator.interpolatePings(inPings)
+    val outPings: Seq[ShipPing] =
+      Interpolator.interpolatePings(inPings, TEST_CONFIG)
 
     assertThatOutPingsMatchesExpectedPings(expectedPings, outPings)
   }
@@ -76,7 +84,8 @@ class InterpolatorTest {
           (9993, 0.09, 0.09),
           (9996, 0.1, 0.1)))
 
-    val outPings: Seq[ShipPing] = Interpolator.interpolatePings(inPings)
+    val outPings: Seq[ShipPing] =
+      Interpolator.interpolatePings(inPings, TEST_CONFIG)
 
     assertThatOutPingsMatchesExpectedPings(expectedPings, outPings)
   }
@@ -99,7 +108,8 @@ class InterpolatorTest {
           (9994, 0.09, 0.09),
           (9997, 0.1, 0.1)))
 
-    val outPings: Seq[ShipPing] = Interpolator.interpolatePings(inPings)
+    val outPings: Seq[ShipPing] =
+      Interpolator.interpolatePings(inPings, TEST_CONFIG)
 
     assertThatOutPingsMatchesExpectedPings(expectedPings, outPings)
   }
@@ -111,7 +121,8 @@ class InterpolatorTest {
     val expectedPings: Seq[ShipPing] = createPings(
       Seq((0, 0, 0), (361, 0.02, 0.02), (722, 0.03, 0.03)))
 
-    val outPings: Seq[ShipPing] = Interpolator.interpolatePings(inPings)
+    val outPings: Seq[ShipPing] =
+      Interpolator.interpolatePings(inPings, TEST_CONFIG)
 
     assertThatOutPingsMatchesExpectedPings(expectedPings, outPings)
   }
@@ -127,7 +138,8 @@ class InterpolatorTest {
     val expectedPings: Seq[ShipPing] = createPings(
       Seq((0, 0, 0), (3, 0.03, 0.03), (6, 0.06, 0.06)))
 
-    val outPings: Seq[ShipPing] = Interpolator.interpolatePings(inPings)
+    val outPings: Seq[ShipPing] =
+      Interpolator.interpolatePings(inPings, TEST_CONFIG)
 
     assertThatOutPingsMatchesExpectedPings(expectedPings, outPings)
   }
@@ -139,7 +151,8 @@ class InterpolatorTest {
     val expectedPings: Seq[ShipPing] = createPings(
       Seq((0, 51.310567, -3.380413), (4, 51.312013, -3.822284)))
 
-    val outPings: Seq[ShipPing] = Interpolator.interpolatePings(inPings)
+    val outPings: Seq[ShipPing] =
+      Interpolator.interpolatePings(inPings, TEST_CONFIG)
 
     assertThatOutPingsMatchesExpectedPings(expectedPings, outPings)
   }

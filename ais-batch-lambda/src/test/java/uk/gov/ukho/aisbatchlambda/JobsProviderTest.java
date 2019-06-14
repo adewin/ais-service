@@ -12,7 +12,9 @@ public class JobsProviderTest {
   public void whenGetJobsThenCorrectJobsReturned() {
     assertThat(JobsProvider.getInstance().getJobs())
         .as("Jobs returned are correct")
-        .extracting("resolution", "prefix")
-        .containsExactlyInAnyOrder(tuple(DEGREES_AT_EQUATOR_FOR_1KM_RESOLUTION, "world-1k"));
+        .extracting(
+            "resolution", "prefix", "distanceInterpolationThreshold", "timeInterpolationThreshold")
+        .containsExactlyInAnyOrder(
+            tuple(DEGREES_AT_EQUATOR_FOR_1KM_RESOLUTION, "world-1k", 30000L, 21600000L));
   }
 }
