@@ -93,7 +93,11 @@ public class AisBatchLambdaHandler implements RequestHandler<Integer, String> {
             "-d",
             String.valueOf(job.getDistanceInterpolationThreshold()),
             "-t",
-            String.valueOf(job.getTimeInterpolationThreshold()));
+            String.valueOf(job.getTimeInterpolationThreshold()),
+            "-s",
+            job.getStartPeriod(),
+            "-e",
+            job.getEndPeriod());
   }
 
   private RunJobFlowRequest buildJobFlowRequest(

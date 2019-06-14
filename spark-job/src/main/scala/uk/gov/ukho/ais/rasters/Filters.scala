@@ -24,5 +24,19 @@ object Filters {
           VALID_MESSAGE_TYPES.contains(msgType)
       }
     }
+
+    def filterPingsByTimePeriod(startPeriod: Timestamp,
+                                endPeriod: Timestamp): RDD[Row] = {
+      rdd.filter {
+        case Row(_: String,
+                 timestamp: Timestamp,
+                 _: Double,
+                 _: Double,
+                 _: Int) =>
+          timestamp.compareTo(startPeriod) >= 0 && timestamp.compareTo(
+            endPeriod) < 0
+      }
+    }
   }
+
 }

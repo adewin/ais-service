@@ -53,7 +53,10 @@ object AisToRaster {
       .option("sep", "\t")
       .csv(config.inputPath)
 
-    val filteredShipPings = filterShipPingsByMessageType(shipPings)
+    val filteredShipPings = filterShipPingsByMessageTypeAndDateRange(
+      shipPings,
+      config.startPeriod,
+      config.endPeriod)
 
     val interpolatedShipPings = filteredShipPings
       .groupByKey()
@@ -104,12 +107,15 @@ object AisToRaster {
     s"$prefix-raster-$timestamp"
   }
 
-  private def filterShipPingsByMessageType(
-      shipPoints: DataFrame): RDD[(String, ShipPing)] = {
+  private def filterShipPingsByMessageTypeAndDateRange(
+      shipPoints: DataFrame,
+      startPeriod: Timestamp,
+      endPeriod: Timestamp): RDD[(String, ShipPing)] = {
     shipPoints
       .select("MMSI", "acquisition_time", "lat", "lon", "message_type_id")
       .rdd
       .filterByValidMessageType()
+      .filterPingsByTimePeriod(startPeriod, endPeriod)
       .map {
         case Row(mmsi: String,
                  timestamp: Timestamp,

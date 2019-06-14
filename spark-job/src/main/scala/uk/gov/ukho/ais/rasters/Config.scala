@@ -1,6 +1,12 @@
 package uk.gov.ukho.ais.rasters
 
+import java.sql.Timestamp
+import java.time.{Instant, LocalDate}
+import java.time.format.DateTimeFormatter
+
 import scopt.OParser
+
+import scala.util.Try
 
 case class Config(inputPath: String,
                   outputDirectory: String,
@@ -8,8 +14,14 @@ case class Config(inputPath: String,
                   isLocal: Boolean,
                   resolution: Double,
                   interpolationTimeThresholdMilliseconds: Long,
-                  interpolationDistanceThresholdMeters: Long)
+                  interpolationDistanceThresholdMeters: Long,
+                  startPeriod: Timestamp,
+                  endPeriod: Timestamp)
+
 object Config {
+
+  private final val NO_TIMESTAMP_SUPPLIED =
+    Timestamp.valueOf("1970-01-01 00:00:00")
 
   private val PARSER = {
     val builder = OParser.builder[Config]
@@ -18,6 +30,13 @@ object Config {
       case value: Double if value > 0 => builder.success
       case value: Long if value > 0   => builder.success
       case _                          => builder.failure("Negative values are not allowed")
+    }
+
+    def validateDate: String => Either[String, Unit] = {
+      case value if isValidDate(value) => builder.success
+      case _ =>
+        builder.failure(
+          "Invalid format, date must be in format of: 'YYYY-MM-DD'")
     }
 
     import builder._
@@ -56,6 +75,23 @@ object Config {
         .action((value, config) =>
           config.copy(interpolationDistanceThresholdMeters = value))
         .validate(validatePositive),
+      opt[String]('s', "startPeriod")
+        .required()
+        .valueName("<startPeriod>")
+        .text(
+          "start date when to count the first ping from, as an ISO format date")
+        .action((value, config) =>
+          config.copy(startPeriod = TimestampConverter
+            .convertToTimestamp(value, forStartPeriod = true)))
+        .validate(validateDate),
+      opt[String]('e', "endPeriod")
+        .required()
+        .valueName("<endPeriod>")
+        .text("end date when to count the pings up to, as an ISO format date")
+        .action((value, config) =>
+          config.copy(endPeriod = TimestampConverter
+            .convertToTimestamp(value, forStartPeriod = false)))
+        .validate(validateDate),
       opt[String]('p', "prefix")
         .required()
         .valueName("<output filename prefix>")
@@ -79,7 +115,13 @@ object Config {
         isLocal = false,
         resolution = 1,
         interpolationTimeThresholdMilliseconds = 0,
-        interpolationDistanceThresholdMeters = 0
+        interpolationDistanceThresholdMeters = 0,
+        startPeriod = NO_TIMESTAMP_SUPPLIED,
+        endPeriod = NO_TIMESTAMP_SUPPLIED
       )
     )
+
+  private def isValidDate(date: String): Boolean = {
+    Try(LocalDate.parse(date, DateTimeFormatter.ISO_DATE)).isSuccess
+  }
 }

@@ -11,7 +11,7 @@ allprojects {
     apply { plugin("com.diffplug.gradle.spotless") }
 
     group = "uk.gov.ukho"
-    version = "1.4-SNAPSHOT"
+    version = "1.5-SNAPSHOT"
 
     configure<SpotlessExtension> {
         kotlinGradle {

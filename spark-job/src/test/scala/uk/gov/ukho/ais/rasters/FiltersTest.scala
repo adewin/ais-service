@@ -51,4 +51,32 @@ class FiltersTest {
     assertThat(result.collect())
       .containsExactlyInAnyOrderElementsOf(expectedRows.asJava)
   }
+
+  @Test
+  def whenFilteringOnDatesThenDatesOutsideRangesAreFilteredOut(): Unit = {
+    val testTime = Instant.now()
+
+    val expectedRows: Seq[Row] = Seq(
+      Row("mmsi1", Timestamp.from(testTime.plusSeconds(60)), 0d, 0d, 0),
+      Row("mmsi2", Timestamp.from(testTime.plusSeconds(120)), 1d, 1d, 1),
+      Row("mmsi3", Timestamp.from(testTime.plusSeconds(180)), 2d, 2d, 2)
+    )
+
+    val rdd: RDD[Row] = spark.sparkContext.parallelize(
+      Seq(
+        Row("mmsi1", Timestamp.from(testTime.plusSeconds(60)), 0d, 0d, 0),
+        Row("mmsi2", Timestamp.from(testTime.plusSeconds(120)), 1d, 1d, 1),
+        Row("mmsi3", Timestamp.from(testTime.plusSeconds(180)), 2d, 2d, 2),
+        Row("mmsi4", Timestamp.from(testTime.plusSeconds(300)), 3d, 3d, 3),
+        Row("mmsi5", Timestamp.from(testTime.plusSeconds(600)), 4d, 4d, 4),
+        Row("mmsi6", Timestamp.from(testTime.plusSeconds(720)), 17d, 17d, 17)
+      ))
+
+    val result: RDD[Row] = rdd.filterPingsByTimePeriod(
+      Timestamp.from(testTime),
+      Timestamp.from(testTime.plusSeconds(300)))
+
+    assertThat(result.collect())
+      .containsExactlyInAnyOrderElementsOf(expectedRows.asJava)
+  }
 }

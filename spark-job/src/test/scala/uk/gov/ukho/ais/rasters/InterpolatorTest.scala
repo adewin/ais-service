@@ -1,5 +1,6 @@
 package uk.gov.ukho.ais.rasters
 
+import java.sql.Timestamp
 import java.util.Comparator
 
 import org.apache.commons.math3.util.Precision
@@ -13,8 +14,20 @@ class InterpolatorTest {
   private final val DOUBLE_COMPARISON_PRECISION: Double = 0.00000000000000001
   private final val TIME_THRESHOLD: Long = 6 * 60 * 60 * 1000
   private final val DISTANCE_THRESHOLD: Long = 30000
+  private final val START_PERIOD =
+    Timestamp.valueOf("1970-01-01 00:00:00")
+  private final val END_PERIOD =
+    Timestamp.valueOf("3000-01-01 00:00:00")
   private final val TEST_CONFIG: Config =
-    new Config("", "", "", true, 0, TIME_THRESHOLD, DISTANCE_THRESHOLD)
+    new Config("",
+               "",
+               "",
+               true,
+               0,
+               TIME_THRESHOLD,
+               DISTANCE_THRESHOLD,
+               START_PERIOD,
+               END_PERIOD)
 
   private val doubleComparator: Comparator[Double] = new Comparator[Double] {
     override def compare(a: Double, b: Double): Int =

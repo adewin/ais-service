@@ -2,6 +2,8 @@ package uk.gov.ukho.ais.rasters
 
 import java.io.{File, IOException}
 import java.nio.file.{Files, Path, StandardCopyOption}
+import java.sql.Timestamp
+import java.time.Instant
 
 import geotrellis.raster.io.geotiff.reader.GeoTiffReader
 import org.apache.commons.io.FileUtils
@@ -34,13 +36,17 @@ class ComponentTest {
   def beforeEach(): Unit = {
     val path: Path = Files.createTempDirectory("aisrastertest")
     tempOutputDir = path.toFile
-    testConfig = Config("",
-                        tempOutputDir.getAbsolutePath,
-                        "test-prefix",
-                        isLocal = true,
-                        TEST_RESOLUTION,
-                        6 * 60 * 60 * 1000,
-                        30000)
+    testConfig = Config(
+      "",
+      tempOutputDir.getAbsolutePath,
+      "test-prefix",
+      isLocal = true,
+      TEST_RESOLUTION,
+      6 * 60 * 60 * 1000,
+      30000,
+      startPeriod = Timestamp.valueOf("1970-01-01 11:00:00"),
+      endPeriod = Timestamp.valueOf("3000-01-01 11:00:00")
+    )
   }
 
   @After
@@ -185,6 +191,37 @@ class ComponentTest {
     assertThat(count).isEqualTo(TOTAL_CELL_COUNT_WHOLE_WORLD_AT_1K)
     assertTiffFileNameIsCorrect(geoTiff.tifFileName)
     assertPngBeenCreated()
+  }
+
+  @Test
+  def whenDateFilterAppliedThenFiltersOutPingsOutsideThatRange(): Unit = {
+    testConfig = testConfig.copy(
+      startPeriod = Timestamp.from(Instant.parse("2019-01-01T00:00:00Z")),
+      endPeriod = Timestamp.from(Instant.parse("2019-02-01T00:00:00Z"))
+    )
+    generateTiffForInputFile("ais_6pings_known_time.txt")
+    val expectedNumberOfValidMessages = 1
+
+    val geoTiff: CreatedTif = getTiffFile
+
+    val (sum, count) = geoTiff.calculateSumAndCount()
+
+    assertThat(sum).isEqualTo(expectedNumberOfValidMessages)
+    assertThat(count).isEqualTo(TOTAL_CELL_COUNT_WHOLE_WORLD_AT_1K)
+  }
+
+  @Test
+  def whenDateFilterNotAppliedThenAllPingsIncluded(): Unit = {
+    generateTiffForInputFile("ais_6pings_known_time.txt")
+    val expectedNumberOfValidMessages = 6
+
+    val geoTiff: CreatedTif = getTiffFile
+
+    val (sum, count) = geoTiff.calculateSumAndCount()
+
+    assertThat(sum).isEqualTo(expectedNumberOfValidMessages)
+    assertThat(count).isEqualTo(TOTAL_CELL_COUNT_WHOLE_WORLD_AT_1K)
+
   }
 
   @Test(expected = classOf[SparkException])
