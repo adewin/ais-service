@@ -23,7 +23,7 @@ class ComponentTest {
   }
 
   private final val TEST_RESOLUTION = 1
-  private final val TOTAL_CELL_COUNT_WHOLE_WORLD_AT_1K = 64800
+  private final val TOTAL_CELL_COUNT_WHOLE_WORLD_AT_1K = 65884
   @SuppressWarnings(
     Array("org.wartremover.warts.Var", "org.wartremover.warts.Null"))
   var testConfig: Config = _

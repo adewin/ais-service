@@ -35,7 +35,7 @@ object AisToRaster {
 
   def generate(config: Config): Unit = {
     val rasterExtent: RasterExtent = RasterExtent(
-      Extent(-180, -90, 180, 90),
+      Extent(-180, -90, 180, 90).expandBy(config.resolution),
       CellSize(config.resolution, config.resolution)
     )
 
@@ -87,19 +87,26 @@ object AisToRaster {
     val filename = generateFilename(config.outputFilenamePrefix)
     val directory = if (config.isLocal) config.outputDirectory else s"/tmp"
 
-    GeoTiffWriter.write(geoTiff, s"$directory/$filename.tif")
-    rasterMatrix.renderPng(cm).write(s"$directory/$filename.png")
+    val tiffFile: File = new File(s"$directory/$filename.tif")
+    val pngFile: File = new File(s"$directory/$filename.png")
+
+    GeoTiffWriter.write(geoTiff, tiffFile.getAbsolutePath)
+    rasterMatrix.renderPng(cm).write(pngFile.getAbsolutePath)
 
     if (!config.isLocal) {
-      S3Client.DEFAULT.putObject(
-        new PutObjectRequest(config.outputDirectory,
-                             s"$filename.tif",
-                             new File(s"$directory/$filename.tif")))
-      S3Client.DEFAULT.putObject(
-        new PutObjectRequest(config.outputDirectory,
-                             s"$filename.png",
-                             new File(s"$directory/$filename.png")))
+      uploadFileToS3AndDelete(config.outputDirectory, tiffFile)
+      uploadFileToS3AndDelete(config.outputDirectory, pngFile)
     }
+  }
+
+  private def uploadFileToS3AndDelete(s3Directory: String,
+                                      localFileToUpload: File): Unit = {
+    S3Client.DEFAULT.putObject(
+      new PutObjectRequest(s3Directory,
+                           localFileToUpload.getName,
+                           localFileToUpload))
+
+    localFileToUpload.delete()
   }
 
   private def generateFilename(prefix: String): String = {

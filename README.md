@@ -29,7 +29,7 @@ To run the full infra deployment (locally):
 ```
 export TF_VAR_PASSWORD=<ais_to_heatmaps_parameters_password>
 
-./gradlew deploy # :deployment:terraformPlan :deployment:terraformApply
+./gradlew :deployment:terraformPlan :deployment:terraformApply --interactive
 ```
 
 To decrypt `parameters.json.enc` (Requires the ```TF_VAR_PASSWORD``` environment variable set):

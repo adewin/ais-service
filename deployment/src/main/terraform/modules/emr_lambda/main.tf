@@ -40,7 +40,7 @@ resource "aws_lambda_function" "emr_lambda" {
       JOB_FLOW_ROLE = "EMR_EC2_DefaultRole"
       CLUSTER_NAME = "AIS Heatmap Cluster"
       EMR_VERSION = "emr-5.20.0"
-      INSTANCE_COUNT = "3"
+      INSTANCE_COUNT = "21"
       DRIVER_MEMORY = "50g"
       EXECUTOR_MEMORY = "16g"
     }

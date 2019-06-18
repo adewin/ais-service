@@ -10,3 +10,6 @@ Outputting the interpolated points as a TSV can be done using:
     }
     .saveAsTextFile("interpolated.csv")
       
+Run locally with:
+
+    <your-spark-install-dir>/bin/spark-submit --class uk.gov.ukho.ais.rasters.AisToRaster spark-job/build/libs/spark-job-<version>-all.jar -i <ais-file> -l -o . -p monthly-world-1k-Sep-18 -r 0.1 -d 30000 -t 21600000 -s 2018-09-01 -e 2018-09-30
