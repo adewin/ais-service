@@ -72,3 +72,9 @@ To run the above:
 ```
 python get_dates.py <your-ais-text-file-here>
 ```
+
+## aggregateReports Gradle Task
+
+The `aggregateReports` task has been added to `spark-ais-to-raster/build.gradle.kts`
+
+It collates each projects `build/reports` into one central location so that they can be viewed locally and within CI

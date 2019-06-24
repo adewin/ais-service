@@ -11,6 +11,7 @@ object Versions {
     const val lambdaJavaCore = "1.2.0"
     const val dependencyCheckGradle = "5.0.0"
     const val jacksonDatabind = "2.9.9"
+    const val findsecbugs = "1.7.1"
 
     // Test dependencies
     const val junit = "4.12"
@@ -20,4 +21,5 @@ object Versions {
     const val spotless = "3.23.0"
     const val shadow = "5.0.0"
     const val wartremover = "0.9.6"
+    const val spotbugs = "2.0.0"
 }

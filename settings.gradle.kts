@@ -6,6 +6,7 @@ pluginManagement {
                 "com.github.johnrengelman.shadow" -> useVersion(Versions.shadow)
                 "cz.augi.gradle.wartremover" -> useVersion(Versions.wartremover)
                 "org.owasp.dependencycheck" -> useVersion(Versions.dependencyCheckGradle)
+                "com.github.spotbugs" -> useVersion(Versions.spotbugs)
             }
         }
     }

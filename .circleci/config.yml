@@ -13,7 +13,9 @@ jobs:
       - image: circleci/openjdk:8-jdk
     steps:
       - checkout
-      - run: ./gradlew clean check
+      - run: ./gradlew --continue clean check aggregateReports
+      - store_artifacts:
+          path:  ./build/reports
 
   test:
     docker:
@@ -21,21 +23,6 @@ jobs:
     steps:
       - checkout
       - run: ./gradlew clean test
-
-  dependencyCheckReports:
-    docker:
-      - image: circleci/openjdk:8-jdk
-    steps:
-      - checkout
-      - run: './gradlew clean dependencyCheckAnalyze'
-      - run:
-          name: Collect dependency check reports
-          command: |
-            mkdir /tmp/dependency-check-reports
-            cp ./spark-job/build/reports/dependency-check-report.html /tmp/dependency-check-reports/spark-job-dependency-check-report.html
-            cp ./ais-batch-lambda/build/reports/dependency-check-report.html /tmp/dependency-check-reports/ais-batch-lambda-dependency-check-report.html
-      - store_artifacts:
-          path:  /tmp/dependency-check-reports
 
   deploy:
     docker:
@@ -52,13 +39,11 @@ workflows:
       - build
       - check
       - test
-      - dependencyCheckReports
       - deploy:
           requires:
             - build
             - check
             - test
-            - dependencyCheckReports
           filters:
             branches:
               only: master
@@ -72,4 +57,4 @@ workflows:
               only:
                 - master
     jobs:
-      - dependencyCheckReports
+      - check

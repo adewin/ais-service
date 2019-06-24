@@ -23,7 +23,7 @@ object Config {
   private final val NO_TIMESTAMP_SUPPLIED =
     Timestamp.valueOf("1970-01-01 00:00:00")
 
-  private val PARSER = {
+  @transient private final val PARSER = {
     val builder = OParser.builder[Config]
 
     def validatePositive: AnyVal => Either[String, Unit] = {
