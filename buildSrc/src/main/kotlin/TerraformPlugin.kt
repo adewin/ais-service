@@ -15,14 +15,8 @@ import java.io.ByteArrayOutputStream
 import java.io.File
 import javax.inject.Inject
 
-internal val isWindows = System.getProperty("os.name").toLowerCase().contains("windows")
-internal val osName = if (isWindows) "windows" else "linux"
-
 internal const val terraformVersion = "0.12.1"
-internal val terraformBinaryUrl = "https://releases.hashicorp.com/terraform/$terraformVersion/terraform_${terraformVersion}_${osName}_amd64.zip"
-
 internal const val terraformExtensionName = "terraform"
-
 internal const val terraformTaskClean = "terraformClean"
 internal const val terraformTaskDownload = "terraformDownload"
 internal const val terraformTaskInit = "terraformInit"
@@ -30,6 +24,15 @@ internal const val terraformTaskValidate = "terraformValidate"
 internal const val terraformTaskPlan = "terraformPlan"
 internal const val terraformTaskApply = "terraformApply"
 
+internal val osName = with(System.getProperty("os.name").toLowerCase()) {
+    when {
+        contains("windows") -> "windows"
+        contains("mac os") -> "darwin"
+        else -> "linux"
+    }
+}
+
+internal val terraformBinaryUrl = "https://releases.hashicorp.com/terraform/$terraformVersion/terraform_${terraformVersion}_${osName}_amd64.zip"
 internal val Project.terraformBinary
     get() = File(buildDir, "bin/terraform")
 internal val Project.terraformWorkingDir
