@@ -19,7 +19,7 @@ public final class AisLambdaConfiguration {
   public static final String DRIVER_MEMORY = System.getenv("DRIVER_MEMORY");
   public static final String EXECUTOR_MEMORY = System.getenv("EXECUTOR_MEMORY");
   public static final String DRAUGHT_CONFIG_FILE = System.getenv("DRAUGHT_CONFIG_FILE");
-  public static final String STATIC_DATA_FILE = System.getenv("DRAUGHT_CONFIG_FILE");
+  public static final String STATIC_DATA_FILE = System.getenv("STATIC_DATA_FILE");
 
   private AisLambdaConfiguration() {}
 }
