@@ -1,7 +1,7 @@
 package uk.gov.ukho.ais.rasters
 
 import java.sql.Timestamp
-import java.time.{Instant, LocalDate}
+import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 import scopt.OParser
@@ -10,15 +10,19 @@ import scala.util.Try
 
 case class Config(inputPath: String,
                   outputDirectory: String,
+                  draughtConfigFile: String,
+                  staticDataFile: String,
                   outputFilenamePrefix: String,
                   isLocal: Boolean,
                   resolution: Double,
                   interpolationTimeThresholdMilliseconds: Long,
                   interpolationDistanceThresholdMeters: Long,
                   startPeriod: Timestamp,
-                  endPeriod: Timestamp)
+                  endPeriod: Timestamp,
+                  draughtIndex: Option[Int]) {}
 
-object Config {
+object ConfigParser {
+  var instance: Option[Config] = Option.empty
 
   private final val NO_TIMESTAMP_SUPPLIED =
     Timestamp.valueOf("1970-01-01 00:00:00")
@@ -39,6 +43,15 @@ object Config {
           "Invalid format, date must be in format of: 'YYYY-MM-DD'")
     }
 
+    def validateDraughtIndex: String => Either[String, Unit] = {
+      case value if value == "unknown" => builder.success
+      case value if Try(value.toInt).isSuccess && value.toInt >= 0 =>
+        builder.success
+      case _ =>
+        builder.failure(
+          "draughtIndex must be 'unknown' or a numeric and positive integer")
+    }
+
     import builder._
     OParser.sequence(
       programName("ais-to-raster"),
@@ -55,6 +68,16 @@ object Config {
         .valueName("<output directory/S3 bucket>")
         .text("location to output the resulting GeoTIFF and PNG")
         .action((value, config) => config.copy(outputDirectory = value)),
+      opt[String]("draughtConfigFile")
+        .required()
+        .valueName("<file containing the draught buckets to use>")
+        .text("csv file ov min,max draught values representing the buckets to use for draught variants")
+        .action((value, config) => config.copy(draughtConfigFile = value)),
+      opt[String]("staticDataFile")
+        .required()
+        .valueName("<file containing the Arkevista static AIS data>")
+        .text("tsv file provided by Arkevista containing static AIS data")
+        .action((value, config) => config.copy(staticDataFile = value)),
       opt[Double]('r', "resolution")
         .required()
         .valueName("<decimal degrees>")
@@ -97,6 +120,13 @@ object Config {
         .valueName("<output filename prefix>")
         .text("prefix to be added to the output filename")
         .action((value, config) => config.copy(outputFilenamePrefix = value)),
+      opt[String]("draughtIndex")
+        .optional()
+        .valueName("<draught range index>")
+        .text("index of the draught range")
+        .action((value, config) =>
+          config.copy(draughtIndex = determineDraughtIndex(value)))
+        .validate(validateDraughtIndex),
       opt[Unit]('l', "local-mode")
         .optional()
         .text("run in local mode")
@@ -104,24 +134,40 @@ object Config {
     )
   }
 
-  def parse(args: Array[String]): Option[Config] =
-    OParser.parse(
+  private def determineDraughtIndex(value: String): Option[Int] = {
+    Option(if (value == "unknown") {
+      -1
+    } else {
+      value.toInt
+    })
+  }
+
+  def parse(args: Array[String]): Unit =
+    instance = OParser.parse(
       PARSER,
       args,
       Config(
         inputPath = "",
         outputDirectory = "",
+        draughtConfigFile = "",
+        staticDataFile = "",
         outputFilenamePrefix = "",
         isLocal = false,
         resolution = 1,
         interpolationTimeThresholdMilliseconds = 0,
         interpolationDistanceThresholdMeters = 0,
         startPeriod = NO_TIMESTAMP_SUPPLIED,
-        endPeriod = NO_TIMESTAMP_SUPPLIED
+        endPeriod = NO_TIMESTAMP_SUPPLIED,
+        draughtIndex = None
       )
     )
 
   private def isValidDate(date: String): Boolean = {
     Try(LocalDate.parse(date, DateTimeFormatter.ISO_DATE)).isSuccess
+  }
+
+  def config: Config = instance match {
+    case Some(config: Config) => config
+    case _                    => throw new IllegalStateException("No config set")
   }
 }

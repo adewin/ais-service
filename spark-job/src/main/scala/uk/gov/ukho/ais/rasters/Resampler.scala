@@ -1,27 +1,37 @@
 package uk.gov.ukho.ais.rasters
 
 import geotrellis.util.Haversine
+import org.apache.spark.rdd.RDD
 
 import scala.collection.mutable
 
-@SuppressWarnings(
-  Array(
-    "org.wartremover.warts.Null",
-    "org.wartremover.warts.Var",
-    "org.wartremover.warts.TraversableOps"
-  ))
-object Interpolator {
+object Resampler {
 
   private final val TIME_STEP: Long = 3 * 60 * 1000
 
-  def interpolatePings(pings: Seq[ShipPing], config: Config): Seq[ShipPing] = {
+  implicit class RDDResampler(rdd: RDD[(String, ShipPing)]) {
+    def resample(): RDD[ShipPing] = {
+      rdd
+        .groupByKey()
+        .flatMap {
+          case (_: String, pings: Seq[ShipPing]) =>
+            Resampler.resamplePings(pings)
+        }
+    }
+  }
 
+  private def resamplePings(pings: Seq[ShipPing]): Seq[ShipPing] = {
     val outputPings: mutable.MutableList[ShipPing] = mutable.MutableList()
     var prevPing: ShipPing = null
 
     pings
       .sortBy {
-        case ShipPing(_: String, acquisitionTime: Long, _: Double, _: Double) =>
+        case ShipPing(_: String,
+                      acquisitionTime: Long,
+                      _: Double,
+                      _: Double,
+                      _: Double,
+                      _: Int) =>
           acquisitionTime
       }
       .foreach(currPing => {
@@ -32,9 +42,7 @@ object Interpolator {
           outputPings ++= interpolateBetweenPingsFromTime(
             prevPing,
             currPing,
-            outputPings.last.acquisitionTime,
-            config
-          )
+            outputPings.last.acquisitionTime)
         }
 
         prevPing = currPing
@@ -45,25 +53,23 @@ object Interpolator {
 
   private def interpolateBetweenPingsFromTime(prevPing: ShipPing,
                                               currPing: ShipPing,
-                                              fromTime: Long,
-                                              config: Config): List[ShipPing] =
-    if (shouldInterpolateBetweenPings(prevPing, currPing, config)) {
+                                              fromTime: Long) =
+    if (shouldInterpolateBetweenPings(prevPing, currPing)) {
       addInterpolatedPings(prevPing, currPing, fromTime)
     } else {
       List(currPing)
     }
 
   private def shouldInterpolateBetweenPings(prevPing: ShipPing,
-                                            currPing: ShipPing,
-                                            config: Config): Boolean = {
+                                            currPing: ShipPing) = {
     isTimeBetweenPingsWithinThreshold(
       prevPing,
       currPing,
-      config.interpolationTimeThresholdMilliseconds) &&
+      ConfigParser.config.interpolationTimeThresholdMilliseconds) &&
     isDistanceBetweenPingsWithinThreshold(
       prevPing,
       currPing,
-      config.interpolationDistanceThresholdMeters)
+      ConfigParser.config.interpolationDistanceThresholdMeters)
   }
 
   private def isDistanceBetweenPingsWithinThreshold(
@@ -110,6 +116,11 @@ object Interpolator {
     val newLat: Double = timeProportion * latGap + prevPing.latitude
     val newLong: Double = timeProportion * longGap + prevPing.longitude
 
-    ShipPing(currPing.mmsi, nextTime, newLat, newLong)
+    ShipPing(currPing.mmsi,
+             nextTime,
+             newLat,
+             newLong,
+             currPing.draught,
+             currPing.messageTypeId)
   }
 }

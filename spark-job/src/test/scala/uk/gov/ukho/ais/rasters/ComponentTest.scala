@@ -1,52 +1,53 @@
 package uk.gov.ukho.ais.rasters
 
 import java.io.{File, IOException}
-import java.nio.file.{Files, Path, StandardCopyOption}
+import java.nio.file.{Files, Path}
 import java.sql.Timestamp
-import java.time.Instant
+import java.time.format.DateTimeFormatter
+import java.time.{Instant, ZoneId}
 
 import geotrellis.raster.io.geotiff.reader.GeoTiffReader
 import org.apache.commons.io.FileUtils
 import org.apache.spark.SparkException
-import org.apache.spark.sql.SparkSession
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.{After, Before, Test}
 
+import scala.collection.mutable
+
 class ComponentTest {
 
-  val spark: SparkSession = {
-    SparkSession
-      .builder()
-      .master("local")
-      .appName("Spark Testing")
-      .getOrCreate()
-  }
+  Session.init(true)
 
   private final val TEST_RESOLUTION = 1
   private final val TOTAL_CELL_COUNT_WHOLE_WORLD_AT_1K = 65884
-  @SuppressWarnings(
-    Array("org.wartremover.warts.Var", "org.wartremover.warts.Null"))
-  var testConfig: Config = _
 
-  @SuppressWarnings(
-    Array("org.wartremover.warts.Var", "org.wartremover.warts.Null"))
+  var testConfig: TestingConfigBuilder = _
+
   var tempOutputDir: File = _
+
+  private final val STATIC_DATA_FILE: String =
+    ResourceService.copyFileToFileSystem("test_static_data.txt")
+  private final val DRAUGHT_VESSEL_RANGE_FILE: String =
+    ResourceService.copyFileToFileSystem("draught_data.txt")
+  private final val DEFAULT_START_DATE = "1970-01-01"
+  private final val DEFAULT_END_DATE = "3000-01-01"
+  private final val DEFAULT_INTERPOLATION_METERS = "30000"
+  private final val DEFAULT_INTERPOLATION_TIME =
+    String.valueOf(6 * 60 * 60 * 1000)
 
   @Before
   def beforeEach(): Unit = {
     val path: Path = Files.createTempDirectory("aisrastertest")
     tempOutputDir = path.toFile
-    testConfig = Config(
-      "",
-      tempOutputDir.getAbsolutePath,
-      "test-prefix",
-      isLocal = true,
-      TEST_RESOLUTION,
-      6 * 60 * 60 * 1000,
-      30000,
-      startPeriod = Timestamp.valueOf("1970-01-01 11:00:00"),
-      endPeriod = Timestamp.valueOf("3000-01-01 11:00:00")
-    )
+    testConfig = TestingConfigBuilder
+      .fromDefaults()
+      .outputDirectory(tempOutputDir.getAbsolutePath)
+      .staticDataFile(STATIC_DATA_FILE)
+      .startPeriod(DEFAULT_START_DATE)
+      .endPeriod(DEFAULT_END_DATE)
+      .interpolationDistanceThresholdMeters(DEFAULT_INTERPOLATION_METERS)
+      .interpolationTimeThresholdMilliseconds(DEFAULT_INTERPOLATION_TIME)
+      .draughtConfigFile(DRAUGHT_VESSEL_RANGE_FILE)
   }
 
   @After
@@ -112,8 +113,9 @@ class ComponentTest {
   @Test
   def whenAGappySampleIsInputtedWithGivenTimeThresholdThenATifIsProducedWithInterpolatedPoints()
     : Unit = {
-    testConfig = testConfig.copy(
-      interpolationTimeThresholdMilliseconds = (6 * 60 - 1) * 1000)
+    testConfig = testConfig.interpolationTimeThresholdMilliseconds(
+      s"${(6L * 60L - 1L) * 1000L}")
+
     generateTiffForInputFile("resampling_test.txt")
     val expectedNumberOfPings = 4
 
@@ -131,7 +133,7 @@ class ComponentTest {
   @Test
   def whenAGappySampleIsInputtedWithGivenDistanceThresholdThenATifIsProducedWithInterpolatedPoints()
     : Unit = {
-    testConfig = testConfig.copy(interpolationDistanceThresholdMeters = 1000)
+    testConfig = testConfig.interpolationDistanceThresholdMeters("1000")
     generateTiffForInputFile("resampling_test_distance_threshold.txt")
     val expectedNumberOfPings = 5
 
@@ -195,10 +197,9 @@ class ComponentTest {
 
   @Test
   def whenDateFilterAppliedThenFiltersOutPingsOutsideThatRange(): Unit = {
-    testConfig = testConfig.copy(
-      startPeriod = Timestamp.from(Instant.parse("2019-01-01T00:00:00Z")),
-      endPeriod = Timestamp.from(Instant.parse("2019-02-01T00:00:00Z"))
-    )
+
+    testConfig = testConfig.startPeriod("2019-01-01").endPeriod("2019-02-01")
+
     generateTiffForInputFile("ais_6pings_known_time.txt")
     val expectedNumberOfValidMessages = 1
 
@@ -222,6 +223,43 @@ class ComponentTest {
     assertThat(sum).isEqualTo(expectedNumberOfValidMessages)
     assertThat(count).isEqualTo(TOTAL_CELL_COUNT_WHOLE_WORLD_AT_1K)
 
+  }
+
+  @Test
+  def whenVesselDraughtFilterAppliedThenPingsNotInRangeFilteredOut(): Unit = {
+    testConfig = testConfig.draughtIndex("1")
+
+    generateTiffForInputFile("ais_6pings.txt")
+    val expectedNumberOfValidMessages = 1
+
+    val geoTiff: CreatedTif = getTiffFile
+
+    val (sum, count) = geoTiff.calculateSumAndCount()
+
+    assertThat(sum).isEqualTo(expectedNumberOfValidMessages)
+    assertThat(count).isEqualTo(TOTAL_CELL_COUNT_WHOLE_WORLD_AT_1K)
+  }
+
+  @Test
+  def whenFilteringUnknownVesselDraughtThenVesselsWithKnownDraughtFilteredOut()
+    : Unit = {
+    testConfig = testConfig.draughtIndex("unknown")
+
+    generateTiffForInputFile("ais_6pings.txt")
+    val expectedNumberOfValidMessages = 4
+
+    val geoTiff: CreatedTif = getTiffFile
+
+    val (sum, count) = geoTiff.calculateSumAndCount()
+
+    assertThat(sum).isEqualTo(expectedNumberOfValidMessages)
+    assertThat(count).isEqualTo(TOTAL_CELL_COUNT_WHOLE_WORLD_AT_1K)
+  }
+
+  @Test(expected = classOf[IllegalStateException])
+  def whenNoParametersPassedToSparkJobThenIllegalStateExceptionIsRaised()
+    : Unit = {
+    AisToRaster.main(Array())
   }
 
   @Test(expected = classOf[SparkException])
@@ -268,25 +306,11 @@ class ComponentTest {
   }
 
   private def generateTiffForInputFile(fileOnClasspath: String): Unit = {
-    val savedLocalFile = copyFileToFileSystem(fileOnClasspath)
+    val savedLocalFile = ResourceService.copyFileToFileSystem(fileOnClasspath)
 
-    AisToRaster.generate(testConfig.copy(inputPath = savedLocalFile))
+    testConfig = testConfig.inputPath(savedLocalFile)
+
+    AisToRaster.main(testConfig.build())
   }
 
-  @SuppressWarnings(Array("org.wartremover.warts.Throw"))
-  def copyFileToFileSystem(filename: String): String = {
-    val resourceInputStream = getClass.getResourceAsStream(s"/$filename")
-    val tempFile: File = File.createTempFile("scalatest", filename)
-
-    if (resourceInputStream == null)
-      throw new IllegalArgumentException(
-        s"File: $filename does not exist or cannot be read")
-
-    Files.copy(resourceInputStream,
-               tempFile.toPath,
-               StandardCopyOption.REPLACE_EXISTING)
-
-    tempFile.deleteOnExit()
-    tempFile.getAbsolutePath
-  }
 }

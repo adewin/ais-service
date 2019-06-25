@@ -10,30 +10,16 @@ import com.amazonaws.services.elasticmapreduce.model.RunJobFlowRequest;
 import com.amazonaws.services.elasticmapreduce.model.StepConfig;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class AisBatchLambdaHandler implements RequestHandler<Integer, String> {
 
-  private static final String JOB_FULLY_QUALIFIED_CLASS_NAME =
-      System.getenv("JOB_FULLY_QUALIFIED_CLASS_NAME");
-  private static final String JOB_LOCATION = System.getenv("JOB_LOCATION");
-  private static final String INPUT_LOCATION = System.getenv("INPUT_LOCATION");
-  private static final String OUTPUT_LOCATION = System.getenv("OUTPUT_LOCATION");
-  private static final String INSTANCE_TYPE_MASTER = System.getenv("INSTANCE_TYPE_MASTER");
-  private static final String INSTANCE_TYPE_WORKER = System.getenv("INSTANCE_TYPE_WORKER");
-  private static final String LOG_URI = System.getenv("LOG_URI");
-  private static final String SERVICE_ROLE = System.getenv("SERVICE_ROLE");
-  private static final String JOB_FLOW_ROLE = System.getenv("JOB_FLOW_ROLE");
-  private static final String CLUSTER_NAME = System.getenv("CLUSTER_NAME");
-  private static final String EMR_VERSION = System.getenv("EMR_VERSION");
-  private static final String INSTANCE_COUNT = System.getenv("INSTANCE_COUNT");
-  private static final String DRIVER_MEMORY = System.getenv("DRIVER_MEMORY");
-  private static final String EXECUTOR_MEMORY = System.getenv("EXECUTOR_MEMORY");
-
   @Override
-  public String handleRequest(final Integer inputInt, final Context context) {
+  public String handleRequest(final Integer _unusedInput, final Context context) {
 
     final AmazonElasticMapReduce emr = buildMapReduceClient();
     final List<Application> apps = buildApplications();
@@ -56,6 +42,7 @@ public class AisBatchLambdaHandler implements RequestHandler<Integer, String> {
   private List<StepConfig> buildSteps() {
 
     return JobsProvider.getInstance().getJobs().stream()
+        .filter(Job::isActive)
         .map(this::createSparkStepConfig)
         .map(this::createStepConfig)
         .collect(Collectors.toList());
@@ -69,54 +56,66 @@ public class AisBatchLambdaHandler implements RequestHandler<Integer, String> {
   }
 
   private HadoopJarStepConfig createSparkStepConfig(final Job job) {
-    return new HadoopJarStepConfig()
-        .withJar("command-runner.jar")
-        .withArgs(
-            "spark-submit",
-            "--conf",
-            "spark.driver.maxResultSize=4g",
-            "--driver-memory",
-            DRIVER_MEMORY,
-            "--executor-memory",
-            EXECUTOR_MEMORY,
-            "--class",
-            JOB_FULLY_QUALIFIED_CLASS_NAME,
-            JOB_LOCATION,
-            "-i",
-            INPUT_LOCATION,
-            "-o",
-            OUTPUT_LOCATION,
-            "-p",
-            job.getPrefix(),
-            "-r",
-            job.getResolution().toString(),
-            "-d",
-            String.valueOf(job.getDistanceInterpolationThreshold()),
-            "-t",
-            String.valueOf(job.getTimeInterpolationThreshold()),
-            "-s",
-            job.getStartPeriod(),
-            "-e",
-            job.getEndPeriod());
+    final List<String> args =
+        new ArrayList<>(
+            Arrays.asList(
+                "spark-submit",
+                "--conf",
+                "spark.driver.maxResultSize=4g",
+                "--driver-memory",
+                AisLambdaConfiguration.DRIVER_MEMORY,
+                "--executor-memory",
+                AisLambdaConfiguration.EXECUTOR_MEMORY,
+                "--class",
+                AisLambdaConfiguration.JOB_FULLY_QUALIFIED_CLASS_NAME,
+                AisLambdaConfiguration.JOB_LOCATION,
+                "-i",
+                AisLambdaConfiguration.INPUT_LOCATION,
+                "-o",
+                job.getIsOutputLocationSensitive()
+                    ? AisLambdaConfiguration.SENSITIVE_OUTPUT_LOCATION
+                    : AisLambdaConfiguration.DEFAULT_OUTPUT_LOCATION,
+                "-p",
+                job.getPrefix(),
+                "-r",
+                String.valueOf(job.getResolution()),
+                "-d",
+                String.valueOf(job.getDistanceInterpolationThreshold()),
+                "-t",
+                String.valueOf(job.getTimeInterpolationThreshold()),
+                "-s",
+                job.getStartPeriod(),
+                "-e",
+                job.getEndPeriod(),
+                "--draughtConfigFile",
+                AisLambdaConfiguration.DRAUGHT_CONFIG_FILE,
+                "--staticDataFile",
+                AisLambdaConfiguration.STATIC_DATA_FILE));
+
+    if (job.getDraughtIndex() != null) {
+      args.addAll(Arrays.asList("--draughtIndex", job.getDraughtIndex()));
+    }
+
+    return new HadoopJarStepConfig().withJar("command-runner.jar").withArgs(args);
   }
 
   private RunJobFlowRequest buildJobFlowRequest(
       final List<StepConfig> steps, final List<Application> apps) {
 
     return new RunJobFlowRequest()
-        .withName(CLUSTER_NAME)
-        .withReleaseLabel(EMR_VERSION)
+        .withName(AisLambdaConfiguration.CLUSTER_NAME)
+        .withReleaseLabel(AisLambdaConfiguration.EMR_VERSION)
         .withSteps(steps)
         .withApplications(apps)
-        .withLogUri(LOG_URI)
-        .withServiceRole(SERVICE_ROLE)
-        .withJobFlowRole(JOB_FLOW_ROLE)
+        .withLogUri(AisLambdaConfiguration.LOG_URI)
+        .withServiceRole(AisLambdaConfiguration.SERVICE_ROLE)
+        .withJobFlowRole(AisLambdaConfiguration.JOB_FLOW_ROLE)
         .withVisibleToAllUsers(true)
         .withInstances(
             new JobFlowInstancesConfig()
-                .withInstanceCount(Integer.parseInt(INSTANCE_COUNT))
-                .withMasterInstanceType(INSTANCE_TYPE_MASTER)
-                .withSlaveInstanceType(INSTANCE_TYPE_WORKER)
+                .withInstanceCount(Integer.parseInt(AisLambdaConfiguration.INSTANCE_COUNT))
+                .withMasterInstanceType(AisLambdaConfiguration.INSTANCE_TYPE_MASTER)
+                .withSlaveInstanceType(AisLambdaConfiguration.INSTANCE_TYPE_WORKER)
                 .withKeepJobFlowAliveWhenNoSteps(false));
   }
 }

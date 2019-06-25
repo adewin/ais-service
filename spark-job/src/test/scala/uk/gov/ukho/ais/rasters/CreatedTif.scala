@@ -9,7 +9,6 @@ class CreatedTif(private val geoTiff: SinglebandGeoTiff,
 
   def tile: Tile = this.geoTiff.tile
 
-  @SuppressWarnings(Array("org.wartremover.warts.Var"))
   def calculateSumAndCount(geoTiff: SinglebandGeoTiff): (Int, Int) = {
     var sum: Int = 0
     var count: Int = 0

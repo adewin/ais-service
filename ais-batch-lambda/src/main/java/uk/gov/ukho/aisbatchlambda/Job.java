@@ -1,29 +1,64 @@
 package uk.gov.ukho.aisbatchlambda;
 
 public class Job {
-  private final Double resolution;
+  private final double resolution;
   private final String prefix;
-  private final Long distanceInterpolationThreshold;
-  private final Long timeInterpolationThreshold;
+  private final long distanceInterpolationThreshold;
+  private final long timeInterpolationThreshold;
   private final String startPeriod;
   private final String endPeriod;
+  private final String inputLocation;
+  private final boolean isOutputLocationSensitive;
+  private final String draughtIndex;
+  private final boolean active;
 
   public Job(
-      final Double resolution,
       final String prefix,
-      final Long distanceInterpolationThreshold,
-      final Long timeInterpolationThreshold,
+      final double resolution,
+      final long distanceInterpolationThreshold,
+      final long timeInterpolationThreshold,
       final String startPeriod,
-      final String endPeriod) {
+      final String endPeriod,
+      final String inputLocation,
+      final boolean isOutputLocationSensitive,
+      final boolean active,
+      final String draughtIndex) {
     this.resolution = resolution;
     this.prefix = prefix;
     this.distanceInterpolationThreshold = distanceInterpolationThreshold;
     this.timeInterpolationThreshold = timeInterpolationThreshold;
     this.startPeriod = startPeriod;
     this.endPeriod = endPeriod;
+    this.inputLocation = inputLocation;
+    this.isOutputLocationSensitive = isOutputLocationSensitive;
+    this.draughtIndex = draughtIndex;
+    this.active = active;
   }
 
-  public Double getResolution() {
+  public Job(
+      final String prefix,
+      final double resolution,
+      final long distanceInterpolationThreshold,
+      final long timeInterpolationThreshold,
+      final String startPeriod,
+      final String endPeriod,
+      final String inputLocation,
+      final boolean isOutputLocationSensitive,
+      final boolean active) {
+    this(
+        prefix,
+        resolution,
+        distanceInterpolationThreshold,
+        timeInterpolationThreshold,
+        startPeriod,
+        endPeriod,
+        inputLocation,
+        isOutputLocationSensitive,
+        active,
+        null);
+  }
+
+  public double getResolution() {
     return resolution;
   }
 
@@ -31,11 +66,11 @@ public class Job {
     return prefix;
   }
 
-  public Long getDistanceInterpolationThreshold() {
+  public long getDistanceInterpolationThreshold() {
     return distanceInterpolationThreshold;
   }
 
-  public Long getTimeInterpolationThreshold() {
+  public long getTimeInterpolationThreshold() {
     return timeInterpolationThreshold;
   }
 
@@ -45,5 +80,21 @@ public class Job {
 
   public String getEndPeriod() {
     return endPeriod;
+  }
+
+  public String getInputLocation() {
+    return inputLocation;
+  }
+
+  public boolean getIsOutputLocationSensitive() {
+    return isOutputLocationSensitive;
+  }
+
+  public String getDraughtIndex() {
+    return draughtIndex;
+  }
+
+  public boolean isActive() {
+    return active;
   }
 }
