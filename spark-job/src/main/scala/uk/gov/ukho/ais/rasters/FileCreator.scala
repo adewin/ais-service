@@ -21,15 +21,16 @@ object FileCreator {
     .withLocale(Locale.UK)
     .withZone(ZoneId.of("UTC"))
 
-  def createOutputFiles(raster: (RasterExtent, IntArrayTile)): Unit = {
+  def createOutputFiles(raster: (RasterExtent, IntArrayTile),
+                        config: Config): Unit = {
     val (rasterExtent, rasterMatrix) = raster
 
     val cm =
       ColorMap.fromQuantileBreaks(rasterMatrix.histogram, ColorRamps.BlueToRed)
 
-    val filename = generateFilename(ConfigParser.config.outputFilenamePrefix)
+    val filename = generateFilename(config.outputFilenamePrefix)
     val directory =
-      if (ConfigParser.config.isLocal) ConfigParser.config.outputDirectory
+      if (config.isLocal) config.outputDirectory
       else s"/tmp"
 
     def createGeoTiff(): File = {
@@ -48,9 +49,9 @@ object FileCreator {
     val tiffFile = createGeoTiff()
     val pngFile = createPng()
 
-    if (!ConfigParser.config.isLocal) {
-      uploadFileToS3AndDelete(ConfigParser.config.outputDirectory, tiffFile)
-      uploadFileToS3AndDelete(ConfigParser.config.outputDirectory, pngFile)
+    if (!config.isLocal) {
+      uploadFileToS3AndDelete(config.outputDirectory, tiffFile)
+      uploadFileToS3AndDelete(config.outputDirectory, pngFile)
     }
   }
 

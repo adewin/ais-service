@@ -10,7 +10,7 @@ object Resampler {
   private final val TIME_STEP: Long = 3 * 60 * 1000
 
   implicit class RDDResampler(rdd: RDD[(String, ShipPing)]) {
-    def resample(): RDD[ShipPing] = {
+    def resample(implicit config: Config): RDD[ShipPing] = {
       rdd
         .groupByKey()
         .flatMap {
@@ -20,7 +20,8 @@ object Resampler {
     }
   }
 
-  private def resamplePings(pings: Seq[ShipPing]): Seq[ShipPing] = {
+  private def resamplePings(pings: Seq[ShipPing])(
+      implicit config: Config): Seq[ShipPing] = {
     val outputPings: mutable.MutableList[ShipPing] = mutable.MutableList()
     var prevPing: ShipPing = null
 
@@ -51,25 +52,27 @@ object Resampler {
     outputPings
   }
 
-  private def interpolateBetweenPingsFromTime(prevPing: ShipPing,
-                                              currPing: ShipPing,
-                                              fromTime: Long) =
+  private def interpolateBetweenPingsFromTime(
+      prevPing: ShipPing,
+      currPing: ShipPing,
+      fromTime: Long)(implicit config: Config) =
     if (shouldInterpolateBetweenPings(prevPing, currPing)) {
       addInterpolatedPings(prevPing, currPing, fromTime)
     } else {
       List(currPing)
     }
 
-  private def shouldInterpolateBetweenPings(prevPing: ShipPing,
-                                            currPing: ShipPing) = {
+  private def shouldInterpolateBetweenPings(
+      prevPing: ShipPing,
+      currPing: ShipPing)(implicit config: Config) = {
     isTimeBetweenPingsWithinThreshold(
       prevPing,
       currPing,
-      ConfigParser.config.interpolationTimeThresholdMilliseconds) &&
+      config.interpolationTimeThresholdMilliseconds) &&
     isDistanceBetweenPingsWithinThreshold(
       prevPing,
       currPing,
-      ConfigParser.config.interpolationDistanceThresholdMeters)
+      config.interpolationDistanceThresholdMeters)
   }
 
   private def isDistanceBetweenPingsWithinThreshold(

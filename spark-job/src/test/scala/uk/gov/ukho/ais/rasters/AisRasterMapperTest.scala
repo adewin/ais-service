@@ -12,35 +12,31 @@ class AisRasterMapperTest {
 
   private final val RESOLUTION = 1D
   private final val TOTAL_CELL_COUNT_WHOLE_WORLD_AT_1K = 65884
+  private final val TEST_CONFIG: Config = ConfigParser.parse(
+    Array(
+      "-i",
+      "",
+      "-o",
+      "",
+      "-p",
+      "",
+      "-r",
+      s"$RESOLUTION",
+      "-t",
+      "3000",
+      "-d",
+      "300000",
+      "-s",
+      "1970-01-01",
+      "-e",
+      "3000-01-01",
+      "--draughtConfigFile",
+      "",
+      "--staticDataFile",
+      ""
+    ))
 
   Session.init(true)
-
-  @Before
-  def beforeEach(): Unit = {
-    ConfigParser.parse(
-      Array(
-        "-i",
-        "",
-        "-o",
-        "",
-        "-p",
-        "",
-        "-r",
-        s"$RESOLUTION",
-        "-t",
-        "3000",
-        "-d",
-        "300000",
-        "-s",
-        "1970-01-01",
-        "-e",
-        "3000-01-01",
-        "--draughtConfigFile",
-        "",
-        "--staticDataFile",
-        ""
-      ))
-  }
 
   @Test
   def whenMappingShipPingsThenRasterAndMatrixCreated(): Unit = {
@@ -54,7 +50,7 @@ class AisRasterMapperTest {
         ShipPing("mmsi1", Instant.now.toEpochMilli, 10D, -179.0, -1D, 1)
       ))
 
-    inputRdd.mapToRaster() match {
+    inputRdd.mapToRaster(TEST_CONFIG) match {
       case (extent: RasterExtent, matrix: IntArrayTile) =>
         assertThat(extent.size).isEqualTo(TOTAL_CELL_COUNT_WHOLE_WORLD_AT_1K)
         assertThat(matrix.findMinMax).isEqualTo((0, 2))

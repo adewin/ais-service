@@ -17,15 +17,13 @@ object AisDataFilters {
 
   implicit class RDDFilters(rdd: RDD[(String, ShipPing)]) {
 
-    def filterShipPings(): RDD[(String, ShipPing)] = {
-      val vesselDraughtRanges = DataLoader.loadVesselDraughtRangeData()
+    def filterShipPings(config: Config): RDD[(String, ShipPing)] = {
+      val vesselDraughtRanges = DataLoader.loadVesselDraughtRangeData(config)
 
       rdd
         .filterByValidMessageType()
-        .filterPingsByTimePeriod(ConfigParser.config.startPeriod,
-                                 ConfigParser.config.endPeriod)
-        .filterPingsByDraught(ConfigParser.config.draughtIndex,
-                              vesselDraughtRanges)
+        .filterPingsByTimePeriod(config.startPeriod, config.endPeriod)
+        .filterPingsByDraught(config.draughtIndex, vesselDraughtRanges)
     }
 
     def filterByValidMessageType(): RDD[(String, ShipPing)] = {

@@ -22,8 +22,6 @@ case class Config(inputPath: String,
                   draughtIndex: Option[Int]) {}
 
 object ConfigParser {
-  var instance: Option[Config] = Option.empty
-
   private final val NO_TIMESTAMP_SUPPLIED =
     Timestamp.valueOf("1970-01-01 00:00:00")
 
@@ -142,32 +140,29 @@ object ConfigParser {
     })
   }
 
-  def parse(args: Array[String]): Unit =
-    instance = OParser.parse(
-      PARSER,
-      args,
-      Config(
-        inputPath = "",
-        outputDirectory = "",
-        draughtConfigFile = "",
-        staticDataFile = "",
-        outputFilenamePrefix = "",
-        isLocal = false,
-        resolution = 1,
-        interpolationTimeThresholdMilliseconds = 0,
-        interpolationDistanceThresholdMeters = 0,
-        startPeriod = NO_TIMESTAMP_SUPPLIED,
-        endPeriod = NO_TIMESTAMP_SUPPLIED,
-        draughtIndex = None
+  def parse(args: Array[String]): Config =
+    OParser
+      .parse(
+        PARSER,
+        args,
+        Config(
+          inputPath = "",
+          outputDirectory = "",
+          draughtConfigFile = "",
+          staticDataFile = "",
+          outputFilenamePrefix = "",
+          isLocal = false,
+          resolution = 1,
+          interpolationTimeThresholdMilliseconds = 0,
+          interpolationDistanceThresholdMeters = 0,
+          startPeriod = NO_TIMESTAMP_SUPPLIED,
+          endPeriod = NO_TIMESTAMP_SUPPLIED,
+          draughtIndex = None
+        )
       )
-    )
+      .fold { throw new IllegalStateException("config not loaded") }(identity)
 
   private def isValidDate(date: String): Boolean = {
     Try(LocalDate.parse(date, DateTimeFormatter.ISO_DATE)).isSuccess
-  }
-
-  def config: Config = instance match {
-    case Some(config: Config) => config
-    case _                    => throw new IllegalStateException("No config set")
   }
 }

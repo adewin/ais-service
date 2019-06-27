@@ -24,6 +24,8 @@ class AisDataFiltersTest {
   private final val TIME_THRESHOLD: String = "12"
   private final val DISTANCE_THRESHOLD: String = "13"
 
+  private var testConfig: Config = _
+
   @Test
   def whenFilteringOnMsgTypeThenInvalidTypesFilteredOut(): Unit = {
     val timestamp = Timestamp.from(Instant.now())
@@ -240,7 +242,7 @@ class AisDataFiltersTest {
   @Test
   def whenFilteringShipPingsThenAllFiltersApplied(): Unit = {
     val testTime = Instant.now()
-    setConfigToUseDate(
+    testConfig = setConfigToUseDate(
       LocalDateTime.ofInstant(testTime, ZoneId.systemDefault()).toLocalDate)
 
     val shipPingInTimeAndVesselDraughtRanges = createShipPingWith(
@@ -302,13 +304,13 @@ class AisDataFiltersTest {
           shipPingWithoutAnyMatchingAttributes
         ))
 
-    val result: RDD[(String, ShipPing)] = rdd.filterShipPings()
+    val result: RDD[(String, ShipPing)] = rdd.filterShipPings(testConfig)
 
     assertThat(result.collect())
       .containsExactlyInAnyOrderElementsOf(expectedRows.asJava)
   }
 
-  private def setConfigToUseDate(testDate: LocalDate): Unit = {
+  private def setConfigToUseDate(testDate: LocalDate): Config = {
     ConfigParser.parse(
       Array(
         "-i",

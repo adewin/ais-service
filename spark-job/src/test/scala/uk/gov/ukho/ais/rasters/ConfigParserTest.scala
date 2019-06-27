@@ -29,9 +29,7 @@ class ConfigParserTest {
         draughtIndex = None
       )
 
-    ConfigParser.parse(args)
-
-    assertThat(ConfigParser.config)
+    assertThat(ConfigParser.parse(args))
       .isEqualToComparingFieldByField(expectedConfig)
   }
 
@@ -43,9 +41,7 @@ class ConfigParserTest {
       .draughtIndex("unknown")
       .build()
 
-    ConfigParser.parse(args)
-
-    assertThat(ConfigParser.config.draughtIndex.get).isEqualTo(-1)
+    assertThat(ConfigParser.parse(args).draughtIndex.get).isEqualTo(-1)
   }
 
   @Test
@@ -54,9 +50,7 @@ class ConfigParserTest {
       .fromDefaults()
       .build()
 
-    ConfigParser.parse(args)
-
-    assertThat(ConfigParser.config.draughtIndex).isEqualTo(None)
+    assertThat(ConfigParser.parse(args).draughtIndex).isEqualTo(None)
   }
 
   @Test(expected = classOf[IllegalStateException])
@@ -67,7 +61,6 @@ class ConfigParserTest {
       .build()
 
     ConfigParser.parse(args)
-    ConfigParser.config
   }
 
   @Test(expected = classOf[IllegalStateException])
@@ -78,7 +71,6 @@ class ConfigParserTest {
       .build()
 
     ConfigParser.parse(args)
-    ConfigParser.config
   }
 
   @Test(expected = classOf[IllegalStateException])
@@ -89,7 +81,6 @@ class ConfigParserTest {
       .build()
 
     ConfigParser.parse(args)
-    ConfigParser.config
   }
 
   @Test
@@ -99,9 +90,7 @@ class ConfigParserTest {
       .draughtIndex("12")
       .build()
 
-    ConfigParser.parse(args)
-
-    assertThat(ConfigParser.config.draughtIndex.get).isEqualTo(12)
+    assertThat(ConfigParser.parse(args).draughtIndex.get).isEqualTo(12)
   }
 
   @Test(expected = classOf[IllegalStateException])
@@ -112,7 +101,6 @@ class ConfigParserTest {
       .build()
 
     ConfigParser.parse(args)
-    ConfigParser.config
   }
 
   @Test(expected = classOf[IllegalStateException])
@@ -123,6 +111,5 @@ class ConfigParserTest {
       .build()
 
     ConfigParser.parse(args)
-    ConfigParser.config
   }
 }

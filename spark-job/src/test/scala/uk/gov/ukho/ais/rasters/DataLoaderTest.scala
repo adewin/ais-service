@@ -16,11 +16,12 @@ class DataLoaderTest {
   private final val END_PERIOD = "2019-12-31"
   private final val TIME_THRESHOLD: String = "12"
   private final val DISTANCE_THRESHOLD: String = "13"
+  private var testConfig: Config = _
 
   Session.init(true)
 
   def setConfig(inputFile: String): Unit = {
-    ConfigParser.parse(
+    testConfig = ConfigParser.parse(
       Array(
         "-i",
         ResourceService.copyFileToFileSystem(inputFile),
@@ -50,7 +51,7 @@ class DataLoaderTest {
     : Unit = {
     setConfig(SINGLE_PING_INPUT_PATH)
 
-    val result = DataLoader.loadAisData()
+    val result = DataLoader.loadAisData(testConfig)
 
     assertThat(result.keys.collect())
       .containsExactly("3456793")
@@ -66,7 +67,7 @@ class DataLoaderTest {
     : Unit = {
     setConfig(SINGLE_PING_NO_STATIC_DATA_INPUT_PATH)
 
-    val result = DataLoader.loadAisData()
+    val result = DataLoader.loadAisData(testConfig)
 
     assertThat(result.keys.collect())
       .containsExactly("5555555")
@@ -81,7 +82,7 @@ class DataLoaderTest {
   def whenLoadingDraughtRangeDataThenDraughtDataLoaded(): Unit = {
     setConfig(SINGLE_PING_INPUT_PATH)
 
-    val result = DataLoader.loadVesselDraughtRangeData()
+    val result = DataLoader.loadVesselDraughtRangeData(testConfig)
 
     assertThat(result)
       .usingFieldByFieldElementComparator()

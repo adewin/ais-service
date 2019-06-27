@@ -46,11 +46,11 @@ object DataLoader {
     }
   }
 
-  def loadAisData(): RDD[(String, ShipPing)] = {
+  def loadAisData(config: Config): RDD[(String, ShipPing)] = {
     val staticData = Session.sparkSession.read
       .schema(Schema.STATIC_DATA_SCHEMA)
       .option("sep", "\t")
-      .csv(ConfigParser.config.staticDataFile)
+      .csv(config.staticDataFile)
       .select("MMSI", "draught")
       .groupBy("MMSI")
       .max("draught")
@@ -60,7 +60,7 @@ object DataLoader {
     Session.sparkSession.read
       .schema(Schema.AIS_SCHEMA)
       .option("sep", "\t")
-      .csv(ConfigParser.config.inputPath)
+      .csv(config.inputPath)
       .select("MMSI", "acquisition_time", "lat", "lon", "message_type_id")
       .rdd
       .mapAisDataToKeyedTuple()
@@ -68,11 +68,11 @@ object DataLoader {
       .mapToKeyedShipPingTuple()
   }
 
-  def loadVesselDraughtRangeData(): Array[VesselDraughtRange] = {
+  def loadVesselDraughtRangeData(config: Config): Array[VesselDraughtRange] = {
     Session.sparkSession.read
       .schema(Schema.DRAUGHT_SCHEMA)
       .option("sep", "\t")
-      .csv(ConfigParser.config.draughtConfigFile)
+      .csv(config.draughtConfigFile)
       .select("MinPoint", "MaxPoint")
       .rdd
       .map {

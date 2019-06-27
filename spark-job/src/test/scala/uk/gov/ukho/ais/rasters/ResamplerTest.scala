@@ -5,7 +5,7 @@ import java.util.Comparator
 import org.apache.commons.math3.util.Precision
 import org.apache.spark.rdd.RDD
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.{Before, Test}
+import org.junit.Test
 import uk.gov.ukho.ais.rasters.Resampler.RDDResampler
 
 import scala.collection.JavaConverters._
@@ -17,6 +17,29 @@ class ResamplerTest {
   private final val DISTANCE_THRESHOLD: Long = 30000
   private final val START_PERIOD = "1970-01-01"
   private final val END_PERIOD = "3000-01-01"
+  private final val TEST_CONFIG = ConfigParser.parse(
+    Array(
+      "-i",
+      "",
+      "-o",
+      "",
+      "-p",
+      "",
+      "-r",
+      "1",
+      "-t",
+      s"$TIME_THRESHOLD",
+      "-d",
+      s"$DISTANCE_THRESHOLD",
+      "-s",
+      START_PERIOD,
+      "-e",
+      END_PERIOD,
+      "--draughtConfigFile",
+      "",
+      "--staticDataFile",
+      ""
+    ))
 
   Session.init(true)
 
@@ -25,38 +48,11 @@ class ResamplerTest {
       Precision.compareTo(a, b, DOUBLE_COMPARISON_PRECISION)
   }
 
-  @Before
-  def beforeEach(): Unit = {
-    ConfigParser.parse(
-      Array(
-        "-i",
-        "",
-        "-o",
-        "",
-        "-p",
-        "",
-        "-r",
-        "1",
-        "-t",
-        s"$TIME_THRESHOLD",
-        "-d",
-        s"$DISTANCE_THRESHOLD",
-        "-s",
-        START_PERIOD,
-        "-e",
-        END_PERIOD,
-        "--draughtConfigFile",
-        "",
-        "--staticDataFile",
-        ""
-      ))
-  }
-
   @Test
   def whenResamplingNoPingsThenNoPingsReturned(): Unit = {
     val inputRdd: RDD[(String, ShipPing)] = createRdd(Seq())
 
-    val outPings: Seq[ShipPing] = inputRdd.resample().collect()
+    val outPings: Seq[ShipPing] = inputRdd.resample(TEST_CONFIG).collect()
 
     assertThat(outPings.size).isEqualTo(0)
   }
@@ -67,7 +63,7 @@ class ResamplerTest {
 
     val expectedPings: Seq[ShipPing] = createPings(Seq((3, 1, 1)))
 
-    val outPings: Seq[ShipPing] = inputRdd.resample().collect()
+    val outPings: Seq[ShipPing] = inputRdd.resample(TEST_CONFIG).collect()
 
     assertThatOutPingsMatchesExpectedPings(expectedPings, outPings)
   }
@@ -79,7 +75,7 @@ class ResamplerTest {
     val expectedPings: Seq[ShipPing] = createPings(
       Seq((0, 0, 0), (3, 0.001, 0.001), (6, 0.002, 0.002)))
 
-    val outPings: Seq[ShipPing] = inputRdd.resample().collect()
+    val outPings: Seq[ShipPing] = inputRdd.resample(TEST_CONFIG).collect()
 
     assertThatOutPingsMatchesExpectedPings(expectedPings, outPings)
   }
@@ -91,7 +87,7 @@ class ResamplerTest {
     val expectedPings: Seq[ShipPing] = createPings(
       Seq((0, 0, 0), (3, 0.01, 0.01), (6, 0.02, 0.02), (9, 0.03, 0.03)))
 
-    val outPings: Seq[ShipPing] = inPings.resample().collect()
+    val outPings: Seq[ShipPing] = inPings.resample(TEST_CONFIG).collect()
 
     assertThatOutPingsMatchesExpectedPings(expectedPings, outPings)
   }
@@ -113,7 +109,7 @@ class ResamplerTest {
           (9993, 0.09, 0.09),
           (9996, 0.1, 0.1)))
 
-    val outPings: Seq[ShipPing] = inputRdd.resample().collect()
+    val outPings: Seq[ShipPing] = inputRdd.resample(TEST_CONFIG).collect()
 
     assertThatOutPingsMatchesExpectedPings(expectedPings, outPings)
   }
@@ -136,7 +132,7 @@ class ResamplerTest {
           (9994, 0.09, 0.09),
           (9997, 0.1, 0.1)))
 
-    val outPings: Seq[ShipPing] = inputRdd.resample().collect()
+    val outPings: Seq[ShipPing] = inputRdd.resample(TEST_CONFIG).collect()
 
     assertThatOutPingsMatchesExpectedPings(expectedPings, outPings)
   }
@@ -148,7 +144,7 @@ class ResamplerTest {
     val expectedPings: Seq[ShipPing] = createPings(
       Seq((0, 0, 0), (361, 0.02, 0.02), (722, 0.03, 0.03)))
 
-    val outPings: Seq[ShipPing] = inputRdd.resample().collect()
+    val outPings: Seq[ShipPing] = inputRdd.resample(TEST_CONFIG).collect()
 
     assertThatOutPingsMatchesExpectedPings(expectedPings, outPings)
   }
@@ -164,7 +160,7 @@ class ResamplerTest {
     val expectedPings: Seq[ShipPing] = createPings(
       Seq((0, 0, 0), (3, 0.03, 0.03), (6, 0.06, 0.06)))
 
-    val outPings: Seq[ShipPing] = inputRdd.resample().collect()
+    val outPings: Seq[ShipPing] = inputRdd.resample(TEST_CONFIG).collect()
 
     assertThatOutPingsMatchesExpectedPings(expectedPings, outPings)
   }
@@ -176,7 +172,7 @@ class ResamplerTest {
     val expectedPings: Seq[ShipPing] = createPings(
       Seq((0, 51.310567, -3.380413), (4, 51.312013, -3.822284)))
 
-    val outPings: Seq[ShipPing] = inputRdd.resample().collect()
+    val outPings: Seq[ShipPing] = inputRdd.resample(TEST_CONFIG).collect()
 
     assertThatOutPingsMatchesExpectedPings(expectedPings, outPings)
   }

@@ -9,19 +9,15 @@ object AisToRaster {
   def main(args: Array[String]): Unit = {
     Session.init()
 
-    ConfigParser.parse(args)
+    val config: Config = ConfigParser.parse(args)
 
-    orchestrateHeatmapGeneration()
-  }
-
-  def orchestrateHeatmapGeneration(): Unit = {
     val raster = DataLoader
-      .loadAisData()
-      .filterShipPings()
-      .resample()
-      .mapToRaster()
+      .loadAisData(config)
+      .filterShipPings(config)
+      .resample(config)
+      .mapToRaster(config)
 
-    FileCreator.createOutputFiles(raster)
+    FileCreator.createOutputFiles(raster, config)
   }
 
 }

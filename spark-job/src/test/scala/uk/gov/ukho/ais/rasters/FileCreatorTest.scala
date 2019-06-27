@@ -7,56 +7,54 @@ import geotrellis.raster.{CellSize, IntArrayTile, RasterExtent}
 import geotrellis.vector.Extent
 import org.apache.commons.io.FileUtils
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.{After, Before, Test}
+import org.junit.{After, AfterClass, Before, Test}
 
 class FileCreatorTest {
-  var tempOutputDir: File = _
+  private final val TEMP_OUTPUT_DIRECTORY: File =
+    Files.createTempDirectory("aisrastertest").toFile
+  private final val TEST_CONFIG: Config = ConfigParser.parse(
+    Array(
+      "-i",
+      "",
+      "-o",
+      TEMP_OUTPUT_DIRECTORY.getAbsolutePath,
+      "-p",
+      "test",
+      "-r",
+      "1",
+      "-t",
+      "3",
+      "-d",
+      "3",
+      "-s",
+      "1970-01-01",
+      "-e",
+      "1970-01-01",
+      "--draughtConfigFile",
+      "",
+      "--staticDataFile",
+      "",
+      "-l"
+    ))
 
-  @Before
-  def beforeEach(): Unit = {
-    val path: Path = Files.createTempDirectory("aisrastertest")
-    tempOutputDir = path.toFile
-    ConfigParser.parse(
-      Array(
-        "-i",
-        "",
-        "-o",
-        tempOutputDir.getAbsolutePath,
-        "-p",
-        "test",
-        "-r",
-        "1",
-        "-t",
-        "3",
-        "-d",
-        "3",
-        "-s",
-        "1970-01-01",
-        "-e",
-        "1970-01-01",
-        "--draughtConfigFile",
-        "",
-        "--staticDataFile",
-        "",
-        "-l"
-      ))
+  {
+    TEMP_OUTPUT_DIRECTORY.deleteOnExit()
   }
 
   @After
   def afterEach(): Unit = {
     try {
-      FileUtils.cleanDirectory(tempOutputDir)
-      FileUtils.deleteDirectory(tempOutputDir)
+      FileUtils.cleanDirectory(TEMP_OUTPUT_DIRECTORY)
     } catch {
       case e: IOException =>
         System.err.println(
-          s"Unable to delete: $tempOutputDir due to '${e.getMessage}'")
+          s"Unable to delete: $TEMP_OUTPUT_DIRECTORY due to '${e.getMessage}'")
     }
   }
 
   @Test
   def whenCalledWithRasterExtentAndMatrixThenFilesAreCreated(): Unit = {
-    val resolution = ConfigParser.config.resolution
+    val resolution = TEST_CONFIG.resolution
 
     val rasterExtent = RasterExtent(
       Extent(-180, -90, 180, 90).expandBy(resolution),
@@ -68,7 +66,7 @@ class FileCreatorTest {
 
     val raster = (rasterExtent, rasterMatrix)
 
-    FileCreator.createOutputFiles(raster)
+    FileCreator.createOutputFiles(raster, TEST_CONFIG)
 
     val png = findGeneratedFile("png")
     val tiff = findGeneratedFile("tif")
@@ -82,7 +80,7 @@ class FileCreatorTest {
 
   private def findGeneratedFile(fileExtension: String): File = {
     FileUtils
-      .listFiles(tempOutputDir, Array(fileExtension), false)
+      .listFiles(TEMP_OUTPUT_DIRECTORY, Array(fileExtension), false)
       .stream()
       .findFirst()
       .get()

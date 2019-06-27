@@ -8,8 +8,8 @@ object AisRasterMapper {
 
   implicit class ShipPingRasterMapper(rdd: RDD[ShipPing]) {
 
-    def mapToRaster(): (RasterExtent, IntArrayTile) = {
-      val resolution = ConfigParser.config.resolution
+    def mapToRaster(config: Config): (RasterExtent, IntArrayTile) = {
+      val resolution = config.resolution
 
       val rasterExtent = RasterExtent(
         Extent(-180, -90, 180, 90).expandBy(resolution),
