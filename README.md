@@ -60,7 +60,7 @@ This project provides a simple Terraform plugin to Gradle.
 
 **deployment:terraformPlan** - Runs Terraform ```plan``` to show what has changed (Runs ```:deployment:terraformInit``` and ```:deployment:terraformDownload``` if these have not been run)
 
-**deployment:terraformDeploy** - Runs Terraform ```apply```, *--autoApprove* is a flag which will override the manual confirm step to confirm the deployment, the purpose of this is for CI/CD (Runs ```:deployment:terraformInit``` and ```:deployment:terraformDownload``` if these have not been run)
+**deployment:terraformApply** - Runs Terraform ```apply```, *--autoApprove* is a flag which will override the manual confirm step to confirm the deployment, the purpose of this is for CI/CD (Runs ```:deployment:terraformInit``` and ```:deployment:terraformDownload``` if these have not been run)
 
 
 ## Data Ingest
