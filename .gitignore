@@ -12,3 +12,5 @@ build/
 .terraform/
 
 */out/*
+
+.scannerwork/

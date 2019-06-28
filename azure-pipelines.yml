@@ -10,7 +10,6 @@ stages:
         container: jdk
         steps:
           - script: ./gradlew clean assemble
-
       - job: check
         container: jdk
         steps:
@@ -20,7 +19,17 @@ stages:
               AWS_DEFAULT_REGION: $(AWS_DEFAULT_REGION)
               AWS_SECRET_ACCESS_KEY: $(AWS_SECRET_ACCESS_KEY)
               TF_VAR_PASSWORD: $(TF_VAR_PASSWORD)
-
+          - task: SonarCloudPrepare@1
+            inputs:
+              SonarCloud: 'ukho-sonarcloud'
+              organization: 'ukho'
+              scannerMode: 'CLI'
+              configMode: 'manual'
+              cliProjectKey: 'UKHO_spark-ais-to-raster'
+              cliProjectName: 'ais-to-raster'
+              cliSources: '.'
+              extraProperties: 'sonar.java.binaries=**/**'
+          - task: SonarCloudAnalyze@1
       - job: test
         container: jdk
         steps:
