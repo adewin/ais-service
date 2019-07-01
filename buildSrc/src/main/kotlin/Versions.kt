@@ -12,6 +12,8 @@ object Versions {
     const val dependencyCheckGradle = "5.0.0"
     const val jacksonDatabind = "2.9.9"
     const val findsecbugs = "1.7.1"
+    const val sprayJson = "1.3.5"
+    const val guava = "28.0-jre"
 
     // Test dependencies
     const val junit = "4.12"

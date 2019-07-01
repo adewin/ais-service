@@ -13,7 +13,7 @@ allprojects {
     apply { plugin("com.diffplug.gradle.spotless") }
 
     group = "uk.gov.ukho"
-    version = "1.10-SNAPSHOT"
+    version = "1.11-SNAPSHOT"
 
     configure<SpotlessExtension> {
         kotlinGradle {
@@ -35,7 +35,8 @@ allprojects {
 
         configure<DependencyCheckExtension> {
             failBuildOnCVSS = 0.0f
-            scanConfigurations = listOf("implementation")
+            scanConfigurations = listOf("runtimeClasspath")
+            suppressionFile = "${rootProject.rootDir}/dependency-suppressions.xml"
         }
 
         tasks.getByName("check").dependsOn("dependencyCheckAnalyze")

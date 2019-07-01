@@ -29,6 +29,15 @@ dependencies {
     implementation("org.locationtech.geotrellis:geotrellis-spark_${Versions.scalaCompat}:${Versions.geotrellis}")
     implementation("org.locationtech.geotrellis:geotrellis-s3_${Versions.scalaCompat}:${Versions.geotrellis}")
 
+    constraints {
+        implementation("io.spray:spray-json_${Versions.scalaCompat}:${Versions.sprayJson}") {
+            because("Version brought in by Scala version 2.11.2 has vulnerabilities")
+        }
+        implementation("com.google.guava:guava:${Versions.guava}") {
+            because("Version brought in by Scala version 2.11.2 has vulnerabilities")
+        }
+    }
+
     compileOnly(sparkCoreDependency)
     compileOnly(sparkSqlDependency)
 

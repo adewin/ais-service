@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.2.xsd">
+    <suppress until="2019-07-01Z">
+        <notes><![CDATA[
+        2.9.9 is the latest version of com.fasterxml.jackson.core:jackson-databind
+        ]]></notes>
+        <cve>CVE-2019-12814</cve>
+    </suppress>
+    <suppress until="2019-07-01Z">
+        <notes><![CDATA[
+        scala-compiler-2.11.12 is the latest supported version of Scala in AWS EMR
+        ]]></notes>
+        <cve>CVE-2016-7103</cve>
+        <cve>CVE-2010-5312</cve>
+        <cve>CVE-2015-9251</cve>
+        <cve>CVE-2012-6708</cve>
+        <cve>CVE-2019-11358</cve>
+    </suppress>
+    <suppress until="2019-07-01Z">
+        <notes><![CDATA[
+        jackson-databind-2.6.7.1.jar is the latest supported version in Scala 2.11.12
+        ]]>
+        </notes>
+        <cve>CVE-2017-15095</cve>
+        <cve>CVE-2017-17485</cve>
+        <cve>CVE-2018-1000873</cve>
+        <cve>CVE-2018-14718</cve>
+        <cve>CVE-2018-14719</cve>
+        <cve>CVE-2018-14720</cve>
+        <cve>CVE-2018-14721</cve>
+        <cve>CVE-2018-19360</cve>
+        <cve>CVE-2018-19361</cve>
+        <cve>CVE-2018-19362</cve>
+        <cve>CVE-2018-5968</cve>
+        <cve>CVE-2018-7489</cve>
+        <cve>CVE-2019-12086</cve>
+        <cve>CVE-2019-12384</cve>
+        <cwe>611</cwe>
+    </suppress>
+</suppressions>
