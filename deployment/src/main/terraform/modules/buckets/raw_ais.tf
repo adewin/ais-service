@@ -1,5 +1,5 @@
 resource aws_s3_bucket ais_bucket {
-  bucket = var.ais_bucket
+  bucket = var.raw_ais_bucket
   acl    = "private"
 }
 
@@ -96,5 +96,5 @@ EOF
 resource aws_ssm_parameter ais_bucket {
   name  = "/buckets/ais_bucket"
   type  = "SecureString"
-  value = var.ais_bucket
+  value = var.raw_ais_bucket
 }
