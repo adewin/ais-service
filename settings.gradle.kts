@@ -12,7 +12,7 @@ pluginManagement {
     }
 }
 
-rootProject.name = "ais-to-raster"
+rootProject.name = "ais-service"
 
 include("spark-job")
 include("ais-batch-lambda")
