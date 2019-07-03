@@ -1,7 +1,6 @@
 module ais_upload_store {
-  source       = "./store"
-  store_name   = var.ais_data_upload_store_name
-  logical_name = "raw-ais"
+  source     = "./store"
+  store_name = var.ais_data_upload_store_name
 }
 
 module raw_ais_full_perms {

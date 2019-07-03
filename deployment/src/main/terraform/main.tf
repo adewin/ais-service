@@ -15,7 +15,6 @@ terraform {
 module s3_buckets {
   source                   = "./modules/legacy-buckets"
   jobs_bucket              = data.external.secrets.result["jobs_bucket"]
-  ais_bucket               = data.external.secrets.result["ais_bucket"]
   heatmap_bucket           = data.external.secrets.result["heatmap_bucket"]
   sensitive_heatmap_bucket = data.external.secrets.result["sensitive_heatmap_bucket"]
   emr_logs_bucket          = data.external.secrets.result["emr_logs_bucket"]
