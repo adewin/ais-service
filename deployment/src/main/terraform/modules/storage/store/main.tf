@@ -4,7 +4,8 @@ resource aws_s3_bucket bucket {
 }
 
 resource aws_ssm_parameter bucket_parameter {
-  name  = "/buckets/${var.logical_name}"
-  type  = "SecureString"
-  value = aws_s3_bucket.bucket.bucket
+  name      = "/buckets/${var.logical_name}"
+  type      = "SecureString"
+  value     = aws_s3_bucket.bucket.bucket
+  overwrite = true
 }
