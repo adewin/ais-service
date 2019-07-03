@@ -11,16 +11,22 @@ terraform {
   }
 }
 
+# DEPRECATED - Use storage for future buckets
 module s3_buckets {
-  source                   = "./modules/buckets"
+  source                   = "./modules/legacy-buckets"
   jobs_bucket              = data.external.secrets.result["jobs_bucket"]
-  raw_ais_bucket           = data.external.secrets.result["raw_ais_bucket"]
+  ais_bucket               = data.external.secrets.result["ais_bucket"]
   heatmap_bucket           = data.external.secrets.result["heatmap_bucket"]
   sensitive_heatmap_bucket = data.external.secrets.result["sensitive_heatmap_bucket"]
   emr_logs_bucket          = data.external.secrets.result["emr_logs_bucket"]
-  ais_data_upload_bucket   = data.external.secrets.result["ais_data_upload_bucket"]
   spark_job_jar_path       = var.SPARK_JOB_JAR_PATH
   spark_job_jar_name       = var.SPARK_JOB_JAR_NAME
+}
+
+module storage {
+  source                     = "./modules/storage"
+  raw_ais_store_name         = data.external.secrets.result["raw_ais_bucket"]
+  ais_data_upload_store_name = data.external.secrets.result["ais_data_upload_bucket"]
 }
 
 module emr_lambda {
