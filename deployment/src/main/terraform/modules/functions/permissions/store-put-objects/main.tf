@@ -10,8 +10,8 @@ resource aws_iam_policy store_put_object {
         "s3:PutObject"
       ],
       "Resource": [
-        "arn:s3:::${var.store_name}",
-        "arn:s3:::${var.store_name}/*"
+        "arn:aws:s3:::${var.store_name}",
+        "arn:aws:s3:::${var.store_name}/*"
       ]
     }
   ]

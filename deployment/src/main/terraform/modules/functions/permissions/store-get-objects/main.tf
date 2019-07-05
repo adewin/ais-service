@@ -10,8 +10,8 @@ resource aws_iam_policy store_get_object {
         "s3:Get*"
       ],
       "Resource": [
-        "arn:s3:::${var.store_name}",
-        "arn:s3:::${var.store_name}/*"
+        "arn:aws:s3:::${var.store_name}",
+        "arn:aws:s3:::${var.store_name}/*"
       ]
     }
   ]
