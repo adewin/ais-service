@@ -2,10 +2,12 @@ import com.diffplug.gradle.spotless.SpotlessExtension
 import com.github.spotbugs.SpotBugsExtension
 import com.github.spotbugs.SpotBugsTask
 import org.owasp.dependencycheck.gradle.extension.DependencyCheckExtension
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 plugins {
     id("com.diffplug.gradle.spotless")
     id("org.owasp.dependencycheck") apply false
+    id("com.github.johnrengelman.shadow") apply false
     id("com.github.spotbugs")
 }
 
@@ -13,7 +15,7 @@ allprojects {
     apply { plugin("com.diffplug.gradle.spotless") }
 
     group = "uk.gov.ukho"
-    version = "1.14-SNAPSHOT"
+    version = "1.15-SNAPSHOT"
 
     configure<SpotlessExtension> {
         kotlinGradle {
@@ -24,6 +26,7 @@ allprojects {
     pluginManager.withPlugin("java") {
         apply(plugin = "org.owasp.dependencycheck")
         apply(plugin = "com.github.spotbugs")
+        apply(plugin = "com.github.johnrengelman.shadow")
 
         configure<SpotlessExtension> {
             java {
@@ -31,6 +34,10 @@ allprojects {
                 googleJavaFormat()
                 indentWithSpaces(4)
             }
+        }
+
+        repositories {
+            jcenter()
         }
 
         configure<DependencyCheckExtension> {
@@ -56,6 +63,15 @@ allprojects {
                 xml.isEnabled = false
                 html.isEnabled = true
             }
+        }
+
+        tasks.withType<JavaCompile> {
+            sourceCompatibility = "1.8"
+            targetCompatibility = "1.8"
+        }
+
+        tasks.withType<ShadowJar> {
+            isZip64 = true
         }
     }
 
@@ -87,3 +103,5 @@ configure<SpotlessExtension> {
         ktlint()
     }
 }
+
+subprojects { parent!!.path.takeIf { it != rootProject.path }?.let { evaluationDependsOn(it) } }

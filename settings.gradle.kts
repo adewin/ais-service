@@ -14,6 +14,4 @@ pluginManagement {
 
 rootProject.name = "ais-service"
 
-include("spark-job")
-include("ais-batch-lambda")
-include("deployment")
+include("spark-job", "lambdas:ais-batch-lambda", "lambdas:ingest-upload-file-lambda", "deployment")

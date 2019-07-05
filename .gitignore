@@ -1,6 +1,7 @@
 .gradle/
 .gradletasknamecache
-build/
+build
+out
 
 .idea/
 *.iml
@@ -10,7 +11,5 @@ build/
 *.secret.*
 
 .terraform/
-
-*/out/*
 
 .scannerwork/

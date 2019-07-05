@@ -24,19 +24,21 @@ module s3_buckets {
 
 module storage {
   source                     = "./modules/storage"
-  raw_ais_store_name         = data.external.secrets.result["raw_ais_bucket"]
-  ais_data_upload_store_name = data.external.secrets.result["ais_data_upload_bucket"]
+  raw_ais_store_name         = data.external.secrets.result["raw_ais_store"]
+  ais_data_upload_store_name = data.external.secrets.result["ais_data_upload_store"]
 }
 
-module emr_lambda {
-  source                   = "./modules/emr_lambda"
-  jar                      = var.AIS_BATCH_LAMBDA_JAR_PATH
-  jobs_bucket              = data.external.secrets.result["jobs_bucket"]
-  ais_bucket               = data.external.secrets.result["raw_ais_bucket"]
-  heatmap_bucket           = data.external.secrets.result["heatmap_bucket"]
-  sensitive_heatmap_bucket = data.external.secrets.result["sensitive_heatmap_bucket"]
-  emr_logs_bucket          = data.external.secrets.result["emr_logs_bucket"]
-  spark_job_jar_name       = var.SPARK_JOB_JAR_NAME
+module functions {
+  source                       = "./modules/functions"
+  ais_data_upload_store_name   = data.external.secrets.result["ais_data_upload_store"]
+  ais_raw_store_name           = data.external.secrets.result["raw_ais_store"]
+  data_upload_function_jar     = var.DATA_FILE_FUNCTION_LAMBDA_JAR_PATH
+  emr_all_jobs_function_jar    = var.AIS_BATCH_FUNCTION_JAR_PATH
+  emr_logs_store_name          = data.external.secrets.result["emr_logs_bucket"]
+  heatmap_store_name           = data.external.secrets.result["sensitive_heatmap_bucket"]
+  jobs_store_name              = data.external.secrets.result["jobs_bucket"]
+  sensitive_heatmap_store_name = data.external.secrets.result["sensitive_heatmap_bucket"]
+  spark_job_jar_name           = var.SPARK_JOB_JAR_NAME
 }
 
 module notifications {

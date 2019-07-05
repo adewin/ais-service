@@ -17,15 +17,18 @@ configure<SpotlessExtension> {
 }
 
 configure<TerraformExtension> {
-    val aisBatchLambdaShadowJarTask = tasks.getByPath(":ais-batch-lambda:shadowJar")
+
+    val aisBatchLambdaShadowJarTask = tasks.getByPath(":lambdas:ais-batch-lambda:shadowJar")
+    val ingestUploadFileLambdaShadowJarTask = tasks.getByPath(":lambdas:ingest-upload-file-lambda:shadowJar")
     val sparkJobShadowJarTask = tasks.getByPath(":spark-job:shadowJar")
 
-    dependsOn(aisBatchLambdaShadowJarTask)
-
-    dependsOn(sparkJobShadowJarTask)
+    dependsOn(aisBatchLambdaShadowJarTask,
+            sparkJobShadowJarTask,
+            ingestUploadFileLambdaShadowJarTask)
 
     environmentVariables(
-            "TF_VAR_AIS_BATCH_LAMBDA_JAR_PATH" to aisBatchLambdaShadowJarTask.outputs.files.singleFile.absolutePath,
+            "TF_VAR_AIS_BATCH_FUNCTION_JAR_PATH" to aisBatchLambdaShadowJarTask.outputs.files.singleFile.absolutePath,
+            "TF_VAR_DATA_FILE_FUNCTION_LAMBDA_JAR_PATH" to ingestUploadFileLambdaShadowJarTask.outputs.files.singleFile.absolutePath,
             "TF_VAR_SPARK_JOB_JAR_PATH" to sparkJobShadowJarTask.outputs.files.singleFile.absolutePath,
             "TF_VAR_SPARK_JOB_JAR_NAME" to sparkJobShadowJarTask.outputs.files.singleFile.name
     )
