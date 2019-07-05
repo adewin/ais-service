@@ -4,7 +4,7 @@ import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.s3.AmazonS3;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import uk.gov.ukho.ais.ingestuploadfile.model.S3Object;
+import uk.gov.ukho.ais.s3eventhandling.model.S3Object;
 
 public class S3ObjectCopier {
 

@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import uk.gov.ukho.ais.emrjobrunner.model.AbstractJob;
 
 public class JobsProvider {
 
@@ -29,11 +30,11 @@ public class JobsProvider {
     return instance;
   }
 
-  public List<Job> getJobs() {
-    final List<Job> jobs =
+  public List<AbstractJob> getJobs() {
+    final List<AbstractJob> batchJobs =
         new ArrayList<>(
             Arrays.asList(
-                new Job(
+                new HeatmapJob(
                     "seasonal-world-1k-30km-6hr-Autumn-Aug-2018-Oct-2018",
                     DEGREES_AT_EQUATOR_FOR_1KM_RESOLUTION,
                     DISTANCE_INTERPOLATION_THRESHOLD_30KM,
@@ -43,7 +44,7 @@ public class JobsProvider {
                     "/",
                     false,
                     false),
-                new Job(
+                new HeatmapJob(
                     "seasonal-world-1k-30km-6hr-Winter-Nov-2018-Jan-2019",
                     DEGREES_AT_EQUATOR_FOR_1KM_RESOLUTION,
                     DISTANCE_INTERPOLATION_THRESHOLD_30KM,
@@ -53,7 +54,7 @@ public class JobsProvider {
                     "/",
                     false,
                     false),
-                new Job(
+                new HeatmapJob(
                     "seasonal-world-1k-30km-6hr-Spring-Feb-2019-Apr-2019",
                     DEGREES_AT_EQUATOR_FOR_1KM_RESOLUTION,
                     DISTANCE_INTERPOLATION_THRESHOLD_30KM,
@@ -63,7 +64,7 @@ public class JobsProvider {
                     "/",
                     false,
                     false),
-                new Job(
+                new HeatmapJob(
                     "annual-world-1k-30km-6hr-Jul-2018-May-2019",
                     DEGREES_AT_EQUATOR_FOR_1KM_RESOLUTION,
                     DISTANCE_INTERPOLATION_THRESHOLD_30KM,
@@ -73,7 +74,7 @@ public class JobsProvider {
                     "/",
                     false,
                     false),
-                new Job(
+                new HeatmapJob(
                     "annual-world-1k-100km-18hr-Jul-2018-May-2019",
                     DEGREES_AT_EQUATOR_FOR_1KM_RESOLUTION,
                     DISTANCE_INTERPOLATION_THRESHOLD_100KM,
@@ -84,30 +85,30 @@ public class JobsProvider {
                     false,
                     false)));
 
-    jobs.addAll(
+    batchJobs.addAll(
         createDraughtJobs(
             "30km-6hr", DISTANCE_INTERPOLATION_THRESHOLD_30KM, TIME_INTERPOLATION_THRESHOLD_6HR));
 
-    jobs.addAll(
+    batchJobs.addAll(
         createDraughtJobs(
             "100km-18hr",
             DISTANCE_INTERPOLATION_THRESHOLD_100KM,
             TIME_INTERPOLATION_THRESHOLD_18HR));
 
-    jobs.addAll(createMonthlyJobs());
+    batchJobs.addAll(createMonthlyJobs());
 
-    return jobs;
+    return batchJobs;
   }
 
-  private List<Job> createDraughtJobs(
+  private List<HeatmapJob> createDraughtJobs(
       final String interpolationPrefix,
       final long distanceInterpolationThreshold,
       final long timeInterpolationThreshold) {
 
-    final List<Job> jobs = new ArrayList<>();
+    final List<HeatmapJob> heatmapJobs = new ArrayList<>();
 
-    jobs.add(
-        new Job(
+    heatmapJobs.add(
+        new HeatmapJob(
             "annual-world-1k-unknowndraught-" + interpolationPrefix + "-Jul-2018-May-2019",
             DEGREES_AT_EQUATOR_FOR_1KM_RESOLUTION,
             distanceInterpolationThreshold,
@@ -122,8 +123,8 @@ public class JobsProvider {
     int draughtIndex = 0;
 
     for (int bucket = 1; bucket <= 3; bucket++) {
-      jobs.add(
-          new Job(
+      heatmapJobs.add(
+          new HeatmapJob(
               "annual-world-1k-cat1draught"
                   + bucket
                   + "-"
@@ -142,8 +143,8 @@ public class JobsProvider {
     }
 
     for (int bucket = 1; bucket <= 5; bucket++) {
-      jobs.add(
-          new Job(
+      heatmapJobs.add(
+          new HeatmapJob(
               "annual-world-1k-cat2draught"
                   + bucket
                   + "-"
@@ -161,10 +162,10 @@ public class JobsProvider {
       draughtIndex++;
     }
 
-    return jobs;
+    return heatmapJobs;
   }
 
-  private List<Job> createMonthlyJobs() {
+  private List<HeatmapJob> createMonthlyJobs() {
     return Arrays.asList(
         createMonthlyJob(2018, 7),
         createMonthlyJob(2018, 8),
@@ -179,10 +180,10 @@ public class JobsProvider {
         createMonthlyJob(2019, 5));
   }
 
-  private Job createMonthlyJob(final int year, final int month) {
+  private HeatmapJob createMonthlyJob(final int year, final int month) {
     final LocalDate startOfMonth = LocalDate.of(year, month, 1);
     final LocalDate endOfMonth = startOfMonth.plusMonths(1).minusDays(1);
-    return new Job(
+    return new HeatmapJob(
         "monthly-world-1k-30km-6hr-"
             + startOfMonth.getMonth().getDisplayName(TextStyle.SHORT, Locale.getDefault())
             + "-"

@@ -1,4 +1,4 @@
-package uk.gov.ukho.ais.ingestuploadfile.model;
+package uk.gov.ukho.ais.s3eventhandling.model;
 
 public class S3Object {
 
@@ -22,5 +22,10 @@ public class S3Object {
 
   public S3ObjectEvent getS3ObjectEvent() {
     return s3ObjectEvent;
+  }
+
+  @Override
+  public String toString() {
+    return "s3a://" + bucket + "/" + key;
   }
 }

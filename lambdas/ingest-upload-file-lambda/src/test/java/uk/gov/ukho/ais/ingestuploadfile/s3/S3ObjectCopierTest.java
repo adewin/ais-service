@@ -10,8 +10,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import uk.gov.ukho.ais.ingestuploadfile.model.S3Object;
-import uk.gov.ukho.ais.ingestuploadfile.model.S3ObjectEvent;
+import uk.gov.ukho.ais.s3eventhandling.model.S3Object;
+import uk.gov.ukho.ais.s3eventhandling.model.S3ObjectEvent;
 
 @RunWith(MockitoJUnitRunner.class)
 public class S3ObjectCopierTest {

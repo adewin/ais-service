@@ -1,14 +1,16 @@
-package uk.gov.ukho.ais.ingestuploadfile.s3;
+package uk.gov.ukho.ais.s3eventhandling.service;
 
 import com.amazonaws.services.lambda.runtime.events.S3Event;
 import java.util.List;
 import java.util.stream.Collectors;
-import uk.gov.ukho.ais.ingestuploadfile.model.S3Object;
-import uk.gov.ukho.ais.ingestuploadfile.model.S3ObjectEvent;
+import uk.gov.ukho.ais.s3eventhandling.model.S3Object;
+import uk.gov.ukho.ais.s3eventhandling.model.S3ObjectEvent;
 
-public class S3ObjectExtractor {
+public final class S3ObjectExtractor {
 
-  public List<S3Object> extractS3Objects(final S3Event s3Event) {
+  private S3ObjectExtractor() {}
+
+  public static List<S3Object> extractS3Objects(final S3Event s3Event) {
     return s3Event.getRecords().stream()
         .map(
             s3EventNotificationRecord ->

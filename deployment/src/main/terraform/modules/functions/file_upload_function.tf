@@ -10,17 +10,17 @@ module file_upload_function {
 }
 
 module file_upload_function_get_uploaded_file_permission {
-  source                     = "./permissions/store-get-objects"
-  function_name              = module.file_upload_function.function_name
-  function_execution_role_id = module.file_upload_function.function_execution_role_id
-  store_name                 = var.ais_data_upload_store_name
+  source                       = "./permissions/store-get-objects"
+  function_name                = module.file_upload_function.function_name
+  function_execution_role_name = module.file_upload_function.function_execution_role_name
+  store_name                   = var.ais_data_upload_store_name
 }
 
 module file_upload_function_put_uploaded_file_permission {
-  source                     = "./permissions/store-put-objects"
-  function_name              = module.file_upload_function.function_name
-  function_execution_role_id = module.file_upload_function.function_execution_role_id
-  store_name                 = var.ais_raw_store_name
+  source                       = "./permissions/store-put-objects"
+  function_name                = module.file_upload_function.function_name
+  function_execution_role_name = module.file_upload_function.function_execution_role_name
+  store_name                   = var.ais_raw_store_name
 }
 
 module file_upload_store_trigger {

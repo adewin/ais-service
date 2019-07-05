@@ -1,9 +1,11 @@
-package uk.gov.ukho.ais.ingestuploadfile;
+package uk.gov.ukho.ais.s3testutil;
 
 import com.amazonaws.services.s3.event.S3EventNotification;
 import java.time.Instant;
 
 public class S3EventUtil {
+
+  private S3EventUtil() {}
 
   public static S3EventNotification.S3EventNotificationRecord createRecordFor(
       final String bucketName, final String objectKey, final String eventName) {

@@ -26,6 +26,6 @@ module emr_all_jobs_function {
 }
 
 module emr_orchestration_permissions {
-  source                     = "./permissions/orchestrate-heatmaps"
-  function_execution_role_id = module.emr_all_jobs_function.function_execution_role_id
+  source                       = "./permissions/orchestrate-heatmaps"
+  function_execution_role_name = module.emr_all_jobs_function.function_execution_role_name
 }

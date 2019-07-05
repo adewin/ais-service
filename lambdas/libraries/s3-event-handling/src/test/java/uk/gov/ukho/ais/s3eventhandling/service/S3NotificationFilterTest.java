@@ -1,10 +1,10 @@
-package uk.gov.ukho.ais.ingestuploadfile.s3;
+package uk.gov.ukho.ais.s3eventhandling.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Test;
-import uk.gov.ukho.ais.ingestuploadfile.model.S3Object;
-import uk.gov.ukho.ais.ingestuploadfile.model.S3ObjectEvent;
+import uk.gov.ukho.ais.s3eventhandling.model.S3Object;
+import uk.gov.ukho.ais.s3eventhandling.model.S3ObjectEvent;
 
 public class S3NotificationFilterTest {
 

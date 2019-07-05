@@ -1,4 +1,4 @@
-package uk.gov.ukho.ais.ingestuploadfile.model;
+package uk.gov.ukho.ais.s3eventhandling.model;
 
 import java.util.Arrays;
 import java.util.List;

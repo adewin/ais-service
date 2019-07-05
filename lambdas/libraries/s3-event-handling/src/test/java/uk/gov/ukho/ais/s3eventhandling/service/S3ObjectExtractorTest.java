@@ -1,4 +1,4 @@
-package uk.gov.ukho.ais.ingestuploadfile.s3;
+package uk.gov.ukho.ais.s3eventhandling.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -7,13 +7,11 @@ import com.amazonaws.services.s3.event.S3EventNotification;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.Test;
-import uk.gov.ukho.ais.ingestuploadfile.S3EventUtil;
-import uk.gov.ukho.ais.ingestuploadfile.model.S3Object;
-import uk.gov.ukho.ais.ingestuploadfile.model.S3ObjectEvent;
+import uk.gov.ukho.ais.s3eventhandling.model.S3Object;
+import uk.gov.ukho.ais.s3eventhandling.model.S3ObjectEvent;
+import uk.gov.ukho.ais.s3testutil.S3EventUtil;
 
 public class S3ObjectExtractorTest {
-
-  private final S3ObjectExtractor s3ObjectExtractor = new S3ObjectExtractor();
 
   @Test
   public void whenExtractingS3ObjectsFromS3EventThenListOfS3ObjectsReturned() {
@@ -27,7 +25,7 @@ public class S3ObjectExtractorTest {
             S3EventUtil.createRecordFor(
                 bucketName, "NotInteresting.txt", S3ObjectEvent.REMOVED.getEvents().get(0)));
 
-    final List<S3Object> result = s3ObjectExtractor.extractS3Objects(new S3Event(records));
+    final List<S3Object> result = S3ObjectExtractor.extractS3Objects(new S3Event(records));
 
     assertThat(result)
         .usingFieldByFieldElementComparator()

@@ -1,6 +1,11 @@
 package uk.gov.ukho.aisbatchlambda;
 
-public class Job {
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import uk.gov.ukho.ais.emrjobrunner.model.AbstractJob;
+
+public class HeatmapJob extends AbstractJob {
   private final double resolution;
   private final String prefix;
   private final long distanceInterpolationThreshold;
@@ -10,9 +15,8 @@ public class Job {
   private final String inputLocation;
   private final boolean isOutputLocationSensitive;
   private final String draughtIndex;
-  private final boolean active;
 
-  public Job(
+  public HeatmapJob(
       final String prefix,
       final double resolution,
       final long distanceInterpolationThreshold,
@@ -23,6 +27,7 @@ public class Job {
       final boolean isOutputLocationSensitive,
       final boolean active,
       final String draughtIndex) {
+    super(active);
     this.resolution = resolution;
     this.prefix = prefix;
     this.distanceInterpolationThreshold = distanceInterpolationThreshold;
@@ -32,10 +37,9 @@ public class Job {
     this.inputLocation = inputLocation;
     this.isOutputLocationSensitive = isOutputLocationSensitive;
     this.draughtIndex = draughtIndex;
-    this.active = active;
   }
 
-  public Job(
+  public HeatmapJob(
       final String prefix,
       final double resolution,
       final long distanceInterpolationThreshold,
@@ -94,7 +98,41 @@ public class Job {
     return draughtIndex;
   }
 
-  public boolean isActive() {
-    return active;
+  @Override
+  public List<String> getJobSpecificParameters() {
+    final List<String> args =
+        new ArrayList<>(
+            Arrays.asList(
+                "--class",
+                AisLambdaConfiguration.JOB_FULLY_QUALIFIED_CLASS_NAME,
+                AisLambdaConfiguration.JOB_LOCATION,
+                "-i",
+                AisLambdaConfiguration.INPUT_LOCATION,
+                "-o",
+                getIsOutputLocationSensitive()
+                    ? AisLambdaConfiguration.SENSITIVE_OUTPUT_LOCATION
+                    : AisLambdaConfiguration.DEFAULT_OUTPUT_LOCATION,
+                "-p",
+                getPrefix(),
+                "-r",
+                String.valueOf(getResolution()),
+                "-d",
+                String.valueOf(getDistanceInterpolationThreshold()),
+                "-t",
+                String.valueOf(getTimeInterpolationThreshold()),
+                "-s",
+                getStartPeriod(),
+                "-e",
+                getEndPeriod(),
+                "--draughtConfigFile",
+                AisLambdaConfiguration.DRAUGHT_CONFIG_FILE,
+                "--staticDataFile",
+                AisLambdaConfiguration.STATIC_DATA_FILE));
+
+    if (getDraughtIndex() != null) {
+      args.addAll(Arrays.asList("--draughtIndex", getDraughtIndex()));
+    }
+
+    return args;
   }
 }

@@ -1,8 +1,8 @@
-package uk.gov.ukho.ais.ingestuploadfile.s3;
+package uk.gov.ukho.ais.s3eventhandling.service;
 
 import java.util.function.Predicate;
-import uk.gov.ukho.ais.ingestuploadfile.model.S3Object;
-import uk.gov.ukho.ais.ingestuploadfile.model.S3ObjectEvent;
+import uk.gov.ukho.ais.s3eventhandling.model.S3Object;
+import uk.gov.ukho.ais.s3eventhandling.model.S3ObjectEvent;
 
 public class S3NotificationFilter {
 

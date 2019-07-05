@@ -16,11 +16,11 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
-import uk.gov.ukho.ais.ingestuploadfile.model.S3Object;
-import uk.gov.ukho.ais.ingestuploadfile.model.S3ObjectEvent;
 import uk.gov.ukho.ais.ingestuploadfile.s3.S3ObjectCopier;
-import uk.gov.ukho.ais.ingestuploadfile.s3.S3ObjectExtractor;
 import uk.gov.ukho.ais.ingestuploadfile.service.FileUploadService;
+import uk.gov.ukho.ais.s3eventhandling.model.S3Object;
+import uk.gov.ukho.ais.s3eventhandling.model.S3ObjectEvent;
+import uk.gov.ukho.ais.s3testutil.S3EventUtil;
 
 @RunWith(MockitoJUnitRunner.class)
 public class FileUploadServiceTest {
@@ -29,27 +29,22 @@ public class FileUploadServiceTest {
 
   @Mock private S3ObjectCopier mockS3ObjectCopier;
 
-  @Mock private S3ObjectExtractor mockS3ObjectExtractor;
-
   private FileUploadService fileUploadService;
 
   @Before
   public void before() {
     MockitoAnnotations.initMocks(this);
-    fileUploadService = new FileUploadService(mockS3ObjectExtractor, mockS3ObjectCopier);
+    fileUploadService = new FileUploadService(mockS3ObjectCopier);
   }
 
   @Test
   public void whenNoObjectsGivenThenNoFilesCopied() {
     final S3Event s3Event = new S3Event(Collections.emptyList());
 
-    when(mockS3ObjectExtractor.extractS3Objects(s3Event)).thenReturn(Collections.emptyList());
-
     boolean result = fileUploadService.copyFiles(s3Event);
 
     assertThat(result).isTrue();
 
-    verify(mockS3ObjectExtractor, times(1)).extractS3Objects(s3Event);
     verify(mockS3ObjectCopier, never()).copyS3ObjectToNewLocation(any());
   }
 
@@ -64,15 +59,12 @@ public class FileUploadServiceTest {
             Collections.singletonList(
                 S3EventUtil.createRecordFor("bucket", objectKey, putCreationEvent)));
 
-    when(mockS3ObjectExtractor.extractS3Objects(s3Event))
-        .thenReturn(Collections.singletonList(s3Object));
     when(mockS3ObjectCopier.copyS3ObjectToNewLocation(any(S3Object.class))).thenReturn(true);
 
     fileUploadService.copyFiles(s3Event);
 
     ArgumentCaptor<S3Object> argumentCaptor = ArgumentCaptor.forClass(S3Object.class);
 
-    verify(mockS3ObjectExtractor, times(1)).extractS3Objects(s3Event);
     verify(mockS3ObjectCopier, times(1)).copyS3ObjectToNewLocation(argumentCaptor.capture());
 
     List<S3Object> capturedArguments = argumentCaptor.getAllValues();
@@ -93,18 +85,12 @@ public class FileUploadServiceTest {
                 S3EventUtil.createRecordFor(bucket, objectKey1, putCreationEvent),
                 S3EventUtil.createRecordFor(bucket, objectKey2, putCreationEvent)));
 
-    when(mockS3ObjectExtractor.extractS3Objects(s3Event))
-        .thenReturn(
-            Arrays.asList(
-                new S3Object(bucket, objectKey1, S3ObjectEvent.CREATED),
-                new S3Object(bucket, objectKey2, S3ObjectEvent.CREATED)));
     when(mockS3ObjectCopier.copyS3ObjectToNewLocation(any(S3Object.class))).thenReturn(true);
 
     fileUploadService.copyFiles(s3Event);
 
     ArgumentCaptor<S3Object> argumentCaptor = ArgumentCaptor.forClass(S3Object.class);
 
-    verify(mockS3ObjectExtractor, times(1)).extractS3Objects(s3Event);
     verify(mockS3ObjectCopier, times(2)).copyS3ObjectToNewLocation(argumentCaptor.capture());
 
     List<S3Object> capturedArguments = argumentCaptor.getAllValues();
@@ -129,11 +115,6 @@ public class FileUploadServiceTest {
                 S3EventUtil.createRecordFor(bucket, objectKey1, putCreationEvent),
                 S3EventUtil.createRecordFor(bucket, objectKey2, putCreationEvent)));
 
-    when(mockS3ObjectExtractor.extractS3Objects(s3Event))
-        .thenReturn(
-            Arrays.asList(
-                new S3Object(bucket, objectKey1, S3ObjectEvent.CREATED),
-                new S3Object(bucket, objectKey2, S3ObjectEvent.CREATED)));
     when(mockS3ObjectCopier.copyS3ObjectToNewLocation(any(S3Object.class)))
         .thenReturn(true)
         .thenReturn(false);
@@ -144,7 +125,6 @@ public class FileUploadServiceTest {
 
     ArgumentCaptor<S3Object> argumentCaptor = ArgumentCaptor.forClass(S3Object.class);
 
-    verify(mockS3ObjectExtractor, times(1)).extractS3Objects(s3Event);
     verify(mockS3ObjectCopier, times(2)).copyS3ObjectToNewLocation(argumentCaptor.capture());
 
     List<S3Object> capturedArguments = argumentCaptor.getAllValues();
@@ -162,24 +142,18 @@ public class FileUploadServiceTest {
     final String objectKey2 = "key2";
 
     final String bucket = "bucket";
+    final String removedEvent = S3ObjectEvent.REMOVED.getEvents().get(0);
 
     final S3Event s3Event =
         new S3Event(
             Arrays.asList(
-                S3EventUtil.createRecordFor(bucket, objectKey1, putCreationEvent),
-                S3EventUtil.createRecordFor(bucket, objectKey2, putCreationEvent)));
-
-    when(mockS3ObjectExtractor.extractS3Objects(s3Event))
-        .thenReturn(
-            Arrays.asList(
-                new S3Object(bucket, objectKey1, S3ObjectEvent.REMOVED),
-                new S3Object(bucket, objectKey2, S3ObjectEvent.UNKNOWN)));
+                S3EventUtil.createRecordFor(bucket, objectKey1, removedEvent),
+                S3EventUtil.createRecordFor(bucket, objectKey2, removedEvent)));
 
     boolean result = fileUploadService.copyFiles(s3Event);
 
     assertThat(result).isTrue();
 
-    verify(mockS3ObjectExtractor, times(1)).extractS3Objects(s3Event);
     verify(mockS3ObjectCopier, never()).copyS3ObjectToNewLocation(any());
   }
 }

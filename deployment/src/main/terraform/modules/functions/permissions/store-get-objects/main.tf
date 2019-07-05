@@ -19,7 +19,7 @@ resource aws_iam_policy store_get_object {
 EOF
 }
 resource aws_iam_role_policy_attachment store_get_object_attachment {
-  role = var.function_execution_role_id
+  role = var.function_execution_role_name
   policy_arn = aws_iam_policy.store_get_object.arn
 }
 
