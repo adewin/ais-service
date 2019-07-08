@@ -7,7 +7,8 @@ resource aws_iam_policy store_put_object {
     {
       "Effect": "Allow",
       "Action": [
-        "s3:PutObject"
+        "s3:PutObject*",
+        "s3:List*",
       ],
       "Resource": [
         "arn:aws:s3:::${var.store_name}",

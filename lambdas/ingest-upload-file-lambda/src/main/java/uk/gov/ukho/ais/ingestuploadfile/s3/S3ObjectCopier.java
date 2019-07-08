@@ -25,12 +25,13 @@ public class S3ObjectCopier {
 
   public boolean copyS3ObjectToNewLocation(final S3Object s3Object) {
     try {
+      LOGGER.info("Copying {} to {}", s3Object, destinationBucket);
       final String destinationKey = destinationKeyPrefix + getFileNameFromKey(s3Object.getKey());
       amazonS3Client.copyObject(
           s3Object.getBucket(), s3Object.getKey(), destinationBucket, destinationKey);
       return true;
     } catch (AmazonServiceException e) {
-      LOGGER.error("Unable to copy file", e);
+      LOGGER.error("Unable to copy file '" + s3Object + "' to " + destinationBucket, e);
       return false;
     }
   }

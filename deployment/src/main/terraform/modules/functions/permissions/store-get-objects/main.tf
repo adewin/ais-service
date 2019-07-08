@@ -7,7 +7,8 @@ resource aws_iam_policy store_get_object {
     {
       "Effect": "Allow",
       "Action": [
-        "s3:Get*"
+        "s3:Get*",
+        "s3:List*"
       ],
       "Resource": [
         "arn:aws:s3:::${var.store_name}",

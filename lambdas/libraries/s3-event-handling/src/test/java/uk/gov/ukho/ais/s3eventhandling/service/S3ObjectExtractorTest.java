@@ -17,11 +17,14 @@ public class S3ObjectExtractorTest {
   public void whenExtractingS3ObjectsFromS3EventThenListOfS3ObjectsReturned() {
     final String bucketName = "ukho-data-bucket";
     final String objectName = "ais-data.txt";
+    final String urlEncodedObject = "ais+data.txt";
 
     final List<S3EventNotification.S3EventNotificationRecord> records =
         Arrays.asList(
             S3EventUtil.createRecordFor(
                 bucketName, objectName, S3ObjectEvent.CREATED.getEvents().get(0)),
+            S3EventUtil.createRecordFor(
+                bucketName, urlEncodedObject, S3ObjectEvent.CREATED.getEvents().get(0)),
             S3EventUtil.createRecordFor(
                 bucketName, "NotInteresting.txt", S3ObjectEvent.REMOVED.getEvents().get(0)));
 
@@ -31,6 +34,7 @@ public class S3ObjectExtractorTest {
         .usingFieldByFieldElementComparator()
         .containsExactlyInAnyOrder(
             new S3Object(bucketName, objectName, S3ObjectEvent.CREATED),
+            new S3Object(bucketName, "ais data.txt", S3ObjectEvent.CREATED),
             new S3Object(bucketName, "NotInteresting.txt", S3ObjectEvent.REMOVED));
   }
 }

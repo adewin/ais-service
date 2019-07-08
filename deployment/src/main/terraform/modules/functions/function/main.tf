@@ -35,7 +35,7 @@ resource aws_cloudwatch_log_group lambda_log_group {
 }
 
 resource aws_iam_policy lambda_logging {
-  name = "emr_lambda_logging"
+  name = "${var.function_name}_logging"
   path = "/"
 
   policy = <<EOF
