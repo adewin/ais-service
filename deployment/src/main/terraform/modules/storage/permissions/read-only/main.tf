@@ -2,7 +2,7 @@ resource aws_iam_group read_only_data_access_group {
   name = "${var.resource_prefix}ReadOnlyAccessUsers"
 }
 
-resource aws_iam_group_policy sensitive_heatmap_read_only_data_access {
+resource aws_iam_group_policy store_read_only_data_access {
   name   = "${var.resource_prefix}ReadOnlyAccess"
   group  = aws_iam_group.read_only_data_access_group.id
   policy = <<EOF

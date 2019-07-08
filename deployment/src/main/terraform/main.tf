@@ -23,9 +23,11 @@ module s3_buckets {
 }
 
 module storage {
-  source                     = "./modules/storage"
-  raw_ais_store_name         = data.external.secrets.result["raw_ais_store"]
-  ais_data_upload_store_name = data.external.secrets.result["ais_data_upload_store"]
+  source                         = "./modules/storage"
+  data_query_results_store_name  = data.external.secrets.result["data_query_results_store"]
+  raw_ais_store_name             = data.external.secrets.result["raw_ais_store"]
+  ais_data_upload_store_name     = data.external.secrets.result["ais_data_upload_store"]
+  raw_partitioned_ais_store_name = data.external.secrets.result["raw_partitioned_ais_store"]
 }
 
 module functions {
@@ -43,4 +45,14 @@ module functions {
 
 module notifications {
   source = "./modules/notifications"
+}
+
+module data_query {
+  source                        = "./modules/data-query"
+  data_query_name               = data.external.secrets.result["data_query_name"]
+  data_query_results_store_name = data.external.secrets.result["data_query_results_store"]
+  catalog_database_name         = "ukho-ais-data"
+  catalog_database_table_name   = "raw_ais_data"
+  data_prefix                   = ""
+  data_store_name               = data.external.secrets.result["raw_partitioned_ais_store"]
 }

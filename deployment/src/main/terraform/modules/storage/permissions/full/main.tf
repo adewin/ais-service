@@ -2,7 +2,7 @@ resource aws_iam_group full_data_access_group {
   name = "${var.resource_prefix}FullAccessUsers"
 }
 
-resource aws_iam_group_policy sensitive_heatmap_full_data_access {
+resource aws_iam_group_policy store_full_data_access {
   name   = "${var.resource_prefix}FullAccess"
   group  = aws_iam_group.full_data_access_group.id
   policy = <<EOF
