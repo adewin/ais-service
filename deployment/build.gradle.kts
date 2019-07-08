@@ -21,7 +21,7 @@ configure<TerraformExtension> {
     val aisBatchLambdaShadowJarTask = tasks.getByPath(":lambdas:ais-batch-lambda:shadowJar")
     val ingestUploadFileLambdaShadowJarTask = tasks.getByPath(":lambdas:ingest-upload-file-lambda:shadowJar")
     val triggerRawPartitioningLambdaShadowJarTask = tasks.getByPath(":lambdas:trigger-raw-partitioning-lambda:shadowJar")
-    val sparkJobShadowJarTask = tasks.getByPath(":spark-job:shadowJar")
+    val sparkJobShadowJarTask = tasks.getByPath(":old-spark-job:shadowJar")
 
     dependsOn(aisBatchLambdaShadowJarTask,
             sparkJobShadowJarTask,

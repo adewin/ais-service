@@ -1,25 +1,43 @@
 import com.diffplug.gradle.spotless.SpotlessExtension
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.github.spotbugs.SpotBugsExtension
 import com.github.spotbugs.SpotBugsTask
 import org.owasp.dependencycheck.gradle.extension.DependencyCheckExtension
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import java.net.URI
 
 plugins {
     id("com.diffplug.gradle.spotless")
     id("org.owasp.dependencycheck") apply false
     id("com.github.johnrengelman.shadow") apply false
     id("com.github.spotbugs")
+    id("cz.augi.gradle.wartremover") apply false
 }
 
 allprojects {
     apply { plugin("com.diffplug.gradle.spotless") }
 
     group = "uk.gov.ukho"
-    version = "1.18-SNAPSHOT"
+    version = "1.19-SNAPSHOT"
 
     configure<SpotlessExtension> {
         kotlinGradle {
             ktlint()
+        }
+    }
+
+    pluginManager.withPlugin("scala") {
+        apply(plugin = "cz.augi.gradle.wartremover")
+
+        repositories {
+            maven { url = URI("https://repo.boundlessgeo.com/main/") }
+            maven { url = URI("http://maven.geomajas.org/") }
+            jcenter()
+        }
+
+        configure<SpotlessExtension> {
+            scala {
+                scalafmt()
+            }
         }
     }
 

@@ -14,12 +14,15 @@ pluginManagement {
 
 rootProject.name = "ais-service"
 
-include(
-        "spark-job",
+include("deployment",
+        "lambdas:ais-batch-lambda",
+        "lambdas:ingest-upload-file-lambda",
         "lambdas:libraries:s3-event-handling",
         "lambdas:libraries:s3-test-util",
         "lambdas:libraries:emr-job-runner",
-        "lambdas:ais-batch-lambda",
-        "lambdas:ingest-upload-file-lambda",
         "lambdas:trigger-raw-partitioning-lambda",
-        "deployment")
+        "libraries:spark-job",
+        "libraries:ais-schemata",
+        "libraries:test-support",
+        "old-spark-job",
+        "partition-raw-ais")
