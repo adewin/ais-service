@@ -30,12 +30,12 @@ resource aws_glue_catalog_table catalog_database_table {
     }
 
     columns {
-      name = "ArkPosId"
+      name = "arkposid"
       type = "string"
     }
 
     columns {
-      name = "MMSI"
+      name = "mmsi"
       type = "string"
     }
 

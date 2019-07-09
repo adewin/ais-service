@@ -19,23 +19,25 @@ configure<SpotlessExtension> {
 configure<TerraformExtension> {
 
     val aisBatchLambdaShadowJarTask = tasks.getByPath(":lambdas:ais-batch-lambda:shadowJar")
+    val aisRawParititioningSparkJobShadowJarTask = tasks.getByPath(":partition-raw-ais:shadowJar")
     val ingestUploadFileLambdaShadowJarTask = tasks.getByPath(":lambdas:ingest-upload-file-lambda:shadowJar")
     val triggerRawPartitioningLambdaShadowJarTask = tasks.getByPath(":lambdas:trigger-raw-partitioning-lambda:shadowJar")
-    val sparkJobShadowJarTask = tasks.getByPath(":old-spark-job:shadowJar")
+    val oldSparkJobShadowJarTask = tasks.getByPath(":old-spark-job:shadowJar")
 
     dependsOn(aisBatchLambdaShadowJarTask,
-            sparkJobShadowJarTask,
+            oldSparkJobShadowJarTask,
             ingestUploadFileLambdaShadowJarTask,
-            triggerRawPartitioningLambdaShadowJarTask)
-
-    dependsOn(triggerRawPartitioningLambdaShadowJarTask)
+            triggerRawPartitioningLambdaShadowJarTask,
+            aisRawParititioningSparkJobShadowJarTask)
 
     environmentVariables(
             "TF_VAR_AIS_BATCH_FUNCTION_JAR_PATH" to aisBatchLambdaShadowJarTask.outputs.files.singleFile.absolutePath,
             "TF_VAR_DATA_FILE_FUNCTION_LAMBDA_JAR_PATH" to ingestUploadFileLambdaShadowJarTask.outputs.files.singleFile.absolutePath,
             "TF_VAR_TRIGGER_RAW_PARTITION_FUNCTION_LAMBDA_JAR_PATH" to triggerRawPartitioningLambdaShadowJarTask.outputs.files.singleFile.absolutePath,
-            "TF_VAR_SPARK_JOB_JAR_PATH" to sparkJobShadowJarTask.outputs.files.singleFile.absolutePath,
-            "TF_VAR_SPARK_JOB_JAR_NAME" to sparkJobShadowJarTask.outputs.files.singleFile.name
+            "TF_VAR_OLD_SPARK_JOB_JAR_PATH" to oldSparkJobShadowJarTask.outputs.files.singleFile.absolutePath,
+            "TF_VAR_OLD_SPARK_JOB_JAR_NAME" to oldSparkJobShadowJarTask.outputs.files.singleFile.name,
+            "TF_VAR_PARTITIONING_SPARK_JOB_JAR_NAME" to aisRawParititioningSparkJobShadowJarTask.outputs.files.singleFile.name,
+            "TF_VAR_PARTITIONING_SPARK_JOB_JAR_PATH" to aisRawParititioningSparkJobShadowJarTask.outputs.files.singleFile.absolutePath
     )
 }
 

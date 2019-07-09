@@ -19,6 +19,12 @@ CircleCI requires an AWS IAM User to run the terraform so create an IAM User cal
 * AmazonEC2ContainerServiceFullAccess
 * AmazonSNSFullAccess
 
+We also have created two policies:
+* GlueFullAccess
+* FullAthenaAccess
+
+Which give CircleCI full access to Athena and Glue
+
 Terraform needs an S3 bucket and a DynamoDB table to manage remote state storage and locking.
 Create an S3 bucket called `ais-to-raster-terra-state` and a DynamoDb table called `ais-to-heatmap-terraform-lock-table` with a primary key of `LockID`
 

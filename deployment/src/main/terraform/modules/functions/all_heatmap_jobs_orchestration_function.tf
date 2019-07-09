@@ -6,7 +6,7 @@ module emr_all_jobs_function {
   function_handler = "uk.gov.ukho.aisbatchlambda.AisBatchLambdaHandler"
   function_environment_variables = {
     JOB_FULLY_QUALIFIED_CLASS_NAME = "uk.gov.ukho.ais.rasters.AisToRaster"
-    JOB_LOCATION                   = "s3://${var.jobs_store_name}/${var.spark_job_jar_name}"
+    JOB_LOCATION                   = "s3://${var.jobs_store_name}/${var.all_heatmaps_spark_job_jar_name}"
     INPUT_LOCATION                 = "s3://${var.ais_raw_store_name}/data/"
     OUTPUT_LOCATION                = var.heatmap_store_name
     INSTANCE_TYPE_MASTER           = "m4.4xlarge"
@@ -26,6 +26,6 @@ module emr_all_jobs_function {
 }
 
 module emr_orchestration_permissions {
-  source                       = "./permissions/orchestrate-heatmaps"
+  source                       = "./permissions/run-spark-job"
   function_execution_role_name = module.emr_all_jobs_function.function_execution_role_name
 }
