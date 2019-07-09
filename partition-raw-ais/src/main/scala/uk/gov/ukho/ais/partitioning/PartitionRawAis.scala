@@ -3,7 +3,7 @@ package uk.gov.ukho.ais.partitioning
 import uk.gov.ukho.ais.partitioning.RddWriters.YearMonthPartitionWriter
 import uk.gov.ukho.ais.{Schema, Session}
 
-class PartitionRawAis {
+object PartitionRawAis {
   private val YEAR_EXPRESSION = "year(acquisition_time) as year"
   private val MONTH_EXPRESSION = "month(acquisition_time) as month"
 

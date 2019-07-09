@@ -29,7 +29,7 @@ class ComponentTest {
     val inputFilePath: String =
       ResourceService.copyFileToFileSystem("ais_6pings.txt")
 
-    new PartitionRawAis()
+    PartitionRawAis
       .main(
         Array(
           "-i",
