@@ -6,5 +6,5 @@ module ais_data_upload_store {
 module ais_data_upload_full_perms {
   source          = "./permissions/full"
   store_id        = module.ais_data_upload_store.store_id
-  resource_prefix = "RawAis"
+  resource_prefix = "DataUpload"
 }
