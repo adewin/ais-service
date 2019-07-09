@@ -16,7 +16,7 @@ module trigger_raw_partition_function {
     DRIVER_MEMORY                  = "50g"
     EXECUTOR_MEMORY                = "16g"
     JOB_FULLY_QUALIFIED_CLASS_NAME = "uk.gov.ukho.ais.partitioning.PartitionRawAis"
-    OUTPUT_LOCATION                = var.ais_raw_partitioned_store_name
+    OUTPUT_LOCATION                = "s3a://${var.ais_raw_partitioned_store_name}/"
   }
 }
 
