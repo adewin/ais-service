@@ -12,6 +12,16 @@ resource aws_glue_catalog_table catalog_database_table {
     EXTERNAL = "TRUE"
   }
 
+  partition_keys {
+    name = "year"
+    type = "int"
+  }
+
+  partition_keys {
+    name = "month"
+    type = "int"
+  }
+
   storage_descriptor {
     location      = "s3://${var.data_store_name}/${var.data_prefix}"
     input_format  = "org.apache.hadoop.mapred.TextInputFormat"

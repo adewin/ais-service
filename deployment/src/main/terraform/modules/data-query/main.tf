@@ -1,11 +1,5 @@
-resource aws_athena_database athena_database {
-  bucket = var.data_query_results_store_name
-  name   = var.data_query_name
-}
-
 module data_query_perms {
   source          = "./permissions/data-query"
-  database_name   = aws_athena_database.athena_database.id
   resource_prefix = "DataQuery"
 }
 
