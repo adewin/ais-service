@@ -12,5 +12,6 @@ resource aws_s3_bucket_notification storage_file_upload_trigger {
   lambda_function {
     lambda_function_arn = var.function_id
     events              = ["s3:ObjectCreated:*"]
+    filter_prefix       = var.item_prefix
   }
 }

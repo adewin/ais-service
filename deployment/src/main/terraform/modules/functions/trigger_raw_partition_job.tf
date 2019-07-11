@@ -36,4 +36,5 @@ module trigger_raw_partition_s3_trigger {
   source      = "./triggers/storage_file_upload"
   function_id = module.trigger_raw_partition_function.function_id
   store_name  = var.ais_raw_store_name
+  item_prefix = "data/"
 }
