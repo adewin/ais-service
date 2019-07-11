@@ -22,7 +22,7 @@ object PartitionRawAis {
       .csv(config.inputPath)
       .selectExpr(selectClause: _*)
       .rdd
-      .groupBy(row => (row.getAs[Int]("year"), row.getAs[Int]("month")))
+      .keyBy(row => (row.getAs[Int]("year"), row.getAs[Int]("month")))
       .writeYearMonthPartitions()
   }
 }

@@ -34,6 +34,8 @@ class StepConfigFactory {
                 "spark-submit",
                 "--conf",
                 "spark.driver.maxResultSize=4g",
+                "--conf",
+                "spark.kryoserializer.buffer.max=1024m",
                 "--driver-memory",
                 emrConfiguration.getDriverMemory(),
                 "--executor-memory",

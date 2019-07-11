@@ -5,16 +5,16 @@ module trigger_raw_partition_function {
   jar              = var.trigger_raw_partition_jar
   function_environment_variables = {
     JOB_LOCATION                   = "s3://${var.jobs_store_name}/${var.partitioning_spark_job_jar_name}"
-    INSTANCE_TYPE_MASTER           = "m4.4xlarge"
-    INSTANCE_TYPE_WORKER           = "m4.2xlarge"
+    INSTANCE_TYPE_MASTER           = "m5.2xlarge"
+    INSTANCE_TYPE_WORKER           = "m5.2xlarge"
     LOG_URI                        = "s3://${var.emr_logs_store_name}/"
     SERVICE_ROLE                   = "EMR_DefaultRole"
     JOB_FLOW_ROLE                  = "EMR_EC2_DefaultRole"
     CLUSTER_NAME                   = "AIS Raw Partitioning Cluster"
     EMR_VERSION                    = "emr-5.20.0"
-    INSTANCE_COUNT                 = "5"
-    DRIVER_MEMORY                  = "50g"
-    EXECUTOR_MEMORY                = "16g"
+    INSTANCE_COUNT                 = "3"
+    DRIVER_MEMORY                  = "21g"
+    EXECUTOR_MEMORY                = "21g"
     JOB_FULLY_QUALIFIED_CLASS_NAME = "uk.gov.ukho.ais.partitioning.PartitionRawAis"
     OUTPUT_LOCATION                = "s3a://${var.ais_raw_partitioned_store_name}/"
   }

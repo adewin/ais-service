@@ -17,7 +17,7 @@ allprojects {
     apply { plugin("com.diffplug.gradle.spotless") }
 
     group = "uk.gov.ukho"
-    version = "1.21-SNAPSHOT"
+    version = "1.22-SNAPSHOT"
 
     configure<SpotlessExtension> {
         kotlinGradle {
@@ -38,6 +38,11 @@ allprojects {
             scala {
                 scalafmt()
             }
+        }
+
+        tasks.withType<ScalaCompile> {
+            sourceCompatibility = "1.8"
+            targetCompatibility = "1.8"
         }
     }
 

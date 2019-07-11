@@ -37,5 +37,7 @@ object ConfigParser {
           outputDirectory = ""
         )
       )
-      .fold { throw new IllegalStateException("config not loaded") }(identity)
+      .fold {
+        throw new IllegalStateException("config not loaded")
+      }(identity)
 }
