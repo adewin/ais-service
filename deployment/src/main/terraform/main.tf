@@ -25,6 +25,7 @@ module storage {
   raw_ais_store_name             = data.external.secrets.result["raw_ais_store"]
   ais_data_upload_store_name     = data.external.secrets.result["ais_data_upload_store"]
   raw_partitioned_ais_store_name = data.external.secrets.result["raw_partitioned_ais_store"]
+  data_query_results_store_name  = data.external.secrets.result["data_query_results_store"]
 }
 
 module partitioning_spark_jar {
@@ -65,6 +66,6 @@ module data_query {
   source                      = "./modules/data-query"
   catalog_database_name       = "ukho-ais-data"
   catalog_database_table_name = "raw_ais_data"
-  data_prefix                 = ""
   data_store_name             = data.external.secrets.result["raw_partitioned_ais_store"]
+  data_query_results_store_id = module.storage.data_query_results_store_id
 }

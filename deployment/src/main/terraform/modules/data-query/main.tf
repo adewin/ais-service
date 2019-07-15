@@ -1,6 +1,7 @@
 module data_query_perms {
-  source          = "./permissions/data-query"
-  resource_prefix = "DataQuery"
+  source           = "./permissions/data-query"
+  resource_prefix  = "DataQuery"
+  results_store_id = var.data_query_results_store_id
 }
 
 module catalog {
