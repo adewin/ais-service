@@ -12,21 +12,6 @@ resource aws_glue_catalog_table catalog_database_table {
     EXTERNAL = "TRUE"
   }
 
-  partition_keys {
-    name = "year"
-    type = "int"
-  }
-
-  partition_keys {
-    name = "month"
-    type = "int"
-  }
-
-  partition_keys {
-    name = "day"
-    type = "int"
-  }
-
   storage_descriptor {
     location      = "s3://${var.data_store_name}/${var.data_prefix}"
     input_format  = "org.apache.hadoop.mapred.TextInputFormat"
@@ -37,10 +22,7 @@ resource aws_glue_catalog_table catalog_database_table {
       serialization_library = "org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe"
 
       parameters = {
-        "field.delim"          = "\t"
-        "mapkey.delim"         = "\u0003"
-        "collection.delim"     = "\u0002"
-        "serialization.format" = "\t"
+        "field.delim" = "\t"
       }
     }
 
@@ -121,6 +103,11 @@ resource aws_glue_catalog_table catalog_database_table {
 
     columns {
       name = "flags"
+      type = "string"
+    }
+
+    columns {
+      name = "input_ais_data_file"
       type = "string"
     }
   }
