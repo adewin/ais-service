@@ -1,6 +1,8 @@
 package uk.gov.ukho.ais.partitioning
 
 import java.io.{File, FileFilter}
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 import java.nio.file.{Files, Path, Paths}
 
 import org.apache.commons.io.FileUtils
@@ -20,14 +22,13 @@ class ComponentTest {
   }
 
   @After
-  def afterEach(): Unit = {
+  def afterEach(): Unit =
     FileUtils.forceDelete(tempOutputDir)
-  }
 
   @Test
   def whenPingsFrom6MonthsThen6FilesCreatedInCorrectFolders(): Unit = {
     val inputFilePath: String =
-      ResourceService.copyFileToFileSystem("ais_6pings.txt")
+      ResourceService.copyFileToFileSystem("ais_8pings.txt")
 
     PartitionRawAis
       .main(
@@ -38,55 +39,53 @@ class ComponentTest {
           tempOutputDir.getAbsolutePath
         ))
 
-    val inputFileName: String = new File(inputFilePath).getName
+    assertFolderHasSubFolders("", "year=2017", "year=2018", "year=2019")
+    assertFolderHasFiles("", "_SUCCESS", "._SUCCESS.crc")
 
-    assertFolderHasSubFoldersAndFiles("",
-                                      false,
-                                      "year=2017",
-                                      "year=2018",
-                                      "year=2019")
-    assertFolderHasSubFoldersAndFiles("year=2017", false, "month=1", "month=2")
-    assertFolderHasSubFoldersAndFiles("year=2018", false, "month=3", "month=4")
-    assertFolderHasSubFoldersAndFiles("year=2019", false, "month=4", "month=5")
+    assertFolderHasSubFolders("year=2017", "month=1", "month=2")
+    assertFolderHasSubFolders("year=2018", "month=3", "month=4")
+    assertFolderHasSubFolders("year=2019", "month=4", "month=5")
 
-    Array[String](
-      "year=2017/month=1",
-      "year=2017/month=2",
-      "year=2018/month=3",
-      "year=2018/month=4",
-      "year=2019/month=4",
-      "year=2019/month=5"
-    ).foreach(subDir => {
-      assertFolderHasSubFoldersAndFiles(subDir, false, inputFileName)
-      assertFolderHasSubFoldersAndFiles(subDir + s"/$inputFileName",
-                                        hasFiles = true)
-    })
+    assertFolderHasSubFolders("year=2017/month=1", "day=1", "day=2")
+    assertFolderHasSubFolders("year=2017/month=2", "day=1")
+    assertFolderHasSubFolders("year=2018/month=3", "day=1")
+    assertFolderHasSubFolders("year=2018/month=4", "day=1", "day=2")
+    assertFolderHasSubFolders("year=2019/month=4", "day=1")
+    assertFolderHasSubFolders("year=2019/month=5", "day=1")
+
+    assertFolderIsNotEmpty("year=2017/month=1/day=1")
+    assertFolderIsNotEmpty("year=2017/month=1/day=2")
+    assertFolderIsNotEmpty("year=2017/month=2/day=1")
+    assertFolderIsNotEmpty("year=2018/month=3/day=1")
+    assertFolderIsNotEmpty("year=2018/month=4/day=1")
+    assertFolderIsNotEmpty("year=2018/month=4/day=2")
+    assertFolderIsNotEmpty("year=2019/month=4/day=1")
+    assertFolderIsNotEmpty("year=2019/month=5/day=1")
   }
 
-  private def assertFolderHasSubFoldersAndFiles(folder: String,
-                                                hasFiles: Boolean,
-                                                subFolders: String*): Unit = {
-    val (directories: Array[String], files: Array[String]) =
-      getFilesAndDirectories(folder)
-    assertThat(directories).containsExactlyInAnyOrder(subFolders: _*)
-    assertThat(files.length != 0).isEqualTo(hasFiles)
-  }
+  private def assertFolderHasSubFolders(folder: String,
+                                        subFolders: String*): Unit =
+    assertThat(getDirectories(folder)).containsExactlyInAnyOrder(subFolders: _*)
 
-  private def getFilesAndDirectories(
-      subFolder: String): (Array[String], Array[String]) = {
-    val dir: File = Paths.get(tempOutputDir.getAbsolutePath, subFolder).toFile
+  private def assertFolderHasFiles(folder: String, files: String*): Unit =
+    assertThat(getFiles(folder)).containsExactlyInAnyOrder(files: _*)
 
-    val directories: Array[String] = dir
-      .listFiles(new FileFilter {
-        override def accept(file: File): Boolean = file.isDirectory
-      })
-      .map(file => file.getName)
+  private def assertFolderIsNotEmpty(folder: String): Unit =
+    assertThat(getFiles(folder)).isNotEmpty
 
-    val files: Array[String] = dir
-      .listFiles(new FileFilter {
-        override def accept(file: File): Boolean = file.isFile
-      })
-      .map(file => file.getName)
-    (directories, files)
-  }
+  private def getDirectories(subFolder: String): Array[String] =
+    Paths
+      .get(tempOutputDir.getAbsolutePath, subFolder)
+      .toFile
+      .listFiles()
+      .filter(_.isDirectory)
+      .map(_.getName)
+
+  private def getFiles(subFolder: String): Array[String] =
+    Paths
+      .get(tempOutputDir.getAbsolutePath, subFolder)
+      .toFile
+      .listFiles()
+      .filter(_.isFile)
+      .map(_.getName)
 }
