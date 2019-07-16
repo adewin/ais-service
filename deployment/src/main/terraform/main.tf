@@ -59,6 +59,12 @@ module functions {
   partitioning_spark_job_jar_name = var.PARTITIONING_SPARK_JOB_JAR_NAME
 }
 
+module messaging {
+  source                         = "./modules/messaging"
+  ais_raw_partitioned_store_id   = module.storage.raw_partitioned_ais_store_id
+  ais_raw_partitioned_store_name = data.external.secrets.result["raw_partitioned_ais_store"]
+}
+
 module notifications {
   source = "./modules/notifications"
 }
