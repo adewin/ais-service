@@ -30,6 +30,7 @@ object PartitionRawAis {
       .format("csv")
       .option("sep", "\t")
       .option("compression", "bzip2")
+      .option("timestampFormat", "dd-MM-yyyy HH:mm:ss")
       .mode(SaveMode.Append)
       .save(config.outputDirectory)
   }

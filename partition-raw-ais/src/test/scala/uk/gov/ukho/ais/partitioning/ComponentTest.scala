@@ -1,11 +1,12 @@
 package uk.gov.ukho.ais.partitioning
 
-import java.io.{File, FileFilter}
+import java.io.{BufferedReader, File, FileFilter, FileInputStream, FileReader}
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 import java.nio.file.{Files, Path, Paths}
 
-import org.apache.commons.io.FileUtils
+import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream
+import org.apache.commons.io.{FileUtils, IOUtils}
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.{After, Before, Test}
 import uk.gov.ukho.ais.{ResourceService, Session}
@@ -61,6 +62,32 @@ class ComponentTest {
     assertFolderIsNotEmpty("year=2018/month=4/day=2")
     assertFolderIsNotEmpty("year=2019/month=4/day=1")
     assertFolderIsNotEmpty("year=2019/month=5/day=1")
+  }
+
+  @Test
+  def whenGivenTimestampThenTimestampIsOutputInUTCFormatAndFilenameColumnCreated()
+    : Unit = {
+    val inputFilePath: String =
+      ResourceService.copyFileToFileSystem("ais_8pings.txt")
+
+    PartitionRawAis
+      .main(
+        Array(
+          "-i",
+          inputFilePath,
+          "-o",
+          tempOutputDir.getAbsolutePath
+        ))
+
+    val dir = new File(
+      s"${tempOutputDir.getAbsolutePath}/year=2017/month=1/day=1")
+    val file =
+      FileUtils.listFiles(dir, Array("bz2"), false).stream().findFirst().get()
+    val stream = new BZip2CompressorInputStream(new FileInputStream(file))
+
+    val split = IOUtils.toString(stream, StandardCharsets.UTF_8).split("\t")
+    assertThat(split(2)).isEqualTo("01-01-2017 00:00:50")
+    assertThat(split.last.stripLineEnd).isEqualTo(s"file://$inputFilePath")
   }
 
   private def assertFolderHasSubFolders(folder: String,
