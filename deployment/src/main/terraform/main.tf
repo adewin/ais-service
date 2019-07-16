@@ -68,7 +68,6 @@ module data_query {
   ais_catalog_database_name                             = "ukho-ais-data"
   ais_raw_catalog_database_table_name                   = "raw_ais_data"
   ais_raw_partitioned_store_name                        = data.external.secrets.result["raw_partitioned_ais_store"]
-  resampled_partitioned_ais_catalog_database_name       = "ukho-resampled-ais-data"
   resampled_partitioned_ais_catalog_database_table_name = "resampled_ais_data"
   resampled_partitioned_ais_store_name                  = data.external.secrets.result["resampled_partitioned_ais_store"]
   data_query_results_store_id                           = module.storage.data_query_results_store_id
