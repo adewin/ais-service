@@ -4,10 +4,6 @@ module data_query_perms {
   results_store_id = var.data_query_results_store_id
 }
 
-module catalog {
-  source                      = "./catalog"
-  catalog_database_name       = var.catalog_database_name
-  catalog_database_table_name = var.catalog_database_table_name
-  data_prefix                 = var.data_prefix
-  data_store_name             = var.data_store_name
+resource aws_glue_catalog_database catalog_database {
+  name = var.ais_catalog_database_name
 }

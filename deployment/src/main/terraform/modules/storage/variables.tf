@@ -5,3 +5,6 @@ variable raw_ais_store_name {}
 variable raw_partitioned_ais_store_name {}
 
 variable data_query_results_store_name {}
+
+variable resampled_partitioned_ais_store_name {}
+
