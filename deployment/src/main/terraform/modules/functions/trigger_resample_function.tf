@@ -38,7 +38,7 @@ module trigger_resample_store_permissions {
 
 module trigger_resample_function_trigger {
   source          = "./triggers/time_based"
-  cron_expression = "0 21 * * MON-FRI"
+  cron_expression = "0 21 ? * MON-FRI *"
   function_id     = module.trigger_resample_function.function_id
   function_name   = module.trigger_resample_function.function_name
 }
