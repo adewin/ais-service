@@ -43,26 +43,29 @@ module old_spark_jar {
   store_name = data.external.secrets.result["jobs_bucket"]
 }
 
-module functions {
-  source                          = "./modules/functions"
-  ais_data_upload_store_name      = data.external.secrets.result["ais_data_upload_store"]
-  ais_raw_store_name              = data.external.secrets.result["raw_ais_store"]
-  emr_logs_store_name             = data.external.secrets.result["emr_logs_bucket"]
-  heatmap_store_name              = data.external.secrets.result["sensitive_heatmap_bucket"]
-  jobs_store_name                 = data.external.secrets.result["jobs_bucket"]
-  sensitive_heatmap_store_name    = data.external.secrets.result["sensitive_heatmap_bucket"]
-  ais_raw_partitioned_store_name  = data.external.secrets.result["raw_partitioned_ais_store"]
-  trigger_raw_partition_jar       = var.TRIGGER_RAW_PARTITION_FUNCTION_LAMBDA_JAR_PATH
-  data_upload_function_jar        = var.DATA_FILE_FUNCTION_LAMBDA_JAR_PATH
-  emr_all_jobs_function_jar       = var.AIS_BATCH_FUNCTION_JAR_PATH
-  all_heatmaps_spark_job_jar_name = var.OLD_SPARK_JOB_JAR_NAME
-  partitioning_spark_job_jar_name = var.PARTITIONING_SPARK_JOB_JAR_NAME
-}
-
 module messaging {
   source                         = "./modules/messaging"
   ais_raw_partitioned_store_id   = module.storage.raw_partitioned_ais_store_id
   ais_raw_partitioned_store_name = data.external.secrets.result["raw_partitioned_ais_store"]
+}
+
+module functions {
+  source                               = "./modules/functions"
+  ais_data_upload_store_name           = data.external.secrets.result["ais_data_upload_store"]
+  ais_raw_store_name                   = data.external.secrets.result["raw_ais_store"]
+  emr_logs_store_name                  = data.external.secrets.result["emr_logs_bucket"]
+  heatmap_store_name                   = data.external.secrets.result["sensitive_heatmap_bucket"]
+  jobs_store_name                      = data.external.secrets.result["jobs_bucket"]
+  sensitive_heatmap_store_name         = data.external.secrets.result["sensitive_heatmap_bucket"]
+  ais_raw_partitioned_store_name       = data.external.secrets.result["raw_partitioned_ais_store"]
+  ais_resampled_partitioned_store_name = data.external.secrets.result["resampled_partitioned_ais_store"]
+  trigger_raw_partition_jar            = var.TRIGGER_RAW_PARTITION_FUNCTION_LAMBDA_JAR_PATH
+  data_upload_function_jar             = var.DATA_FILE_FUNCTION_LAMBDA_JAR_PATH
+  emr_all_jobs_function_jar            = var.AIS_BATCH_FUNCTION_JAR_PATH
+  all_heatmaps_spark_job_jar_name      = var.OLD_SPARK_JOB_JAR_NAME
+  partitioning_spark_job_jar_name      = var.PARTITIONING_SPARK_JOB_JAR_NAME
+  new_partitioned_raw_queue_url        = module.messaging.new_partitioned_file_queue_url
+  trigger_resample_jar                 = var.TRIGGER_RESAMPLE_FUNCTION_LAMBDA_JAR_PATH
 }
 
 module notifications {

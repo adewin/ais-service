@@ -21,7 +21,7 @@ module trigger_raw_partition_function {
 }
 
 module trigger_raw_partition_read_raw_data_permissions {
-  source                       = "./permissions/store-get-objects"
+  source                       = "./permissions/store/get-objects"
   function_execution_role_name = module.trigger_raw_partition_function.function_execution_role_name
   function_name                = module.trigger_raw_partition_function.function_name
   store_name                   = var.ais_raw_store_name

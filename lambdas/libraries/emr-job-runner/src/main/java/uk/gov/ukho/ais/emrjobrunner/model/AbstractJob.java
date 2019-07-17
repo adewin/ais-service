@@ -6,6 +6,10 @@ public abstract class AbstractJob {
 
   private final boolean active;
 
+  public AbstractJob() {
+    this.active = true;
+  }
+
   protected AbstractJob(boolean active) {
     this.active = active;
   }

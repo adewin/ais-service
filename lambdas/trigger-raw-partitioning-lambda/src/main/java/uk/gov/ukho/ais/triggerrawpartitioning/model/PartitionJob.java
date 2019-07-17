@@ -10,7 +10,7 @@ public class PartitionJob extends AbstractJob {
   private final String fileReference;
 
   public PartitionJob(String fileReference) {
-    super(true);
+    super();
     this.fileReference = fileReference;
   }
 
