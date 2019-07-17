@@ -41,7 +41,7 @@
     </suppress>
     <suppress until="2019-08-01Z">
         <notes><![CDATA[
-        2.9.9 is the latest version of com.fasterxml.jackson.core:jackson-databind
+        2.9.9.1 is the latest version of com.fasterxml.jackson.core:jackson-databind
         ]]></notes>
         <cve>CVE-2019-12814</cve>
     </suppress>
@@ -74,6 +74,7 @@
         <cve>CVE-2018-7489</cve>
         <cve>CVE-2019-12086</cve>
         <cve>CVE-2019-12384</cve>
+        <cve>CVE-2018-11307</cve>
         <cwe>611</cwe>
     </suppress>
 </suppressions>

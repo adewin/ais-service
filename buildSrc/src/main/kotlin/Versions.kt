@@ -10,7 +10,7 @@ object Versions {
     const val mavenAwsBom = "1.11.571"
     const val lambdaJavaCore = "1.2.0"
     const val dependencyCheckGradle = "5.1.0"
-    const val jacksonDatabind = "2.9.9"
+    const val jacksonDatabind = "2.9.9.1"
     const val findsecbugs = "1.7.1"
     const val sprayJson = "1.3.5"
     const val guava = "28.0-jre"
