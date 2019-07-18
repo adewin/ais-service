@@ -36,6 +36,13 @@ module partitioning_spark_jar {
   store_name = data.external.secrets.result["jobs_bucket"]
 }
 
+module resampling_spark_jar {
+  source     = "./modules/storage/file"
+  file_name  = var.RESAMPLING_SPARK_JOB_JAR_NAME
+  file_path  = var.RESAMPLING_SPARK_JOB_JAR_PATH
+  store_name = data.external.secrets.result["jobs_bucket"]
+}
+
 module old_spark_jar {
   source     = "./modules/storage/file"
   file_name  = var.OLD_SPARK_JOB_JAR_NAME
@@ -66,6 +73,7 @@ module functions {
   partitioning_spark_job_jar_name      = var.PARTITIONING_SPARK_JOB_JAR_NAME
   new_partitioned_raw_queue_url        = module.messaging.new_partitioned_file_queue_url
   trigger_resample_jar                 = var.TRIGGER_RESAMPLE_FUNCTION_LAMBDA_JAR_PATH
+  resampling_spark_job_jar_name        = var.RESAMPLING_SPARK_JOB_JAR_NAME
 }
 
 module notifications {
