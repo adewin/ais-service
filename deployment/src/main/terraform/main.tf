@@ -81,11 +81,13 @@ module notifications {
 }
 
 module data_query {
-  source                                                = "./modules/data-query"
-  ais_catalog_database_name                             = "ukho-ais-data"
-  ais_raw_catalog_database_table_name                   = "raw_ais_data"
-  ais_raw_partitioned_store_name                        = data.external.secrets.result["raw_partitioned_ais_store"]
-  resampled_partitioned_ais_catalog_database_table_name = "resampled_ais_data"
-  resampled_partitioned_ais_store_name                  = data.external.secrets.result["resampled_partitioned_ais_store"]
-  data_query_results_store_id                           = module.storage.data_query_results_store_id
+  source                           = "./modules/data-query"
+  database_name                    = "ukho_ais_data"
+  processed_ais_table_name         = "processed_ais_data"
+  processed_ais_store_name         = data.external.secrets.result["raw_partitioned_ais_store"]
+  derived_resampled_ais_table_name = "derived_resampled_ais_data"
+  derived_resampled_ais_store_name = data.external.secrets.result["resampled_partitioned_ais_store"]
+  osd_ais_table_name               = "osd_ais_data"
+  osd_ais_store_name               = data.external.secrets.result["raw_ais_store"]
+  data_query_results_store_id      = module.storage.data_query_results_store_id
 }

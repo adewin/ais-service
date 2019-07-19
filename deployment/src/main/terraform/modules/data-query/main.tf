@@ -5,5 +5,5 @@ module data_query_perms {
 }
 
 resource aws_glue_catalog_database catalog_database {
-  name = var.ais_catalog_database_name
+  name = var.database_name
 }

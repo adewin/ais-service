@@ -85,7 +85,7 @@ class ComponentTest {
     val stream = new BZip2CompressorInputStream(new FileInputStream(file))
 
     val split = IOUtils.toString(stream, StandardCharsets.UTF_8).split("\t")
-    assertThat(split(2)).isEqualTo("01-01-2017 00:00:50")
+    assertThat(split(2)).isEqualTo("2017-01-01 00:00:50")
     assertThat(split.last.stripLineEnd).isEqualTo(s"file://$inputFilePath")
   }
 

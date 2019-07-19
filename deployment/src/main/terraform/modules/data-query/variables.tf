@@ -1,11 +1,12 @@
-variable ais_catalog_database_name {}
+variable database_name {}
 
-variable ais_raw_catalog_database_table_name {}
+variable processed_ais_table_name {}
+variable processed_ais_store_name {}
 
-variable ais_raw_partitioned_store_name {}
+variable derived_resampled_ais_table_name {}
+variable derived_resampled_ais_store_name {}
 
-variable resampled_partitioned_ais_catalog_database_table_name {}
-
-variable resampled_partitioned_ais_store_name {}
+variable osd_ais_table_name {}
+variable osd_ais_store_name {}
 
 variable data_query_results_store_id {}
