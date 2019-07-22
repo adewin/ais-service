@@ -27,6 +27,8 @@ module storage {
   raw_ais_store_name                   = data.external.secrets.result["raw_ais_store"]
   raw_partitioned_ais_store_name       = data.external.secrets.result["raw_partitioned_ais_store"]
   resampled_partitioned_ais_store_name = data.external.secrets.result["resampled_partitioned_ais_store"]
+  static_data_store_name               = data.external.secrets.result["static_data_store"]
+  static_data_upload_store_name        = data.external.secrets.result["static_data_upload_store"]
 }
 
 module partitioning_spark_jar {
