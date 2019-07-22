@@ -6,7 +6,7 @@ module trigger_raw_partition_function {
   function_environment_variables = {
     JOB_LOCATION                   = "s3://${var.jobs_store_name}/${var.partitioning_spark_job_jar_name}"
     INSTANCE_TYPE_MASTER           = "m5.xlarge"
-    INSTANCE_TYPE_WORKER           = "m5.large"
+    INSTANCE_TYPE_WORKER           = "m5.xlarge"
     LOG_URI                        = "s3://${var.emr_logs_store_name}/"
     SERVICE_ROLE                   = "EMR_DefaultRole"
     JOB_FLOW_ROLE                  = "EMR_EC2_DefaultRole"
@@ -14,7 +14,7 @@ module trigger_raw_partition_function {
     EMR_VERSION                    = "emr-5.20.0"
     INSTANCE_COUNT                 = "9"
     DRIVER_MEMORY                  = "11000m"
-    EXECUTOR_MEMORY                = "5529m"
+    EXECUTOR_MEMORY                = "11000m"
     JOB_FULLY_QUALIFIED_CLASS_NAME = "uk.gov.ukho.ais.partitioning.PartitionRawAis"
     OUTPUT_LOCATION                = "s3a://${var.ais_raw_partitioned_store_name}/"
   }
