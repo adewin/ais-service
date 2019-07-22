@@ -68,17 +68,6 @@ This project provides a simple Terraform plugin to Gradle.
 
 **deployment:terraformApply** - Runs Terraform ```apply```, *--autoApprove* is a flag which will override the manual confirm step to confirm the deployment, the purpose of this is for CI/CD (Runs ```:deployment:terraformInit``` and ```:deployment:terraformDownload``` if these have not been run)
 
-
-## Data Ingest
-
-For filling out the appropriate minimum viable metadata, you're required to have the start and end datetimes of the AIS. Unfortunately there is no easy way to do this currently, therefore the script `get_dates.py` under `scripts/` has been provided. This can only currently be run on our VMs.
-
-To run the above:
-
-```
-python get_dates.py <your-ais-text-file-here>
-```
-
 ## aggregateReports Gradle Task
 
 The `aggregateReports` task has been added to `spark-ais-to-raster/build.gradle.kts`
