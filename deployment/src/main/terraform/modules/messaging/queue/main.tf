@@ -12,6 +12,15 @@ resource aws_sqs_queue new_partitioned_file_queue {
       "Condition": {
         "ArnEquals": { "aws:SourceArn": "${var.message_source_id}" }
       }
+    }, {
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "lambda.amazonaws.com"
+      },
+      "Action": [
+        "sqs:ReceiveMessage",
+        "sqs:PurgeQueue"
+      ]
     }
   ]
 }

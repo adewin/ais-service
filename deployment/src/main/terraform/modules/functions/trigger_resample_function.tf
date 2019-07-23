@@ -35,6 +35,12 @@ module trigger_resample_store_permissions {
   store_name                   = var.ais_resampled_partitioned_store_name
 }
 
+module trigger_resample_queue_permissions {
+  source                       = "./permissions/receive-and-purge-queue-messages"
+  function_execution_role_name = module.trigger_resample_function.function_execution_role_name
+  function_name                = module.trigger_resample_function.function_name
+}
+
 module trigger_resample_function_trigger {
   source          = "./triggers/time_based"
   cron_expression = "0 21 ? * MON-FRI *"

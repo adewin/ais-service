@@ -26,7 +26,7 @@ public class ResamplingServiceSupplier implements Supplier<ResamplingService> {
   }
 
   private static Supplier<List<AbstractJob>> resampleJobsSupplier() {
-    return new ResampleJobsSupplier(null);
+    return new ResampleJobsSupplier(new ResampleLambdaConfiguration());
   }
 
   private static BucketEmptier bucketEmptier() {
