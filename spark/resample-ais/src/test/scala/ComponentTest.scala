@@ -125,12 +125,15 @@ class ComponentTest {
     )
 
     assertThat(getLinesFromFiles("/year=2019/month=1/day=1"))
+      .as("Contains correct 2019 data")
       .containsExactlyElementsOf(expected2019Lines.asJava)
 
     assertThat(getLinesFromFiles("/year=2018/month=1/day=1"))
+      .as("Contains correct 2018 data")
       .containsAll(expected2018Lines.asJava)
 
     assertThat(getLinesFromFiles("/year=2017/month=1/day=1"))
+      .as("Contains correct 2017 data")
       .containsExactlyElementsOf(expected2017Lines.asJava)
   }
 
