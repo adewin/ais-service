@@ -1,8 +1,10 @@
 package uk.gov.ukho.ais.resample
 
 import org.apache.spark.sql.SaveMode
+import uk.gov.ukho.ais.resample.RDDToDataFrameConverter.Converter
+import uk.gov.ukho.ais.resample.Resampler.RDDResampler
+import uk.gov.ukho.ais.resample.ShipPingConverter.ConvertToShipPingTuple
 import uk.gov.ukho.ais.{Schema, Session}
-import ResamplingFilter.ResampleAisPings
 
 object ResampleAis {
 
@@ -20,7 +22,10 @@ object ResampleAis {
       .option("sep", "\t")
       .csv(config.inputPath)
       .selectExpr(selectClause: _*)
+      .rdd
+      .convertToKeyedTuple()
       .resample
+      .convertToDataFrame()
       .write
       .partitionBy("year", "month", "day")
       .format("csv")
