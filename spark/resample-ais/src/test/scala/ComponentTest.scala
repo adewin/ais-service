@@ -124,17 +124,17 @@ class ComponentTest {
       "180207074437632\t3456793\t2017-01-01 00:18:00\t1.0035087719298246\t2.0035087719298246\tA\t1\t0\t0\t0.1\t352.2\t320\t-1\t0\t59916\t1024\twibble"
     )
 
-    assertThat(getLinesFromFiles("/year=2019/month=1/day=1"))
-      .containsExactlyElementsOf(expected2019Lines.asJava)
+    assertThat(getLinesFromFiles("/year=2017/month=1/day=1").asJava)
+      .containsExactlyElementsOf(expected2017Lines.asJava)
 
-    assertThat(getLinesFromFiles("/year=2018/month=1/day=1"))
+    assertThat(getLinesFromFiles("/year=2018/month=1/day=1").asJava)
       .containsAll(expected2018Lines.asJava)
 
-    assertThat(getLinesFromFiles("/year=2017/month=1/day=1"))
-      .containsExactlyElementsOf(expected2017Lines.asJava)
+    assertThat(getLinesFromFiles("/year=2019/month=1/day=1").asJava)
+      .containsExactlyElementsOf(expected2019Lines.asJava)
   }
 
-  private def getLinesFromFiles(dirName: String) = {
+  private def getLinesFromFiles(dirName: String): Iterator[String] = {
     val dir: File = new File(s"${tempOutputDir.getAbsolutePath}$dirName")
     val actualLines: Seq[String] = FileUtils
       .listFiles(dir, Array("bz2"), false)
@@ -143,7 +143,7 @@ class ComponentTest {
       .asScala
       .flatMap(bzFilename => readBzippedFile(bzFilename))
       .toSeq
-    actualLines.iterator.asJava
+    actualLines.iterator
   }
 
   private def readBzippedFile(bzippedFile: File): Iterator[String] = {

@@ -1,13 +1,12 @@
 package uk.gov.ukho.ais.resample
 
 import java.sql.Timestamp
-import java.time.{Instant, LocalDateTime, ZoneOffset}
+import java.time.Instant
 
 import geotrellis.util.Haversine
-import org.apache.spark.sql.catalyst.encoders.RowEncoder
-import org.apache.spark.sql.catalyst.expressions.GenericRowWithSchema
-import org.apache.spark.sql.{DataFrame, Row}
-import uk.gov.ukho.ais.Schema
+import org.apache.spark.sql.DataFrame
+import org.apache.spark.sql.expressions.Window
+import uk.gov.ukho.ais.Schema._
 
 import scala.collection.mutable
 
@@ -15,134 +14,139 @@ object ResamplingFilter {
 
   private final val TIME_STEP: Long = 3 * 60 * 1000
 
+  object ResampleAisPings {
+    private def interpolateBetweenPingsFromTime(prevPing: Ping, currPing: Ping)(
+        implicit config: Config): Seq[Ping] = {
+      if (shouldInterpolateBetweenPings(prevPing, currPing)) {
+        addInterpolatedPings(prevPing, currPing)
+      } else {
+        Seq(currPing)
+      }
+    }
+
+    private def shouldInterpolateBetweenPings(prevPing: Ping, currPing: Ping)(
+        implicit config: Config): Boolean = {
+      currPing.mmsi.equals(prevPing.mmsi) &&
+      isTimeBetweenPingsWithinThreshold(
+        prevPing,
+        currPing,
+        config.interpolationTimeThresholdMilliseconds) &&
+      isDistanceBetweenPingsWithinThreshold(
+        prevPing,
+        currPing,
+        config.interpolationDistanceThresholdMeters)
+    }
+
+    private def isDistanceBetweenPingsWithinThreshold(
+        prevPing: Ping,
+        currPing: Ping,
+        distanceThreshold: Long): Boolean =
+      Haversine(
+        prevPing.longitude,
+        prevPing.latitude,
+        currPing.longitude,
+        currPing.latitude
+      ) <= distanceThreshold
+
+    private def isTimeBetweenPingsWithinThreshold(
+        prevPing: Ping,
+        currPing: Ping,
+        timeThreshold: Long): Boolean =
+      currPing.acquisitionTime.getTime - prevPing.acquisitionTime.getTime <= timeThreshold
+
+    private def addInterpolatedPings(prevPing: Ping,
+                                     currPing: Ping): Seq[Ping] = {
+
+      var nextTime: Long = snapTo3Min(prevPing.acquisitionTime.getTime)
+      val interpolatedPings = mutable.MutableList[Ping]()
+
+      while (nextTime < currPing.acquisitionTime.getTime) {
+        interpolatedPings += interpolateForNextTime(nextTime,
+                                                    prevPing,
+                                                    currPing)
+        nextTime += TIME_STEP
+      }
+
+      if (nextTime == currPing.acquisitionTime.getTime) {
+        interpolatedPings += currPing
+      }
+
+      interpolatedPings
+    }
+
+    private def snapTo3Min(epochTime: Long): Long = {
+      val snappedTime: Long = (epochTime / TIME_STEP) * TIME_STEP
+      if (snappedTime <= epochTime)
+        snappedTime + TIME_STEP
+      else
+        snappedTime
+    }
+
+    private def interpolateForNextTime(nextTimeMillis: Long,
+                                       prevPing: Ping,
+                                       currPing: Ping): Ping = {
+      val timeProportion
+        : Double = (nextTimeMillis - prevPing.acquisitionTime.getTime).toDouble /
+        (currPing.acquisitionTime.getTime - prevPing.acquisitionTime.getTime).toDouble
+
+      val latGap: Double = currPing.latitude - prevPing.latitude
+      val lonGap: Double = currPing.longitude - prevPing.longitude
+
+      val newLat: Double = timeProportion * latGap + prevPing.latitude
+      val newLon: Double = timeProportion * lonGap + prevPing.longitude
+
+      Ping(prevPing.id,
+           prevPing.mmsi,
+           Timestamp.from(Instant.ofEpochMilli(nextTimeMillis)),
+           newLon,
+           newLat,
+           prevPing.row)
+    }
+
+    private def prev(columnName: String): String = s"prev_$columnName"
+
+  }
+
   implicit class ResampleAisPings(df: DataFrame) {
 
-    import df.sqlContext.implicits._
-
     def resample(implicit config: Config): DataFrame = {
-      df.groupByKey(row => row.getAs[String](Schema.MMSI))
-        .flatMapGroups {
-          case (_: String, rows: Iterator[Row]) =>
-            ResamplingFilter.resamplePings(rows.toSeq)
-        } {
-          RowEncoder(Schema.PARTITIONED_AIS_SCHEMA)
-        }
+
+      import df.sparkSession.implicits._
+      import org.apache.spark.sql.functions._
+      import ResampleAisPings.{prev, interpolateBetweenPingsFromTime}
+
+      val windowSpec = Window
+        .partitionBy(MMSI)
+        .orderBy(ACQUISITION_TIME)
+
+      df.withColumn(prev(ARKEVISTA_POS_ID),
+                    lag(ARKEVISTA_POS_ID, 1).over(windowSpec))
+        .withColumn(prev(MMSI), lag(MMSI, 1).over(windowSpec))
+        .withColumn(prev(ACQUISITION_TIME),
+                    lag(ACQUISITION_TIME, 1).over(windowSpec))
+        .withColumn(prev(LONGITUDE), lag(LONGITUDE, 1).over(windowSpec))
+        .withColumn(prev(LATITUDE), lag(LATITUDE, 1).over(windowSpec))
+        .flatMap(row =>
+          interpolateBetweenPingsFromTime(
+            Ping(
+              row.getAs[String](prev(ARKEVISTA_POS_ID)),
+              row.getAs[String](prev(MMSI)),
+              row.getAs[Timestamp](prev(ACQUISITION_TIME)),
+              row.getAs[Double](prev(LONGITUDE)),
+              row.getAs[Double](prev(LATITUDE)),
+              row
+            ),
+            Ping(
+              row.getAs[String](ARKEVISTA_POS_ID),
+              row.getAs[String](MMSI),
+              row.getAs[Timestamp](ACQUISITION_TIME),
+              row.getAs[Double](LONGITUDE),
+              row.getAs[Double](LATITUDE),
+              row
+            )
+          ).map(ping => ping.asTuple()))
+        .toDF(PARTITIONED_AIS_SCHEMA.fieldNames: _*)
     }
   }
 
-  def resamplePings(rows: Seq[Row])(implicit config: Config): Seq[Row] = {
-
-    val outputPings: mutable.MutableList[Row] = mutable.MutableList()
-    var prevPing: Row = null
-
-    rows
-      .sortBy(getAcquisitionTimeAsEpochMillis)
-      .foreach(currPing => {
-
-        if (prevPing == null) {
-          outputPings += currPing
-        } else {
-          outputPings ++= interpolateBetweenPingsFromTime(
-            prevPing,
-            currPing,
-            getAcquisitionTimeAsEpochMillis(outputPings.last))
-        }
-
-        prevPing = currPing
-      })
-
-    outputPings
-  }
-
-  private def getAcquisitionTimeAsEpochMillis(row: Row): Long =
-    row.getAs[Timestamp](Schema.ACQUISITION_TIME).getTime
-
-  private def interpolateBetweenPingsFromTime(
-      prevPing: Row,
-      currPing: Row,
-      fromTime: Long)(implicit config: Config): Seq[Row] = {
-    if (shouldInterpolateBetweenPings(prevPing, currPing)) {
-      addInterpolatedPings(prevPing, currPing, fromTime)
-    } else {
-      List(currPing)
-    }
-  }
-
-  private def shouldInterpolateBetweenPings(prevPing: Row, currPing: Row)(
-      implicit config: Config): Boolean = {
-    isTimeBetweenPingsWithinThreshold(
-      prevPing,
-      currPing,
-      config.interpolationTimeThresholdMilliseconds) &&
-    isDistanceBetweenPingsWithinThreshold(
-      prevPing,
-      currPing,
-      config.interpolationDistanceThresholdMeters)
-  }
-
-  private def isDistanceBetweenPingsWithinThreshold(
-      prevPing: Row,
-      currPing: Row,
-      distanceThreshold: Long): Boolean =
-    Haversine(
-      prevPing.getAs[Double](Schema.LONGITUDE),
-      prevPing.getAs[Double](Schema.LATITUDE),
-      currPing.getAs[Double](Schema.LONGITUDE),
-      currPing.getAs[Double](Schema.LATITUDE)
-    ) <= distanceThreshold
-
-  private def isTimeBetweenPingsWithinThreshold(prevPing: Row,
-                                                currPing: Row,
-                                                timeThreshold: Long): Boolean =
-    getAcquisitionTimeAsEpochMillis(currPing) - getAcquisitionTimeAsEpochMillis(
-      prevPing) <= timeThreshold
-
-  private def addInterpolatedPings(prevPing: Row,
-                                   currPing: Row,
-                                   fromTime: Long): List[Row] = {
-    var nextTime: Long = fromTime + TIME_STEP
-    val interpolatedPings = mutable.MutableList[Row]()
-
-    while (nextTime < getAcquisitionTimeAsEpochMillis(currPing)) {
-      interpolatedPings += interpolateForNextTime(nextTime, prevPing, currPing)
-      nextTime += TIME_STEP
-    }
-
-    if (nextTime == getAcquisitionTimeAsEpochMillis(currPing)) {
-      interpolatedPings += currPing
-    }
-
-    interpolatedPings.toList
-  }
-
-  private def interpolateForNextTime(nextTimeMillis: Long,
-                                     prevPing: Row,
-                                     currPing: Row): Row = {
-
-    val timeProportion: Double = (nextTimeMillis - getAcquisitionTimeAsEpochMillis(
-      prevPing)).toDouble /
-      (getAcquisitionTimeAsEpochMillis(currPing) - getAcquisitionTimeAsEpochMillis(
-        prevPing)).toDouble
-
-    val latGap: Double = currPing.getAs[Double](Schema.LATITUDE) - prevPing
-      .getAs[Double](Schema.LATITUDE)
-    val lonGap: Double = currPing.getAs[Double](Schema.LONGITUDE) - prevPing
-      .getAs[Double](Schema.LONGITUDE)
-
-    val newLat: Double = timeProportion * latGap + prevPing.getAs[Double](
-      Schema.LATITUDE)
-    val newLon: Double = timeProportion * lonGap + prevPing.getAs[Double](
-      Schema.LONGITUDE)
-
-    new GenericRowWithSchema(
-      Schema.PARTITIONED_AIS_SCHEMA.fieldNames.map {
-        case Schema.ACQUISITION_TIME =>
-          Timestamp.from(Instant.ofEpochMilli(nextTimeMillis))
-        case Schema.LATITUDE  => newLat
-        case Schema.LONGITUDE => newLon
-        case field            => prevPing.getAs(field)
-      },
-      Schema.PARTITIONED_AIS_SCHEMA
-    )
-  }
 }

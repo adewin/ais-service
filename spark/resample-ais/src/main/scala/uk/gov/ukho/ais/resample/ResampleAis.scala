@@ -7,6 +7,7 @@ import ResamplingFilter.ResampleAisPings
 object ResampleAis {
 
   def main(args: Array[String]): Unit = {
+
     Session.init("Resample AIS")
 
     implicit val config: Config = ConfigParser.parse(args)

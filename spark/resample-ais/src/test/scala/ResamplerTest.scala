@@ -109,13 +109,15 @@ class ResamplerTest {
           (9991, 0.08, 0.08),
           (9997, 0.1, 0.1)))
     val expectedPings: DataFrame = createDataFrame(
-      Seq((0, 0, 0),
-          (3, 0.01, 0.01),
-          (6, 0.02, 0.02),
-          (9, 0.03, 0.03),
-          (9991, 0.08, 0.08),
-          (9994, 0.09, 0.09),
-          (9997, 0.1, 0.1)))
+      Seq(
+        (0, 0, 0),
+        (3, 0.01, 0.01),
+        (6, 0.02, 0.02),
+        (9, 0.03, 0.03),
+        (9991, 0.08, 0.08),
+        (9993, 0.08666666666666667, 0.08666666666666667),
+        (9996, 0.09666666666666668, 0.09666666666666668)
+      ))
 
     val outPings: DataFrame = inputDataFrame.resample(TEST_CONFIG)
 
@@ -206,9 +208,11 @@ class ResamplerTest {
     val outIter = outPings.toLocalIterator()
 
     while (expectedIter.hasNext) {
-      assertThat(expectedIter.next.toSeq.asJava.iterator())
+      assertThat(outIter.next.toSeq.asJava.iterator())
         .usingComparatorForType(doubleComparator, classOf[Double])
-        .containsExactlyElementsOf(outIter.next.toSeq.asJava)
+        .containsExactlyElementsOf(expectedIter.next.toSeq.asJava)
     }
+
+    assertThat(outIter.hasNext).isFalse()
   }
 }
