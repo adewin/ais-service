@@ -76,6 +76,8 @@ module functions {
   new_partitioned_raw_queue_url        = module.messaging.new_partitioned_file_queue_url
   trigger_resample_jar                 = var.TRIGGER_RESAMPLE_FUNCTION_LAMBDA_JAR_PATH
   resampling_spark_job_jar_name        = var.RESAMPLING_SPARK_JOB_JAR_NAME
+  ais_static_data_store_name           = data.external.secrets.result["static_data_store"]
+  ais_static_data_upload_store_name    = data.external.secrets.result["static_data_upload_store"]
 }
 
 module notifications {
