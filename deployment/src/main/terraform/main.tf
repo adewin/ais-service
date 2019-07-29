@@ -76,6 +76,8 @@ module functions {
   new_partitioned_raw_queue_url        = module.messaging.new_partitioned_file_queue_url
   trigger_resample_jar                 = var.TRIGGER_RESAMPLE_FUNCTION_LAMBDA_JAR_PATH
   resampling_spark_job_jar_name        = var.RESAMPLING_SPARK_JOB_JAR_NAME
+  ais_static_data_store_name           = data.external.secrets.result["static_data_store"]
+  ais_static_data_upload_store_name    = data.external.secrets.result["static_data_upload_store"]
 }
 
 module notifications {
@@ -83,13 +85,16 @@ module notifications {
 }
 
 module data_query {
-  source                           = "./modules/data-query"
-  database_name                    = "ukho_ais_data"
-  processed_ais_table_name         = "processed_ais_data"
-  processed_ais_store_name         = data.external.secrets.result["raw_partitioned_ais_store"]
-  derived_resampled_ais_table_name = "derived_resampled_ais_data"
-  derived_resampled_ais_store_name = data.external.secrets.result["resampled_partitioned_ais_store"]
-  osd_ais_table_name               = "osd_ais_data"
-  osd_ais_store_name               = data.external.secrets.result["raw_ais_store"]
-  data_query_results_store_id      = module.storage.data_query_results_store_id
+  source                                       = "./modules/data-query"
+  database_name                                = "ukho_ais_data"
+  processed_ais_table_name                     = "processed_ais_data"
+  processed_ais_store_name                     = data.external.secrets.result["raw_partitioned_ais_store"]
+  osd_ais_table_name                           = "osd_ais_data"
+  osd_ais_store_name                           = data.external.secrets.result["raw_ais_store"]
+  data_query_results_store_id                  = module.storage.data_query_results_store_id
+  derived_resampled_100km_18hr_ais_data_prefix = "100km_18hr/"
+  derived_resampled_100km_18hr_ais_table_name  = "derived_resampled_100km_18hr_ais_data"
+  derived_resampled_30km_6hr_ais_data_prefix   = "30km_6hr/"
+  derived_resampled_30km_6hr_ais_table_name    = "derived_resampled_30km_6hr_ais_data"
+  derived_resampled_ais_store_name             = data.external.secrets.result["resampled_partitioned_ais_store"]
 }

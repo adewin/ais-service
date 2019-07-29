@@ -9,7 +9,7 @@ resource aws_glue_catalog_table catalog_table {
   }
 
   storage_descriptor {
-    location      = "s3://${var.store_name}/"
+    location      = "s3://${var.store_name}/${var.data_prefix}"
     input_format  = "org.apache.hadoop.mapred.TextInputFormat"
     output_format = "org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat"
 

@@ -8,7 +8,11 @@ variable resampling_spark_job_jar_name {}
 
 variable ais_raw_store_name {}
 
+variable ais_static_data_store_name {}
+
 variable ais_data_upload_store_name {}
+
+variable ais_static_data_upload_store_name {}
 
 variable heatmap_store_name {}
 
