@@ -48,6 +48,7 @@ class TerraformPlugin : Plugin<Project> {
             delete(terraformBinary.absolutePath)
             delete(terraformInitDir.absolutePath)
         }
+        tasks.getByName("clean").dependsOn(terraformTaskClean)
 
         afterEvaluate {
             tasks.register(terraformTaskDownload) {
