@@ -2,8 +2,10 @@ package uk.gov.ukho.ais.triggerresamplelambda.model;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
+
 import uk.gov.ukho.ais.emrjobrunner.model.AbstractJob;
 import uk.gov.ukho.ais.triggerresamplelambda.configuration.ResampleLambdaConfiguration;
 

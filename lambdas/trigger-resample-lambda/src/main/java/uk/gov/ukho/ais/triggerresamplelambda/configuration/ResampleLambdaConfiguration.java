@@ -19,9 +19,7 @@ public class ResampleLambdaConfiguration extends EmrConfiguration {
         System.getenv("JOB_FLOW_ROLE"),
         System.getenv("CLUSTER_NAME"),
         System.getenv("EMR_VERSION"),
-        System.getenv("INSTANCE_COUNT"),
-        System.getenv("DRIVER_MEMORY"),
-        System.getenv("EXECUTOR_MEMORY"));
+        System.getenv("INSTANCE_COUNT"));
 
     queueUrl = System.getenv("QUEUE_URL");
     jobFullyQualifiedClassName = System.getenv("JOB_FULLY_QUALIFIED_CLASS_NAME");

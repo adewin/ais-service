@@ -9,8 +9,6 @@ public class EmrConfiguration {
   private final String clusterName;
   private final String emrVersion;
   private final String instanceCount;
-  private final String driverMemory;
-  private final String executorMemory;
 
   public EmrConfiguration(
       final String masterInstanceType,
@@ -20,9 +18,7 @@ public class EmrConfiguration {
       final String jobFlowRole,
       final String clusterName,
       final String emrVersion,
-      final String instanceCount,
-      final String driverMemory,
-      final String executorMemory) {
+      final String instanceCount) {
     this.masterInstanceType = masterInstanceType;
     this.workerInstanceType = workerInstanceType;
     this.logUri = logUri;
@@ -31,8 +27,6 @@ public class EmrConfiguration {
     this.clusterName = clusterName;
     this.emrVersion = emrVersion;
     this.instanceCount = instanceCount;
-    this.driverMemory = driverMemory;
-    this.executorMemory = executorMemory;
   }
 
   public String getMasterInstanceType() {
@@ -65,13 +59,5 @@ public class EmrConfiguration {
 
   public String getInstanceCount() {
     return instanceCount;
-  }
-
-  public String getDriverMemory() {
-    return driverMemory;
-  }
-
-  public String getExecutorMemory() {
-    return executorMemory;
   }
 }

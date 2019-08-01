@@ -13,8 +13,6 @@ module trigger_raw_partition_function {
     CLUSTER_NAME                   = "AIS Raw Partitioning Cluster"
     EMR_VERSION                    = "emr-5.20.0"
     INSTANCE_COUNT                 = "9"
-    DRIVER_MEMORY                  = "11000m"
-    EXECUTOR_MEMORY                = "11000m"
     JOB_FULLY_QUALIFIED_CLASS_NAME = "uk.gov.ukho.ais.partitioning.PartitionRawAis"
     OUTPUT_LOCATION                = "s3a://${var.ais_raw_partitioned_store_name}/"
   }

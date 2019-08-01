@@ -17,8 +17,6 @@ module emr_all_jobs_function {
     CLUSTER_NAME                   = "AIS Heatmap Cluster"
     EMR_VERSION                    = "emr-5.20.0"
     INSTANCE_COUNT                 = "21"
-    DRIVER_MEMORY                  = "50g"
-    EXECUTOR_MEMORY                = "16g"
     SENSITIVE_OUTPUT_LOCATION      = var.sensitive_heatmap_store_name
     DRAUGHT_CONFIG_FILE            = "s3://${var.jobs_store_name}/draughts.config"
     STATIC_DATA_FILE               = "s3://${var.ais_raw_store_name}/static/arkevista_static.txt.bz2"

@@ -22,8 +22,6 @@ public class PartitionJobTest {
   private final String clusterName = "clusterName";
   private final String emrVersion = "emrVersion";
   private final String instanceCount = "instanceCount";
-  private final String driverMemory = "driverMemory";
-  private final String executorMemory = "executorMemory";
   private final String className = "className";
   private final String jobLocation = "jobLocation";
 
@@ -40,8 +38,6 @@ public class PartitionJobTest {
     environmentVariables.set("CLUSTER_NAME", clusterName);
     environmentVariables.set("EMR_VERSION", emrVersion);
     environmentVariables.set("INSTANCE_COUNT", instanceCount);
-    environmentVariables.set("DRIVER_MEMORY", driverMemory);
-    environmentVariables.set("EXECUTOR_MEMORY", executorMemory);
     environmentVariables.set("JOB_FULLY_QUALIFIED_CLASS_NAME", className);
     environmentVariables.set("JOB_LOCATION", jobLocation);
     environmentVariables.set("OUTPUT_LOCATION", outputLocation);

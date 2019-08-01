@@ -27,7 +27,10 @@ object ResampleAis {
       .option("sep", "\t")
       .option("timestampFormat", "yyyy-MM-dd HH:mm:ss")
       .option("compression", "bzip2")
-      .mode(SaveMode.Append)
+      .mode(SaveMode.Overwrite)
       .save(config.outputDirectory)
+
+    Session.sparkSession.sparkContext.stop()
+    Session.sparkSession.stop()
   }
 }

@@ -28,8 +28,6 @@ public class StepConfigFactoryTest {
   private final String clusterName = "clusterName";
   private final String emrVersion = "emrVersion";
   private final String instanceCount = "instanceCount";
-  private final String driverMemory = "driverMemory";
-  private final String executorMemory = "executorMemory";
   private final EmrConfiguration emrConfiguration =
       new EmrConfiguration(
           masterInstanceType,
@@ -39,9 +37,7 @@ public class StepConfigFactoryTest {
           jobFlowRole,
           clusterName,
           emrVersion,
-          instanceCount,
-          driverMemory,
-          executorMemory);
+          instanceCount);
   private final StepConfigFactory stepConfigFactory = new StepConfigFactory(emrConfiguration);
 
   @Test
@@ -62,14 +58,6 @@ public class StepConfigFactoryTest {
     assertThat(hadoopJarStepConfig.getArgs())
         .containsExactly(
             "spark-submit",
-            "--conf",
-            "spark.driver.maxResultSize=4g",
-            "--conf",
-            "spark.kryoserializer.buffer.max=1024m",
-            "--driver-memory",
-            driverMemory,
-            "--executor-memory",
-            executorMemory,
             "-i",
             "input",
             "-o",
@@ -91,15 +79,6 @@ public class StepConfigFactoryTest {
     assertThat(hadoopJarStepConfig.getJar()).isEqualTo("command-runner.jar");
 
     assertThat(hadoopJarStepConfig.getArgs())
-        .containsExactly(
-            "spark-submit",
-            "--conf",
-            "spark.driver.maxResultSize=4g",
-            "--conf",
-            "spark.kryoserializer.buffer.max=1024m",
-            "--driver-memory",
-            driverMemory,
-            "--executor-memory",
-            executorMemory);
+        .containsExactly("spark-submit");
   }
 }

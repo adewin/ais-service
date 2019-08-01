@@ -3,13 +3,13 @@ package uk.gov.ukho.ais.emrjobrunner;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.elasticmapreduce.AmazonElasticMapReduce;
 import com.amazonaws.services.elasticmapreduce.AmazonElasticMapReduceClientBuilder;
-import com.amazonaws.services.elasticmapreduce.model.Application;
-import com.amazonaws.services.elasticmapreduce.model.JobFlowInstancesConfig;
-import com.amazonaws.services.elasticmapreduce.model.RunJobFlowRequest;
-import com.amazonaws.services.elasticmapreduce.model.StepConfig;
+import com.amazonaws.services.elasticmapreduce.model.*;
+
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+
 import uk.gov.ukho.ais.emrjobrunner.model.AbstractJob;
 import uk.gov.ukho.ais.emrjobrunner.model.EmrConfiguration;
 
@@ -20,7 +20,7 @@ public class EmrJobRunner {
 
   public EmrJobRunner(EmrConfiguration emrConfiguration) {
     this.emrConfiguration = emrConfiguration;
-    this.stepConfigFactory = new StepConfigFactory(emrConfiguration);
+    this.stepConfigFactory = new StepConfigFactory();
   }
 
   public String runEmrJobs(final List<AbstractJob> jobs) {
@@ -33,7 +33,6 @@ public class EmrJobRunner {
   }
 
   private AmazonElasticMapReduce buildMapReduceClient() {
-
     return AmazonElasticMapReduceClientBuilder.standard().withRegion(Regions.EU_WEST_2).build();
   }
 
@@ -50,6 +49,19 @@ public class EmrJobRunner {
         .collect(Collectors.toList());
   }
 
+  private List<Configuration> buildSparkConfigurations() {
+
+    return Arrays.asList(
+        new Configuration()
+            .withClassification("spark")
+            .addPropertiesEntry("maximizeResourceAllocation", "true"),
+        new Configuration()
+            .withClassification("spark-defaults")
+            .addPropertiesEntry("spark.driver.maxResultSize", "4g")
+            .addPropertiesEntry("spark.kryoserializer.buffer.max", "1024m")
+    );
+  }
+
   private RunJobFlowRequest buildJobFlowRequest(
       final List<StepConfig> steps, final List<Application> apps) {
 
@@ -58,6 +70,7 @@ public class EmrJobRunner {
         .withReleaseLabel(emrConfiguration.getEmrVersion())
         .withSteps(steps)
         .withApplications(apps)
+        .withConfigurations(buildSparkConfigurations())
         .withLogUri(emrConfiguration.getLogUri())
         .withServiceRole(emrConfiguration.getServiceRole())
         .withJobFlowRole(emrConfiguration.getJobFlowRole())

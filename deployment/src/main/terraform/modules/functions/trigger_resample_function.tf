@@ -6,15 +6,13 @@ module trigger_resample_function {
   jar              = var.trigger_resample_jar
   function_environment_variables = {
     INSTANCE_TYPE_MASTER           = "m5.xlarge"
-    INSTANCE_TYPE_WORKER           = "m5.xlarge"
+    INSTANCE_TYPE_WORKER           = "r5d.16xlarge"
     LOG_URI                        = "s3://${var.emr_logs_store_name}/"
     SERVICE_ROLE                   = "EMR_DefaultRole"
     JOB_FLOW_ROLE                  = "EMR_EC2_DefaultRole"
     CLUSTER_NAME                   = "AIS Raw Resampling Cluster"
     EMR_VERSION                    = "emr-5.20.0"
-    INSTANCE_COUNT                 = "9"
-    DRIVER_MEMORY                  = "11000m"
-    EXECUTOR_MEMORY                = "11000m"
+    INSTANCE_COUNT                 = "4"
     QUEUE_URL                      = var.new_partitioned_raw_queue_url
     JOB_FULLY_QUALIFIED_CLASS_NAME = "uk.gov.ukho.ais.resample.ResampleAis"
     JOB_LOCATION                   = "s3://${var.jobs_store_name}/${var.resampling_spark_job_jar_name}"

@@ -5,7 +5,7 @@ import java.nio.file.{Files, Path}
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream
 import org.apache.commons.io.FileUtils
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.{After, AfterClass, Before, Test}
+import org.junit.{After, AfterClass, Before, Ignore, Test}
 import uk.gov.ukho.ais.resample.ResampleAis
 import uk.gov.ukho.ais.{ResourceService, Session}
 

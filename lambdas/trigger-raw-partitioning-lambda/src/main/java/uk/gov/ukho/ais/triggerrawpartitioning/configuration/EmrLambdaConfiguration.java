@@ -19,9 +19,7 @@ public class EmrLambdaConfiguration extends EmrConfiguration {
         System.getenv("JOB_FLOW_ROLE"),
         System.getenv("CLUSTER_NAME"),
         System.getenv("EMR_VERSION"),
-        System.getenv("INSTANCE_COUNT"),
-        System.getenv("DRIVER_MEMORY"),
-        System.getenv("EXECUTOR_MEMORY"));
+        System.getenv("INSTANCE_COUNT"));
     jobFullyQualifiedClassName = System.getenv("JOB_FULLY_QUALIFIED_CLASS_NAME");
     jobLocation = System.getenv("JOB_LOCATION");
     outputLocation = System.getenv("OUTPUT_LOCATION");

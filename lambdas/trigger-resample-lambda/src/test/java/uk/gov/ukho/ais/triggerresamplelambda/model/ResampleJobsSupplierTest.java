@@ -55,18 +55,18 @@ public class ResampleJobsSupplierTest {
                 "-d",
                 thirtyKm,
                 "-t",
-                sixHours),
-            Arrays.asList(
-                "--class",
-                jobClass,
-                jobLocation,
-                "-i",
-                inputLocation,
-                "-o",
-                outputLocation + "/100km_18hr/",
-                "-d",
-                oneHundredKm,
-                "-t",
-                eighteenHours));
+                sixHours) /*,
+                          Arrays.asList(
+                              "--class",
+                              jobClass,
+                              jobLocation,
+                              "-i",
+                              inputLocation,
+                              "-o",
+                              outputLocation + "/100km_18hr/",
+                              "-d",
+                              oneHundredKm,
+                              "-t",
+                              eighteenHours)*/);
   }
 }

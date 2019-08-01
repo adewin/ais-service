@@ -4,17 +4,12 @@ import com.amazonaws.services.elasticmapreduce.model.HadoopJarStepConfig;
 import com.amazonaws.services.elasticmapreduce.model.StepConfig;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import uk.gov.ukho.ais.emrjobrunner.model.AbstractJob;
 import uk.gov.ukho.ais.emrjobrunner.model.EmrConfiguration;
 
 class StepConfigFactory {
-
-  private final EmrConfiguration emrConfiguration;
-
-  StepConfigFactory(EmrConfiguration emrConfiguration) {
-    this.emrConfiguration = emrConfiguration;
-  }
 
   StepConfig buildStepConfig(final AbstractJob job) {
     return createStepConfig(createSparkStepConfig(job));
@@ -29,17 +24,7 @@ class StepConfigFactory {
 
   private HadoopJarStepConfig createSparkStepConfig(final AbstractJob job) {
     final List<String> args =
-        new ArrayList<>(
-            Arrays.asList(
-                "spark-submit",
-                "--conf",
-                "spark.driver.maxResultSize=4g",
-                "--conf",
-                "spark.kryoserializer.buffer.max=1024m",
-                "--driver-memory",
-                emrConfiguration.getDriverMemory(),
-                "--executor-memory",
-                emrConfiguration.getExecutorMemory()));
+        new ArrayList<>(Collections.singletonList("spark-submit"));
 
     if (job.getJobSpecificParameters().size() > 0) {
       args.addAll(job.getJobSpecificParameters());

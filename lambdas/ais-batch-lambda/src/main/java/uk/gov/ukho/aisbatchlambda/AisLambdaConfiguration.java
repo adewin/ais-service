@@ -21,8 +21,6 @@ public final class AisLambdaConfiguration {
   private static final String CLUSTER_NAME = System.getenv("CLUSTER_NAME");
   private static final String EMR_VERSION = System.getenv("EMR_VERSION");
   private static final String INSTANCE_COUNT = System.getenv("INSTANCE_COUNT");
-  private static final String DRIVER_MEMORY = System.getenv("DRIVER_MEMORY");
-  private static final String EXECUTOR_MEMORY = System.getenv("EXECUTOR_MEMORY");
 
   private static EmrJobRunner emrJobRunner = null;
 
@@ -39,9 +37,7 @@ public final class AisLambdaConfiguration {
               JOB_FLOW_ROLE,
               CLUSTER_NAME,
               EMR_VERSION,
-              INSTANCE_COUNT,
-              DRIVER_MEMORY,
-              EXECUTOR_MEMORY);
+              INSTANCE_COUNT);
       emrJobRunner = new EmrJobRunner(emrConfiguration);
     }
     return emrJobRunner;
