@@ -13,24 +13,24 @@ object ResampleAis {
     implicit val config: Config = ConfigParser.parse(args)
 
     val selectClause: Seq[String] =
-      Schema.PARTITIONED_AIS_SCHEMA.map(field => field.name)
+      Schema.MINIMAL_PARTITIONED_AIS_SCHEMA.map(field => field.name)
 
-    Session.sparkSession.read
+    val step1 = Session.sparkSession.read
       .schema(Schema.PARTITIONED_AIS_SCHEMA)
       .option("sep", "\t")
       .csv(config.inputPath)
       .selectExpr(selectClause: _*)
-      .resample
+
+    val step2 = step1.resample
+
+    step2
       .write
       .partitionBy("year", "month", "day")
       .format("csv")
       .option("sep", "\t")
       .option("timestampFormat", "yyyy-MM-dd HH:mm:ss")
       .option("compression", "bzip2")
-      .mode(SaveMode.Overwrite)
+      .mode(SaveMode.Append)
       .save(config.outputDirectory)
-
-    Session.sparkSession.sparkContext.stop()
-    Session.sparkSession.stop()
   }
 }

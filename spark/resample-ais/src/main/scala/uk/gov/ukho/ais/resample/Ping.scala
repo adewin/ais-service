@@ -19,6 +19,7 @@ case class Ping(id: String,
      this.acquisitionTime,
      this.longitude,
      this.latitude,
+/*
      this.row.getAs[String](VESSEL_CLASS),
      this.row.getAs[Int](MESSAGE_TYPE_ID),
      this.row.getAs[String](NAVIGATIONAL_STATUS),
@@ -31,6 +32,7 @@ case class Ping(id: String,
      this.row.getAs[String](RADIO_STATUS),
      this.row.getAs[String](FLAGS),
      this.row.getAs[String](INPUT_AIS_DATA_FILE),
+*/
      this.row.getAs[Int](YEAR),
      this.row.getAs[Int](MONTH),
      this.row.getAs[Int](DAY))

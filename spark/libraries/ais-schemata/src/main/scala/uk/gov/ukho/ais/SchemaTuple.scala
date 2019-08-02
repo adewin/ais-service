@@ -9,6 +9,7 @@ object SchemaTuple {
                                Timestamp,
                                Double,
                                Double,
+/*
                                String,
                                Int,
                                String,
@@ -21,6 +22,7 @@ object SchemaTuple {
                                String,
                                String,
                                String,
+*/
                                Int,
                                Int,
                                Int)

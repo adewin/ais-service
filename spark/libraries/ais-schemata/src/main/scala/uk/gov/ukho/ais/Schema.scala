@@ -65,6 +65,19 @@ object Schema {
       .add(MONTH, IntegerType, nullable = false)
       .add(DAY, IntegerType, nullable = false)
 
+  val MINIMAL_PARTITIONED_AIS_SCHEMA: StructType = StructType(
+    Array(
+      StructField(ARKEVISTA_POS_ID, StringType, nullable = false),
+      StructField(MMSI, StringType, nullable = false),
+      StructField(ACQUISITION_TIME, TimestampType, nullable = false),
+      StructField(LONGITUDE, DoubleType, nullable = false),
+      StructField(LATITUDE, DoubleType, nullable = false),
+      StructField(YEAR, IntegerType, nullable = false),
+      StructField(MONTH, IntegerType, nullable = false),
+      StructField(DAY, IntegerType, nullable = false)
+    )
+  )
+
   val STATIC_DATA_SCHEMA: StructType = StructType(
     Array(
       StructField(ARKEVISTA_STATIC_ID, StringType, nullable = false),
