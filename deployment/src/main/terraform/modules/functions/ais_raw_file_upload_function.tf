@@ -2,7 +2,7 @@ module ais_raw_file_upload_function {
   source           = "./function"
   function_name    = "ais-data-upload-handler"
   function_handler = "uk.gov.ukho.ais.ingestuploadfile.FileUploadLambdaRequestHandler"
-  jar              = var.data_upload_function_jar
+  function_code    = var.data_upload_function_jar
   function_environment_variables = {
     DESTINATION_BUCKET     = var.ais_raw_store_name
     DESTINATION_KEY_PREFIX = "data/"

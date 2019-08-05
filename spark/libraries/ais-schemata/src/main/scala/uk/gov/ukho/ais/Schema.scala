@@ -36,6 +36,16 @@ object Schema {
   val PORT = "port"
   val STARBOARD = "starboard"
   val DRAUGHT = "draught"
+  val AIS_VERSION = "AIS_version"
+  val POSITION_DEVICE = "position_device"
+  val ETA = "ETA"
+  val DESTINATION = "destination"
+  val DTE = "DTE"
+  val LAST_TIME_PREV_VAL_SEQ = "LastTimePrevValSeq"
+  val FIRST_TIME_THIS_VAL_SEQ = "FirstTimeThisValSeq"
+  val LAST_TIME_THIS_VAL_SEQ = "LastTimeThisValSeq"
+  val FIRST_TIME_NEXT_VAL_SEQ = "FirstTimeNextValSeq"
+  val COUNT_SEQ = "count_seq"
   val VESSEL_TYPE_INDEX = "vessel_type_indx"
 
   val AIS_SCHEMA: StructType = StructType(
@@ -80,7 +90,18 @@ object Schema {
       StructField(PORT, DoubleType, nullable = false),
       StructField(STARBOARD, DoubleType, nullable = false),
       StructField(DRAUGHT, DoubleType, nullable = false),
-      StructField(VESSEL_TYPE_INDEX, DoubleType, nullable = false)
+      StructField(VESSEL_TYPE_INDEX, IntegerType, nullable = false),
+      StructField(MESSAGE_TYPE_ID, IntegerType, nullable = false),
+      StructField(AIS_VERSION, IntegerType, nullable = false),
+      StructField(POSITION_DEVICE, DoubleType, nullable = false),
+      StructField(ETA, TimestampType, nullable = false),
+      StructField(DESTINATION, StringType, nullable = false),
+      StructField(DTE, IntegerType, nullable = false),
+      StructField(LAST_TIME_PREV_VAL_SEQ, TimestampType, nullable = false),
+      StructField(FIRST_TIME_THIS_VAL_SEQ, TimestampType, nullable = false),
+      StructField(LAST_TIME_THIS_VAL_SEQ, TimestampType, nullable = false),
+      StructField(FIRST_TIME_NEXT_VAL_SEQ, TimestampType, nullable = false),
+      StructField(COUNT_SEQ, IntegerType, nullable = true)
     ))
 
   val DRAUGHT_SCHEMA: StructType = StructType(

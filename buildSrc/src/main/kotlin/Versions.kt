@@ -27,7 +27,7 @@ object Versions {
     const val commonsIo = "1.3.2"
 
     // Plugins
-    const val spotless = "3.23.0"
+    const val spotless = "3.24.0"
     const val shadow = "5.0.0"
     const val wartremover = "0.9.6"
     const val spotbugs = "2.0.0"

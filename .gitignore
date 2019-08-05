@@ -13,3 +13,7 @@ out/
 .terraform/
 
 .scannerwork/
+
+setup.py
+*.egg-info/
+__pycache__/

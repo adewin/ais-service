@@ -11,3 +11,5 @@ variable resampled_partitioned_ais_store_name {}
 variable static_data_store_name {}
 
 variable static_data_upload_store_name {}
+
+variable processed_static_data_store_name {}

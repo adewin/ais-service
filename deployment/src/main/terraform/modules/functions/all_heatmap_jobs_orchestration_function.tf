@@ -2,7 +2,7 @@
 module emr_all_jobs_function {
   source           = "./function"
   function_name    = "emr_all_jobs_orchestration"
-  jar              = var.emr_all_jobs_function_jar
+  function_code    = var.emr_all_jobs_function_jar
   function_handler = "uk.gov.ukho.aisbatchlambda.AisBatchLambdaHandler"
   function_environment_variables = {
     JOB_FULLY_QUALIFIED_CLASS_NAME = "uk.gov.ukho.ais.rasters.AisToRaster"

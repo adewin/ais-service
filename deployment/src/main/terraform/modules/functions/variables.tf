@@ -8,11 +8,11 @@ variable resampling_spark_job_jar_name {}
 
 variable ais_raw_store_name {}
 
-variable ais_static_data_store_name {}
+variable static_data_store_name {}
 
 variable ais_data_upload_store_name {}
 
-variable ais_static_data_upload_store_name {}
+variable static_data_upload_store_name {}
 
 variable heatmap_store_name {}
 
@@ -31,3 +31,7 @@ variable trigger_raw_partition_jar {}
 variable trigger_resample_jar {}
 
 variable ais_resampled_partitioned_store_name {}
+
+variable process_static_data_file_zip {}
+
+variable processed_static_data_store_name {}

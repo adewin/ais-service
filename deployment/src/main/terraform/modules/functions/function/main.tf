@@ -19,12 +19,12 @@ EOF
 
 resource aws_lambda_function lambda_function {
   function_name = var.function_name
-  filename = var.jar
+  filename = var.function_code
   handler = var.function_handler
   role = aws_iam_role.lambda_role.arn
-  runtime = "java8"
-  memory_size = 258
-  timeout = 303
+  runtime = var.runtime
+  memory_size = var.memory
+  timeout = var.timeout
   environment {
     variables = var.function_environment_variables
   }

@@ -1,6 +1,6 @@
 resource aws_glue_catalog_table osd_ais_table {
   name          = var.osd_ais_table_name
-  database_name = var.database_name
+  database_name = var.ais_database_name
 
   table_type = "EXTERNAL_TABLE"
 

@@ -3,7 +3,7 @@ module trigger_resample_function {
   source           = "./function"
   function_handler = "uk.gov.ukho.ais.triggerresamplelambda.TriggerResampleLambdaHandler"
   function_name    = "trigger_resampling"
-  jar              = var.trigger_resample_jar
+  function_code    = var.trigger_resample_jar
   function_environment_variables = {
     INSTANCE_TYPE_MASTER           = "m5.xlarge"
     INSTANCE_TYPE_WORKER           = "m5.xlarge"

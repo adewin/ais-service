@@ -28,4 +28,5 @@ include("deployment",
         "spark:libraries:test-support",
         "spark:resample-ais",
         "spark:old-spark-job",
-        "spark:partition-raw-ais")
+        "spark:partition-raw-ais",
+        "lambdas:process_new_static_file")

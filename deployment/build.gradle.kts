@@ -25,12 +25,14 @@ configure<TerraformExtension> {
     val triggerRawPartitioningLambdaShadowJarTask = tasks.getByPath(":lambdas:trigger-raw-partitioning-lambda:shadowJar")
     val triggerResampleLambdaShadowJarTask = tasks.getByPath(":lambdas:trigger-resample-lambda:shadowJar")
     val oldSparkJobShadowJarTask = tasks.getByPath(":spark:old-spark-job:shadowJar")
+    val processStaticDataDistZipTask = tasks.getByPath(":lambdas:process_new_static_file:pythonDistZip")
 
     dependsOn(aisBatchLambdaShadowJarTask,
             oldSparkJobShadowJarTask,
             ingestUploadFileLambdaShadowJarTask,
             triggerRawPartitioningLambdaShadowJarTask,
             triggerResampleLambdaShadowJarTask,
+            processStaticDataDistZipTask,
             aisRawParititioningSparkJobShadowJarTask,
             aisResamplingSparkJobShadowJarTask)
 
@@ -44,10 +46,11 @@ configure<TerraformExtension> {
             "TF_VAR_PARTITIONING_SPARK_JOB_JAR_PATH" to aisRawParititioningSparkJobShadowJarTask.outputs.files.singleFile.absolutePath,
             "TF_VAR_RESAMPLING_SPARK_JOB_JAR_NAME" to aisResamplingSparkJobShadowJarTask.outputs.files.singleFile.name,
             "TF_VAR_RESAMPLING_SPARK_JOB_JAR_PATH" to aisResamplingSparkJobShadowJarTask.outputs.files.singleFile.absolutePath,
-            "TF_VAR_TRIGGER_RESAMPLE_FUNCTION_LAMBDA_JAR_PATH" to triggerResampleLambdaShadowJarTask.outputs.files.singleFile.absolutePath
+            "TF_VAR_TRIGGER_RESAMPLE_FUNCTION_LAMBDA_JAR_PATH" to triggerResampleLambdaShadowJarTask.outputs.files.singleFile.absolutePath,
+            "TF_VAR_PROCESS_STATIC_DATA_ZIP_PATH" to processStaticDataDistZipTask.outputs.files.singleFile.absolutePath
     )
 }
 
 afterEvaluate {
-    tasks.getByName("spotlessTerraform").apply { dependsOn("terraformDownload") }
+    tasks.getByName("spotlessTerraform").dependsOn("terraformDownload")
 }

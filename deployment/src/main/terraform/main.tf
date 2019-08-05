@@ -29,6 +29,7 @@ module storage {
   resampled_partitioned_ais_store_name = data.external.secrets.result["resampled_partitioned_ais_store"]
   static_data_store_name               = data.external.secrets.result["static_data_store"]
   static_data_upload_store_name        = data.external.secrets.result["static_data_upload_store"]
+  processed_static_data_store_name     = data.external.secrets.result["processed_static_data_store"]
 }
 
 module partitioning_spark_jar {
@@ -69,8 +70,10 @@ module functions {
   partitioning_spark_job_jar_name      = var.PARTITIONING_SPARK_JOB_JAR_NAME
   trigger_resample_jar                 = var.TRIGGER_RESAMPLE_FUNCTION_LAMBDA_JAR_PATH
   resampling_spark_job_jar_name        = var.RESAMPLING_SPARK_JOB_JAR_NAME
-  ais_static_data_store_name           = data.external.secrets.result["static_data_store"]
-  ais_static_data_upload_store_name    = data.external.secrets.result["static_data_upload_store"]
+  static_data_store_name               = data.external.secrets.result["static_data_store"]
+  static_data_upload_store_name        = data.external.secrets.result["static_data_upload_store"]
+  process_static_data_file_zip         = var.PROCESS_STATIC_DATA_ZIP_PATH
+  processed_static_data_store_name     = data.external.secrets.result["processed_static_data_store"]
 }
 
 module notifications {
@@ -79,9 +82,11 @@ module notifications {
 
 module data_query {
   source                                       = "./modules/data-query"
-  database_name                                = "ukho_ais_data"
+  ais_database_name                            = "ukho_ais_data"
   processed_ais_table_name                     = "processed_ais_data"
   processed_ais_store_name                     = data.external.secrets.result["raw_partitioned_ais_store"]
+  processed_static_data_table_name             = "processed_static_data"
+  processed_static_data_store_name             = data.external.secrets.result["processed_static_data_store"]
   osd_ais_table_name                           = "osd_ais_data"
   osd_ais_store_name                           = data.external.secrets.result["raw_ais_store"]
   data_query_results_store_id                  = module.storage.data_query_results_store_id

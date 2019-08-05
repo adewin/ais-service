@@ -2,7 +2,7 @@ module trigger_raw_partition_function {
   source           = "./function"
   function_name    = "trigger-raw-partition"
   function_handler = "uk.gov.ukho.ais.triggerrawpartitioning.TriggerRawPartitioningLambdaHandler"
-  jar              = var.trigger_raw_partition_jar
+  function_code    = var.trigger_raw_partition_jar
   function_environment_variables = {
     JOB_LOCATION                   = "s3://${var.jobs_store_name}/${var.partitioning_spark_job_jar_name}"
     INSTANCE_TYPE_MASTER           = "m5.xlarge"

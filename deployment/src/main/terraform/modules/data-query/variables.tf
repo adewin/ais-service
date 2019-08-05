@@ -1,7 +1,10 @@
-variable database_name {}
+variable ais_database_name {}
 
 variable processed_ais_table_name {}
 variable processed_ais_store_name {}
+
+variable processed_static_data_table_name {}
+variable processed_static_data_store_name {}
 
 variable derived_resampled_30km_6hr_ais_table_name {}
 variable derived_resampled_30km_6hr_ais_data_prefix {}
