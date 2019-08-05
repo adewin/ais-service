@@ -8,10 +8,10 @@ module process_static_data_file_function {
   memory           = 2048
 
   function_environment_variables = {
-    DESTINATION_BUCKET    = var.processed_static_data_store_name
-    DESTINATION_PREFIX    = "data"
-    OUTPUT_FILE_EXTENSION = ".csv.bz2"
-    BUFFER_SIZE_MB        = 512
+    DESTINATION_BUCKET     = var.processed_static_data_store_name
+    DESTINATION_KEY_PREFIX = "data"
+    OUTPUT_FILE_EXTENSION  = ".csv.bz2"
+    BUFFER_SIZE_MB         = 512
   }
 }
 
