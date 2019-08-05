@@ -52,12 +52,6 @@ module old_spark_jar {
   store_name = data.external.secrets.result["jobs_bucket"]
 }
 
-module messaging {
-  source                         = "./modules/messaging"
-  ais_raw_partitioned_store_id   = module.storage.raw_partitioned_ais_store_id
-  ais_raw_partitioned_store_name = data.external.secrets.result["raw_partitioned_ais_store"]
-}
-
 module functions {
   source                               = "./modules/functions"
   ais_data_upload_store_name           = data.external.secrets.result["ais_data_upload_store"]
@@ -73,7 +67,6 @@ module functions {
   emr_all_jobs_function_jar            = var.AIS_BATCH_FUNCTION_JAR_PATH
   all_heatmaps_spark_job_jar_name      = var.OLD_SPARK_JOB_JAR_NAME
   partitioning_spark_job_jar_name      = var.PARTITIONING_SPARK_JOB_JAR_NAME
-  new_partitioned_raw_queue_url        = module.messaging.new_partitioned_file_queue_url
   trigger_resample_jar                 = var.TRIGGER_RESAMPLE_FUNCTION_LAMBDA_JAR_PATH
   resampling_spark_job_jar_name        = var.RESAMPLING_SPARK_JOB_JAR_NAME
   ais_static_data_store_name           = data.external.secrets.result["static_data_store"]

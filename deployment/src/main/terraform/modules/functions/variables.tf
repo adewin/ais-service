@@ -30,6 +30,4 @@ variable trigger_raw_partition_jar {}
 
 variable trigger_resample_jar {}
 
-variable new_partitioned_raw_queue_url {}
-
 variable ais_resampled_partitioned_store_name {}

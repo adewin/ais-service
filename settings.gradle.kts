@@ -7,6 +7,7 @@ pluginManagement {
                 "cz.augi.gradle.wartremover" -> useVersion(Versions.wartremover)
                 "org.owasp.dependencycheck" -> useVersion(Versions.dependencyCheckGradle)
                 "com.github.spotbugs" -> useVersion(Versions.spotbugs)
+                "org.springframework.boot" -> useVersion(Versions.springBoot)
             }
         }
     }

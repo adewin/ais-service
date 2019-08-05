@@ -16,6 +16,8 @@ object Versions {
     const val guava = "28.0-jre"
     const val log4j = "2.12.0"
     const val hadoop = "2.9.2"
+    const val springCloudFunction = "2.0.2.RELEASE"
+    const val springBoot = "2.1.6.RELEASE"
 
     // Test dependencies
     const val junit = "4.12"

@@ -15,7 +15,6 @@ module trigger_resample_function {
     INSTANCE_COUNT                 = "9"
     DRIVER_MEMORY                  = "11000m"
     EXECUTOR_MEMORY                = "11000m"
-    QUEUE_URL                      = var.new_partitioned_raw_queue_url
     JOB_FULLY_QUALIFIED_CLASS_NAME = "uk.gov.ukho.ais.resample.ResampleAis"
     JOB_LOCATION                   = "s3://${var.jobs_store_name}/${var.resampling_spark_job_jar_name}"
     INPUT_LOCATION                 = "s3a://${var.ais_raw_partitioned_store_name}"
@@ -26,24 +25,4 @@ module trigger_resample_function {
 module trigger_resample_spark_job_permissions {
   source                       = "./permissions/run-spark-job"
   function_execution_role_name = module.trigger_resample_function.function_execution_role_name
-}
-
-module trigger_resample_store_permissions {
-  source                       = "./permissions/store/remove-objects"
-  function_execution_role_name = module.trigger_resample_function.function_execution_role_name
-  function_name                = module.trigger_resample_function.function_name
-  store_name                   = var.ais_resampled_partitioned_store_name
-}
-
-module trigger_resample_queue_permissions {
-  source                       = "./permissions/receive-and-purge-queue-messages"
-  function_execution_role_name = module.trigger_resample_function.function_execution_role_name
-  function_name                = module.trigger_resample_function.function_name
-}
-
-module trigger_resample_function_trigger {
-  source          = "./triggers/time_based"
-  cron_expression = "0 21 ? * MON-FRI *"
-  function_id     = module.trigger_resample_function.function_id
-  function_name   = module.trigger_resample_function.function_name
 }

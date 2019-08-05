@@ -1,37 +1,49 @@
 package uk.gov.ukho.ais.triggerresamplelambda.configuration;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 import uk.gov.ukho.ais.emrjobrunner.model.EmrConfiguration;
 
+@Component
 public class ResampleLambdaConfiguration extends EmrConfiguration {
 
-  private final String queueUrl;
   private final String jobFullyQualifiedClassName;
   private final String jobLocation;
   private final String inputLocation;
   private final String outputLocation;
 
-  public ResampleLambdaConfiguration() {
+  @Autowired
+  public ResampleLambdaConfiguration(
+      @Value("${INSTANCE_TYPE_MASTER}") final String masterInstanceType,
+      @Value("${INSTANCE_TYPE_WORKER}") final String workerInstanceType,
+      @Value("${LOG_URI}") final String logUri,
+      @Value("${SERVICE_ROLE}") final String serviceRole,
+      @Value("${JOB_FLOW_ROLE}") final String jobFlowRole,
+      @Value("${CLUSTER_NAME}") final String clusterName,
+      @Value("${EMR_VERSION}") final String emrVersion,
+      @Value("${INSTANCE_COUNT}") final String instanceCount,
+      @Value("${DRIVER_MEMORY}") final String driverMemory,
+      @Value("${EXECUTOR_MEMORY}") final String executorMemory,
+      @Value("${JOB_FULLY_QUALIFIED_CLASS_NAME}") final String jobFullyQualifiedClassName,
+      @Value("${JOB_LOCATION}") final String jobLocation,
+      @Value("${INPUT_LOCATION}") final String inputLocation,
+      @Value("${OUTPUT_LOCATION}") final String outputLocation) {
     super(
-        System.getenv("INSTANCE_TYPE_MASTER"),
-        System.getenv("INSTANCE_TYPE_WORKER"),
-        System.getenv("LOG_URI"),
-        System.getenv("SERVICE_ROLE"),
-        System.getenv("JOB_FLOW_ROLE"),
-        System.getenv("CLUSTER_NAME"),
-        System.getenv("EMR_VERSION"),
-        System.getenv("INSTANCE_COUNT"),
-        System.getenv("DRIVER_MEMORY"),
-        System.getenv("EXECUTOR_MEMORY"));
-
-    queueUrl = System.getenv("QUEUE_URL");
-    jobFullyQualifiedClassName = System.getenv("JOB_FULLY_QUALIFIED_CLASS_NAME");
-    jobLocation = System.getenv("JOB_LOCATION");
-    inputLocation = System.getenv("INPUT_LOCATION");
-    outputLocation = System.getenv("OUTPUT_LOCATION");
-  }
-
-  public String getQueueUrl() {
-    return queueUrl;
+        masterInstanceType,
+        workerInstanceType,
+        logUri,
+        serviceRole,
+        jobFlowRole,
+        clusterName,
+        emrVersion,
+        instanceCount,
+        driverMemory,
+        executorMemory);
+    this.jobFullyQualifiedClassName = jobFullyQualifiedClassName;
+    this.jobLocation = jobLocation;
+    this.inputLocation = inputLocation;
+    this.outputLocation = outputLocation;
   }
 
   public String getJobFullyQualifiedClassName() {
