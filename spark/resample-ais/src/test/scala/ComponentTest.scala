@@ -5,7 +5,7 @@ import java.nio.file.{Files, Path}
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream
 import org.apache.commons.io.FileUtils
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.{After, AfterClass, Before, Test}
+import org.junit.{After, AfterClass, Before, Ignore, Test}
 import uk.gov.ukho.ais.resample.ResampleAis
 import uk.gov.ukho.ais.{ResourceService, Session}
 
@@ -124,20 +124,20 @@ class ComponentTest {
       "180207074437632\t3456793\t2017-01-01 00:18:00\t1.0035087719298246\t2.0035087719298246\tA\t1\t0\t0\t0.1\t352.2\t320\t-1\t0\t59916\t1024\twibble"
     )
 
-    assertThat(getLinesFromFiles("/year=2019/month=1/day=1"))
-      .as("Contains correct 2019 data")
-      .containsExactlyElementsOf(expected2019Lines.asJava)
+    assertThat(getLinesFromFiles("/year=2017/month=1/day=1").asJava)
+      .as("Contains correct 2017 data")
+      .containsExactlyElementsOf(expected2017Lines.asJava)
 
-    assertThat(getLinesFromFiles("/year=2018/month=1/day=1"))
+    assertThat(getLinesFromFiles("/year=2018/month=1/day=1").asJava)
       .as("Contains correct 2018 data")
       .containsAll(expected2018Lines.asJava)
 
-    assertThat(getLinesFromFiles("/year=2017/month=1/day=1"))
-      .as("Contains correct 2017 data")
-      .containsExactlyElementsOf(expected2017Lines.asJava)
+    assertThat(getLinesFromFiles("/year=2019/month=1/day=1").asJava)
+      .as("Contains correct 2019 data")
+      .containsExactlyElementsOf(expected2019Lines.asJava)
   }
 
-  private def getLinesFromFiles(dirName: String) = {
+  private def getLinesFromFiles(dirName: String): Iterator[String] = {
     val dir: File = new File(s"${tempOutputDir.getAbsolutePath}$dirName")
     val actualLines: Seq[String] = FileUtils
       .listFiles(dir, Array("bz2"), false)
@@ -146,7 +146,7 @@ class ComponentTest {
       .asScala
       .flatMap(bzFilename => readBzippedFile(bzFilename))
       .toSeq
-    actualLines.iterator.asJava
+    actualLines.iterator
   }
 
   private def readBzippedFile(bzippedFile: File): Iterator[String] = {
