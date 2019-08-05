@@ -3,7 +3,7 @@ module process_static_data_file_function {
   function_name    = "process-static-data-file-handler"
   function_handler = "process_new_static_file.lambda_handler.lambda_handler"
   function_code    = var.process_static_data_file_zip
-  runtime          = "python3"
+  runtime          = "python3.7"
   timeout          = 900
   memory           = 2048
 
