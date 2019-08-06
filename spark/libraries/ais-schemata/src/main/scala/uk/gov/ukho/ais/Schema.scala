@@ -21,6 +21,7 @@ object Schema {
   val RADIO_STATUS = "radio_status"
   val FLAGS = "flags"
   val INPUT_AIS_DATA_FILE = "input_ais_data_file"
+  val INPUT_OSD_STATIC_DATA_FILE = "input_osd_static_data_file"
   val YEAR = "year"
   val MONTH = "month"
   val DAY = "day"
@@ -101,7 +102,8 @@ object Schema {
       StructField(FIRST_TIME_THIS_VAL_SEQ, TimestampType, nullable = false),
       StructField(LAST_TIME_THIS_VAL_SEQ, TimestampType, nullable = false),
       StructField(FIRST_TIME_NEXT_VAL_SEQ, TimestampType, nullable = false),
-      StructField(COUNT_SEQ, IntegerType, nullable = true)
+      StructField(COUNT_SEQ, IntegerType, nullable = true),
+      StructField(INPUT_OSD_STATIC_DATA_FILE, StringType, nullable = false)
     ))
 
   val DRAUGHT_SCHEMA: StructType = StructType(

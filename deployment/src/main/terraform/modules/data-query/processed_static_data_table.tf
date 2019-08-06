@@ -146,5 +146,10 @@ resource aws_glue_catalog_table processed_static_data_store {
       name = "count_seq"
       type = "int"
     }
+
+    columns {
+      name = "input_osd_static_data_file"
+      type = "string"
+    }
   }
 }
