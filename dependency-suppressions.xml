@@ -75,6 +75,8 @@
         <cve>CVE-2019-12086</cve>
         <cve>CVE-2019-12384</cve>
         <cve>CVE-2018-11307</cve>
+        <cve>CVE-2019-14379</cve>
+        <cve>CVE-2019-14439</cve>
         <cwe>611</cwe>
     </suppress>
 </suppressions>
