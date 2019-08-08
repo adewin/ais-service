@@ -4,6 +4,7 @@ import com.amazonaws.regions.Regions;
 import com.amazonaws.services.elasticmapreduce.AmazonElasticMapReduce;
 import com.amazonaws.services.elasticmapreduce.AmazonElasticMapReduceClientBuilder;
 import com.amazonaws.services.elasticmapreduce.model.Application;
+import com.amazonaws.services.elasticmapreduce.model.Configuration;
 import com.amazonaws.services.elasticmapreduce.model.JobFlowInstancesConfig;
 import com.amazonaws.services.elasticmapreduce.model.RunJobFlowRequest;
 import com.amazonaws.services.elasticmapreduce.model.StepConfig;
@@ -50,6 +51,12 @@ public class EmrJobRunner {
         .collect(Collectors.toList());
   }
 
+  private Configuration buildSparkConfiguration() {
+    return new Configuration()
+        .withClassification("spark")
+        .addPropertiesEntry("maximizeResourceAllocation", "true");
+  }
+
   private RunJobFlowRequest buildJobFlowRequest(
       final List<StepConfig> steps, final List<Application> apps) {
 
@@ -58,6 +65,7 @@ public class EmrJobRunner {
         .withReleaseLabel(emrConfiguration.getEmrVersion())
         .withSteps(steps)
         .withApplications(apps)
+        .withConfigurations(buildSparkConfiguration())
         .withLogUri(emrConfiguration.getLogUri())
         .withServiceRole(emrConfiguration.getServiceRole())
         .withJobFlowRole(emrConfiguration.getJobFlowRole())
