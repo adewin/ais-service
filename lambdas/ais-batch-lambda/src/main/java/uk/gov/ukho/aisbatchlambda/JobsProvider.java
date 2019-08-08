@@ -65,6 +65,36 @@ public class JobsProvider {
                     false,
                     false),
                 new HeatmapJob(
+                    "seasonal-world-1k-100km-18hr-Autumn-Aug-2018-Oct-2018",
+                    DEGREES_AT_EQUATOR_FOR_1KM_RESOLUTION,
+                    DISTANCE_INTERPOLATION_THRESHOLD_100KM,
+                    TIME_INTERPOLATION_THRESHOLD_18HR,
+                    "2018-08-01",
+                    "2018-10-31",
+                    "/",
+                    false,
+                    true),
+                new HeatmapJob(
+                    "seasonal-world-1k-100km-18hr-Winter-Nov-2018-Jan-2019",
+                    DEGREES_AT_EQUATOR_FOR_1KM_RESOLUTION,
+                    DISTANCE_INTERPOLATION_THRESHOLD_100KM,
+                    TIME_INTERPOLATION_THRESHOLD_18HR,
+                    "2018-11-01",
+                    "2019-01-31",
+                    "/",
+                    false,
+                    true),
+                new HeatmapJob(
+                    "seasonal-world-1k-100km-18hr-Spring-Feb-2019-Apr-2019",
+                    DEGREES_AT_EQUATOR_FOR_1KM_RESOLUTION,
+                    DISTANCE_INTERPOLATION_THRESHOLD_100KM,
+                    TIME_INTERPOLATION_THRESHOLD_18HR,
+                    "2019-02-01",
+                    "2019-04-30",
+                    "/",
+                    false,
+                    true),
+                new HeatmapJob(
                     "annual-world-1k-30km-6hr-Jul-2018-May-2019",
                     DEGREES_AT_EQUATOR_FOR_1KM_RESOLUTION,
                     DISTANCE_INTERPOLATION_THRESHOLD_30KM,
@@ -117,7 +147,7 @@ public class JobsProvider {
             "2019-05-31",
             "/",
             true,
-            true,
+            false,
             "unknown"));
 
     int draughtIndex = 0;
@@ -137,7 +167,7 @@ public class JobsProvider {
               "2019-05-31",
               "/",
               true,
-              true,
+              false,
               String.valueOf(draughtIndex)));
       draughtIndex++;
     }
@@ -157,7 +187,7 @@ public class JobsProvider {
               "2019-05-31",
               "/",
               true,
-              true,
+              false,
               String.valueOf(draughtIndex)));
       draughtIndex++;
     }
@@ -167,20 +197,34 @@ public class JobsProvider {
 
   private List<HeatmapJob> createMonthlyJobs() {
     return Arrays.asList(
-        createMonthlyJob(2018, 7),
-        createMonthlyJob(2018, 8),
-        createMonthlyJob(2018, 9),
-        createMonthlyJob(2018, 10),
-        createMonthlyJob(2018, 11),
-        createMonthlyJob(2018, 12),
-        createMonthlyJob(2019, 1),
-        createMonthlyJob(2019, 2),
-        createMonthlyJob(2019, 3),
-        createMonthlyJob(2019, 4),
-        createMonthlyJob(2019, 5));
+        create30Km6HrMonthlyJob(2018, 7, false),
+        create30Km6HrMonthlyJob(2018, 8, false),
+        create30Km6HrMonthlyJob(2018, 9, false),
+        create30Km6HrMonthlyJob(2018, 10, false),
+        create30Km6HrMonthlyJob(2018, 11, false),
+        create30Km6HrMonthlyJob(2018, 12, false),
+        create30Km6HrMonthlyJob(2019, 1, false),
+        create30Km6HrMonthlyJob(2019, 2, false),
+        create30Km6HrMonthlyJob(2019, 3, false),
+        create30Km6HrMonthlyJob(2019, 4, false),
+        create30Km6HrMonthlyJob(2019, 5, false),
+        create30Km6HrMonthlyJob(2019, 6, true),
+        create100Km18HrMonthlyJob(2018, 7, true),
+        create100Km18HrMonthlyJob(2018, 8, true),
+        create100Km18HrMonthlyJob(2018, 9, true),
+        create100Km18HrMonthlyJob(2018, 10, true),
+        create100Km18HrMonthlyJob(2018, 11, true),
+        create100Km18HrMonthlyJob(2018, 12, true),
+        create100Km18HrMonthlyJob(2019, 1, true),
+        create100Km18HrMonthlyJob(2019, 2, true),
+        create100Km18HrMonthlyJob(2019, 3, true),
+        create100Km18HrMonthlyJob(2019, 4, true),
+        create100Km18HrMonthlyJob(2019, 5, true),
+        create100Km18HrMonthlyJob(2019, 6, true));
   }
 
-  private HeatmapJob createMonthlyJob(final int year, final int month) {
+  private HeatmapJob create30Km6HrMonthlyJob(
+      final int year, final int month, final boolean enabled) {
     final LocalDate startOfMonth = LocalDate.of(year, month, 1);
     final LocalDate endOfMonth = startOfMonth.plusMonths(1).minusDays(1);
     return new HeatmapJob(
@@ -195,6 +239,25 @@ public class JobsProvider {
         endOfMonth.format(DateTimeFormatter.ISO_DATE),
         "/",
         false,
-        false);
+        enabled);
+  }
+
+  private HeatmapJob create100Km18HrMonthlyJob(
+      final int year, final int month, final boolean enabled) {
+    final LocalDate startOfMonth = LocalDate.of(year, month, 1);
+    final LocalDate endOfMonth = startOfMonth.plusMonths(1).minusDays(1);
+    return new HeatmapJob(
+        "monthly-world-1k-100km-18hr-"
+            + startOfMonth.getMonth().getDisplayName(TextStyle.SHORT, Locale.getDefault())
+            + "-"
+            + year,
+        DEGREES_AT_EQUATOR_FOR_1KM_RESOLUTION,
+        DISTANCE_INTERPOLATION_THRESHOLD_100KM,
+        TIME_INTERPOLATION_THRESHOLD_18HR,
+        startOfMonth.format(DateTimeFormatter.ISO_DATE),
+        endOfMonth.format(DateTimeFormatter.ISO_DATE),
+        "/",
+        false,
+        enabled);
   }
 }
