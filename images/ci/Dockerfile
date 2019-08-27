@@ -7,7 +7,4 @@ RUN apt update -y && apt install -y \
     python3-pip \
     unzip \
     wget \
-    docker \
     && apt clean
-    && systemctl enable docker
-    && systemctl restart docker
