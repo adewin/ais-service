@@ -14,7 +14,6 @@ data "external" "secrets" {
   ]
 }
 
-variable "AIS_BATCH_FUNCTION_JAR_PATH" {}
 variable "DATA_FILE_FUNCTION_LAMBDA_JAR_PATH" {}
 variable "TRIGGER_RAW_PARTITION_FUNCTION_LAMBDA_JAR_PATH" {}
 variable "PARTITIONING_SPARK_JOB_JAR_NAME" {}

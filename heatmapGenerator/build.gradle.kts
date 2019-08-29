@@ -39,10 +39,11 @@ application {
 
 jib {
     to {
-        image = "748740125416.dkr.ecr.eu-west-2.amazonaws.com/ais-heatmaps:latest"
+        image = "${System.getenv("DOCKER_REGISTRY_URL")}/ais-generate-heatmaps"
+        tags = setOf("latest", project.version.toString())
         auth {
-            username = System.getenv("REGISTRY_USERNAME")
-            password = System.getenv("REGISTRY_PASSWORD")
+            username = System.getenv("DOCKER_REGISTRY_USERNAME")
+            password = System.getenv("DOCKER_REGISTRY_PASSWORD")
         }
     }
 }

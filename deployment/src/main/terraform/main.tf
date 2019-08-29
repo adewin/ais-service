@@ -51,7 +51,6 @@ module functions {
   ais_resampled_partitioned_store_name = data.external.secrets.result["resampled_partitioned_ais_store"]
   trigger_raw_partition_jar            = var.TRIGGER_RAW_PARTITION_FUNCTION_LAMBDA_JAR_PATH
   data_upload_function_jar             = var.DATA_FILE_FUNCTION_LAMBDA_JAR_PATH
-  emr_all_jobs_function_jar            = var.AIS_BATCH_FUNCTION_JAR_PATH
   partitioning_spark_job_jar_name      = var.PARTITIONING_SPARK_JOB_JAR_NAME
   static_data_store_name               = data.external.secrets.result["static_data_store"]
   static_data_upload_store_name        = data.external.secrets.result["static_data_upload_store"]

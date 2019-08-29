@@ -2,13 +2,27 @@
 
 [![Build Status](https://ukhogov.visualstudio.com/Pipelines/_apis/build/status/UKHO.ais-service?branchName=master)](https://ukhogov.visualstudio.com/Pipelines/_build/latest?definitionId=69&branchName=master)
 
-This is a Spark job to convert AIS data into a GeoTIFF heatmap. It is intended to be run on AWS EMR.
+An AWS pipeline to convert AIS data into a GeoTIFF heatmap.
 
-Lambda aws cli update code example:
-aws lambda update-function-code --zip-file fileb://emr_lambda.zip --function-name emr_orchestration
+## Deployment
 
+Cloud infrastructure on this project is managed via [Terraform](https://www.terraform.io/).
 
-CircleCI requires an AWS IAM User to run the terraform so create an IAM User called circleci and give it the following permissions:
+Terraform needs an S3 bucket (called `ais-to-raster-terra-state`) and a DynamoDB table (`ais-to-heatmap-terraform-lock-table` with a primary key of `LockID`) to manage remote state storage and locking.
+
+To deploy from your local machine, you must export `TF_VAR_PASSWORD` in your shell (i.e. in your `.bashrc`), and run:
+
+```
+$ ./gradlew terraformPlan --interactive   # print a 'plan' which shows what changes will be made upon `terraformApply`
+$ ./gradlew terraformApply --interactive  # accept the Terraform plan
+```
+
+### Azure Pipelines
+
+This project uses Azure Pipelines for both _Continous Integration (CI)_ and _Continous Deployment (CD)_.
+
+Azure Pipelines requires an AWS IAM User to deploy with the following permissions:
+
 * AWSLambdaFullAccess
 * IAMFullAccess
 * AmazonS3FullAccess
@@ -19,57 +33,13 @@ CircleCI requires an AWS IAM User to run the terraform so create an IAM User cal
 * AmazonEC2ContainerServiceFullAccess
 * AmazonSNSFullAccess
 
-We also have created two policies:
-* GlueFullAccess
-* FullAthenaAccess
+### Terraform Gradle tasks
 
-Which give CircleCI full access to Athena and Glue
-
-Terraform needs an S3 bucket and a DynamoDB table to manage remote state storage and locking.
-Create an S3 bucket called `ais-to-raster-terra-state` and a DynamoDb table called `ais-to-heatmap-terraform-lock-table` with a primary key of `LockID`
-
-## Deployment
-
-To run the full infra deployment (locally):
-
-```
-export TF_VAR_PASSWORD=<ais_to_heatmaps_parameters_password>
-
-./gradlew :deployment:terraformPlan :deployment:terraformApply --interactive
-```
-
-To decrypt `parameters.json.enc` (Requires the ```TF_VAR_PASSWORD``` environment variable set):
-
-```
-./decrypt_parameters.sh
-```
-
-
-To encrypt `parameters.secret.json`: (Requires the ```TF_VAR_PASSWORD``` environment variable set)
-
-```
-./encrypt_parameters.sh
-```
-
-### Gradle Terraform plugin
 This project provides a simple Terraform plugin to Gradle.
 
-#### Terraform Gradle tasks:
-
-**:deployment:terraformClean** - Removes all terraform binaries
-
-**:deployment:terraformInit** - initialises Terraform, *--interactive* prints out the output of the initialisation to Standard out
-
-**:deployment:terraformValidate** - validates terraform templates
-
-**:deployment:terraformDownload** - downloads Terraform so that the plugin can use it
-
-**deployment:terraformPlan** - Runs Terraform ```plan``` to show what has changed (Runs ```:deployment:terraformInit``` and ```:deployment:terraformDownload``` if these have not been run)
-
-**deployment:terraformApply** - Runs Terraform ```apply```, *--autoApprove* is a flag which will override the manual confirm step to confirm the deployment, the purpose of this is for CI/CD (Runs ```:deployment:terraformInit``` and ```:deployment:terraformDownload``` if these have not been run)
-
-## aggregateReports Gradle Task
-
-The `aggregateReports` task has been added to `spark-ais-to-raster/build.gradle.kts`
-
-It collates each projects `build/reports` into one central location so that they can be viewed locally and within CI
+* `:deployment:terraformClean` - delete downloaded Terraform binaries
+* `:deployment:terraformInit` - initialise Terraform, use with the `--interactive` flag to print out the output to `stdout`
+* `:deployment:terraformValidate` - validate Terraform templates
+* `:deployment:terraformDownload` - download a Terraform binary
+* `:deployment:terraformPlan` - run Terraform `plan` to show what has changed (depends upon `:deployment:terraformInit` and `:deployment:terraformDownload`)
+* `:deployment:terraformApply` - run Terraform `apply`, use `--interactive` to allow confirmation, or (for CI/CD purposes) `--autoApprove` (depends upon `:deployment:terraformInit` and `:deployment:terraformDownload`)
