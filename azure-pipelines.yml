@@ -45,6 +45,7 @@ stages:
               TF_VAR_PASSWORD: $(TF_VAR_PASSWORD)
 
           - task: PublishBuildArtifacts@1
+            condition: succeededOrFailed()
             inputs:
               pathtoPublish: './build/reports'
               artifactName: reports
