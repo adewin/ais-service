@@ -17,13 +17,11 @@ rootProject.name = "ais-service"
 
 include("deployment",
         "heatmapGenerator",
-        "lambdas:ais-batch-lambda",
         "lambdas:ingest-upload-file-lambda",
         "lambdas:libraries:s3-event-handling",
         "lambdas:libraries:s3-test-util",
         "lambdas:libraries:emr-job-runner",
         "lambdas:trigger-raw-partitioning-lambda",
-        "lambdas:trigger-resample-lambda",
         "spark:libraries:spark-job",
         "spark:libraries:ais-schemata",
         "spark:libraries:test-support",

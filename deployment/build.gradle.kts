@@ -18,20 +18,17 @@ configure<SpotlessExtension> {
 
 configure<TerraformExtension> {
 
-    val aisBatchLambdaShadowJarTask = tasks.getByPath(":lambdas:ais-batch-lambda:shadowJar")
     val aisRawParititioningSparkJobShadowJarTask = tasks.getByPath(":spark:partition-raw-ais:shadowJar")
     val ingestUploadFileLambdaShadowJarTask = tasks.getByPath(":lambdas:ingest-upload-file-lambda:shadowJar")
     val triggerRawPartitioningLambdaShadowJarTask = tasks.getByPath(":lambdas:trigger-raw-partitioning-lambda:shadowJar")
     val processStaticDataDistZipTask = tasks.getByPath(":lambdas:process_new_static_file:pythonDistZip")
 
-    dependsOn(aisBatchLambdaShadowJarTask,
-            ingestUploadFileLambdaShadowJarTask,
+    dependsOn(ingestUploadFileLambdaShadowJarTask,
             triggerRawPartitioningLambdaShadowJarTask,
             processStaticDataDistZipTask,
             aisRawParititioningSparkJobShadowJarTask)
 
     environmentVariables(
-            "TF_VAR_AIS_BATCH_FUNCTION_JAR_PATH" to aisBatchLambdaShadowJarTask.outputs.files.singleFile.absolutePath,
             "TF_VAR_DATA_FILE_FUNCTION_LAMBDA_JAR_PATH" to ingestUploadFileLambdaShadowJarTask.outputs.files.singleFile.absolutePath,
             "TF_VAR_TRIGGER_RAW_PARTITION_FUNCTION_LAMBDA_JAR_PATH" to triggerRawPartitioningLambdaShadowJarTask.outputs.files.singleFile.absolutePath,
             "TF_VAR_PARTITIONING_SPARK_JOB_JAR_NAME" to aisRawParititioningSparkJobShadowJarTask.outputs.files.singleFile.name,

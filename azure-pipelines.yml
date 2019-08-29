@@ -1,3 +1,19 @@
+trigger:
+  - master
+
+pr:
+  branches:
+    include:
+      - '*'
+
+schedules:
+  - cron: "0 0 * * *"
+    displayName: nightly
+    branches:
+      include:
+        - master
+    always: true
+
 variables:
   poolName: "UKHO Ubuntu 1804"
 
@@ -54,7 +70,7 @@ stages:
             displayName: 'Run Gradle `test` task'
 
   - stage: CD
-    condition: and(succeeded(), eq(variables['build.sourceBranch'], 'refs/heads/master'))
+    condition: and(succeeded(), eq(variables['build.sourceBranch'], 'refs/heads/master'), ne(variables['Build.Reason'], 'Schedule'))
     jobs:
       - job: deploy
         pool: $(poolName)

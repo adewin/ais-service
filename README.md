@@ -1,6 +1,6 @@
 # ais-service
 
-[![CircleCI](https://circleci.com/gh/UKHO/ais-service.svg?style=svg)](https://circleci.com/gh/UKHO/ais-service)
+[![Build Status](https://ukhogov.visualstudio.com/Pipelines/_apis/build/status/UKHO.ais-service?branchName=master)](https://ukhogov.visualstudio.com/Pipelines/_build/latest?definitionId=69&branchName=master)
 
 This is a Spark job to convert AIS data into a GeoTIFF heatmap. It is intended to be run on AWS EMR.
 
