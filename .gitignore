@@ -17,3 +17,5 @@ out/
 setup.py
 *.egg-info/
 __pycache__/
+
+*.env

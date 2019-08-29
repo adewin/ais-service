@@ -16,6 +16,7 @@ pluginManagement {
 rootProject.name = "ais-service"
 
 include("deployment",
+        "heatmapGenerator",
         "lambdas:ais-batch-lambda",
         "lambdas:ingest-upload-file-lambda",
         "lambdas:libraries:s3-event-handling",
@@ -26,7 +27,5 @@ include("deployment",
         "spark:libraries:spark-job",
         "spark:libraries:ais-schemata",
         "spark:libraries:test-support",
-        "spark:resample-ais",
-        "spark:old-spark-job",
         "spark:partition-raw-ais",
         "lambdas:process_new_static_file")

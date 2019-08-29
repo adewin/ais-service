@@ -39,20 +39,6 @@ module partitioning_spark_jar {
   store_name = data.external.secrets.result["jobs_bucket"]
 }
 
-module resampling_spark_jar {
-  source     = "./modules/storage/file"
-  file_name  = var.RESAMPLING_SPARK_JOB_JAR_NAME
-  file_path  = var.RESAMPLING_SPARK_JOB_JAR_PATH
-  store_name = data.external.secrets.result["jobs_bucket"]
-}
-
-module old_spark_jar {
-  source     = "./modules/storage/file"
-  file_name  = var.OLD_SPARK_JOB_JAR_NAME
-  file_path  = var.OLD_SPARK_JOB_JAR_PATH
-  store_name = data.external.secrets.result["jobs_bucket"]
-}
-
 module functions {
   source                               = "./modules/functions"
   ais_data_upload_store_name           = data.external.secrets.result["ais_data_upload_store"]
@@ -66,10 +52,7 @@ module functions {
   trigger_raw_partition_jar            = var.TRIGGER_RAW_PARTITION_FUNCTION_LAMBDA_JAR_PATH
   data_upload_function_jar             = var.DATA_FILE_FUNCTION_LAMBDA_JAR_PATH
   emr_all_jobs_function_jar            = var.AIS_BATCH_FUNCTION_JAR_PATH
-  all_heatmaps_spark_job_jar_name      = var.OLD_SPARK_JOB_JAR_NAME
   partitioning_spark_job_jar_name      = var.PARTITIONING_SPARK_JOB_JAR_NAME
-  trigger_resample_jar                 = var.TRIGGER_RESAMPLE_FUNCTION_LAMBDA_JAR_PATH
-  resampling_spark_job_jar_name        = var.RESAMPLING_SPARK_JOB_JAR_NAME
   static_data_store_name               = data.external.secrets.result["static_data_store"]
   static_data_upload_store_name        = data.external.secrets.result["static_data_upload_store"]
   process_static_data_file_zip         = var.PROCESS_STATIC_DATA_ZIP_PATH

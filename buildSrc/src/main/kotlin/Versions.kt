@@ -1,10 +1,10 @@
 object Versions {
     // Languages
-    const val scalaCompat = "2.11"
-    const val scala = "$scalaCompat.12"
+    const val scalaCompat = "2.12"
+    const val scala = "$scalaCompat.7"
+
     // Dependencies
     const val scopt = "4.0.0-RC2"
-
     const val spark = "2.4.3"
     const val geotrellis = "2.3.1"
     const val mavenAwsBom = "1.11.571"
@@ -18,11 +18,14 @@ object Versions {
     const val hadoop = "2.9.2"
     const val springCloudFunction = "2.0.2.RELEASE"
     const val springBoot = "2.1.6.RELEASE"
+    const val commonsMath3 = "3.6.1"
+    const val commonsCompress = "1.18"
 
     // Test dependencies
     const val junit = "4.12"
     const val assertJ = "3.11.1"
     const val mockito = "2.28.2"
+    const val mockitoScala = "1.5.14"
     const val systemRules = "1.19.0"
     const val commonsIo = "1.3.2"
 
