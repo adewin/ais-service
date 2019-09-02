@@ -16,6 +16,7 @@ pluginManagement {
 rootProject.name = "ais-service"
 
 include("deployment",
+        "heatmapAggregator",
         "heatmapGenerator",
         "lambdas:ingest-upload-file-lambda",
         "lambdas:libraries:s3-event-handling",
