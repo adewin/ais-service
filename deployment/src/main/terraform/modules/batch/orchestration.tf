@@ -9,8 +9,7 @@ resource aws_iam_role batch_heatmap_step_fn_execution_role {
       "Principal": {
         "Service": "states.amazonaws.com"
       },
-      "Effect": "Allow",
-      "Sid": ""
+      "Effect": "Allow"
     }
   ]
 }
@@ -39,7 +38,7 @@ resource aws_sfn_state_machine batch_heatmap_step_fn {
               "End": true,
               "Resource": "arn:aws:states:::batch:submitJob.sync",
               "Parameters": {
-                "JobName": "Create 6hr/30km Heatmap",
+                "JobName": "Create6hr30kmHeatmap",
                 "JobQueue": "${aws_batch_job_queue.queue.arn}",
                 "JobDefinition": "${aws_batch_job_definition.monthly_heatmap_job_definition.arn}",
                 "Parameters": {
@@ -64,7 +63,7 @@ resource aws_sfn_state_machine batch_heatmap_step_fn {
               "End": true,
               "Resource": "arn:aws:states:::batch:submitJob.sync",
               "Parameters": {
-                "JobName": "Create 18hr/100km Heatmap",
+                "JobName": "Create18hr100kmHeatmap",
                 "JobQueue": "${aws_batch_job_queue.queue.arn}",
                 "JobDefinition": "${aws_batch_job_definition.monthly_heatmap_job_definition.arn}",
                 "Parameters": {
