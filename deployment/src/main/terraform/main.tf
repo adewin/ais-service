@@ -25,12 +25,13 @@ module s3_buckets {
 }
 
 module batch {
-  source                     = "./modules/batch"
-  heatmap_store              = data.external.secrets.result["heatmap_bucket"]
-  network_subnet_ids         = module.network.network_subnet_ids
-  network_security_group_ids = [module.network.network_security_group_id]
-  docker_registry_url        = var.DOCKER_REGISTRY_URL
-  project_version            = var.PROJECT_VERSION
+  source                      = "./modules/batch"
+  heatmap_store               = data.external.secrets.result["heatmap_bucket"]
+  network_subnet_ids          = module.network.network_subnet_ids
+  network_security_group_ids  = [module.network.network_security_group_id]
+  docker_registry_url         = var.DOCKER_REGISTRY_URL
+  project_version             = var.PROJECT_VERSION
+  data_query_access_policy_id = module.data_query.data_query_access_policy_id
 }
 
 module storage {

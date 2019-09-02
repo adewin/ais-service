@@ -1,9 +1,9 @@
 module vpc {
   source = "terraform-aws-modules/vpc/aws"
 
-  name = "ukho-network"
-  cidr = "10.1.0.0/16"
+  create_vpc = false
 
-  azs             = ["eu-west-2a", "eu-west-2b", "eu-west-2c"]
-  private_subnets = ["10.1.1.0/24"]
+  manage_default_vpc               = true
+  default_vpc_name                 = "default"
+  default_vpc_enable_dns_hostnames = true
 }
