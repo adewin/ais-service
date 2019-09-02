@@ -43,3 +43,18 @@ This project provides a simple Terraform plugin to Gradle.
 * `:deployment:terraformDownload` - download a Terraform binary
 * `:deployment:terraformPlan` - run Terraform `plan` to show what has changed (depends upon `:deployment:terraformInit` and `:deployment:terraformDownload`)
 * `:deployment:terraformApply` - run Terraform `apply`, use `--interactive` to allow confirmation, or (for CI/CD purposes) `--autoApprove` (depends upon `:deployment:terraformInit` and `:deployment:terraformDownload`)
+
+## Running heatmap generation via step function console
+
+To orchestrate the generation of heatmaps with both combinations of resampling parameters, a step function is used which passes the `year`, `month`, `prefix` and `output` parameters through to the Batch job.
+
+The parameters are specified as key-value in JSON, for example:
+
+```json
+{
+  "year": "",
+  "month": "",
+  "prefix": "",
+  "output": ""
+}
+```

@@ -38,7 +38,7 @@ class GeoTiffRepositoryTest {
         findGeneratedFiles(tempDir.getRoot.getAbsolutePath).map(file =>
           FilenameUtils.getExtension(file))
 
-      softly.assertThat(files).containsExactlyInAnyOrder("png", "tif")
+      softly.assertThat(files).containsExactly("tif")
     }
 
   @Test

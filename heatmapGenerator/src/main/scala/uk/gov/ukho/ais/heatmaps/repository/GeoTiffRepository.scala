@@ -13,6 +13,7 @@ import geotrellis.raster.io.geotiff.writer.GeoTiffWriter
 import geotrellis.raster.render.{ColorMap, ColorRamps}
 import geotrellis.raster.{IntArrayTile, RasterExtent}
 import uk.gov.ukho.ais.heatmaps.Config
+import uk.gov.ukho.ais.heatmaps.service.GeoTiffS3KeyService
 
 object GeoTiffRepository {
 
@@ -45,27 +46,19 @@ object GeoTiffRepository {
       tiffFile
     }
 
-    def createPng(): File = {
-      val pngFile: File = new File(s"$directory/$filename.png")
-      rasterMatrix.renderPng(cm).write(pngFile.getAbsolutePath)
-      pngFile
-    }
-
     val tiffFile = createGeoTiff()
-    val pngFile = createPng()
 
     if (!config.isLocal) {
-      uploadFileToS3AndDelete(config.outputDirectory, tiffFile)
-      uploadFileToS3AndDelete(config.outputDirectory, pngFile)
+      uploadFileToS3AndDelete(tiffFile)
     }
   }
 
-  private def uploadFileToS3AndDelete(s3Directory: String,
-                                      localFileToUpload: File): Unit = {
+  private def uploadFileToS3AndDelete(localFileToUpload: File)(
+      implicit config: Config): Unit = {
     s3Client.putObject(
       new PutObjectRequest(
-        s3Directory,
-        localFileToUpload.getName,
+        config.outputDirectory,
+        GeoTiffS3KeyService.generateS3Key(),
         localFileToUpload
       ))
 
