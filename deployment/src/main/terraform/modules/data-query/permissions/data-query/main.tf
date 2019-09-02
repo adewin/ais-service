@@ -73,7 +73,6 @@ EOF
 }
 
 resource aws_iam_group_policy_attachment data_query_access_group_permissions {
-  name = "${var.resource_prefix}Permissions"
   group = aws_iam_group.data_query_access_group.name
   policy_arn = aws_iam_policy.data_query_access_policy.arn
 }
