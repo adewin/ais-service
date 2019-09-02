@@ -33,7 +33,9 @@ configure<TerraformExtension> {
             "TF_VAR_TRIGGER_RAW_PARTITION_FUNCTION_LAMBDA_JAR_PATH" to triggerRawPartitioningLambdaShadowJarTask.outputs.files.singleFile.absolutePath,
             "TF_VAR_PARTITIONING_SPARK_JOB_JAR_NAME" to aisRawParititioningSparkJobShadowJarTask.outputs.files.singleFile.name,
             "TF_VAR_PARTITIONING_SPARK_JOB_JAR_PATH" to aisRawParititioningSparkJobShadowJarTask.outputs.files.singleFile.absolutePath,
-            "TF_VAR_PROCESS_STATIC_DATA_ZIP_PATH" to processStaticDataDistZipTask.outputs.files.singleFile.absolutePath
+            "TF_VAR_PROCESS_STATIC_DATA_ZIP_PATH" to processStaticDataDistZipTask.outputs.files.singleFile.absolutePath,
+            "TF_VAR_DOCKER_REGISTRY_URL" to System.getenv("DOCKER_REGISTRY_URL"),
+            "TF_VAR_PROJECT_VERSION" to project.version.toString()
     )
 }
 

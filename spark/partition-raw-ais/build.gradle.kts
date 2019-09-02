@@ -1,15 +1,8 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-import java.net.URI
 
 plugins {
     scala
     application
-}
-
-repositories {
-    maven { url = URI("https://repo.boundlessgeo.com/main/") }
-    maven { url = URI("http://maven.geomajas.org/") }
-    jcenter()
 }
 
 dependencies {

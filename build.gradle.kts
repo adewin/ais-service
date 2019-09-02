@@ -29,9 +29,8 @@ allprojects {
         apply(plugin = "cz.augi.gradle.wartremover")
 
         repositories {
-            maven { url = URI("https://repo.boundlessgeo.com/main/") }
-            maven { url = URI("http://maven.geomajas.org/") }
             jcenter()
+            maven { url = URI("https://repo.boundlessgeo.com/main/") }
         }
 
         configure<SpotlessExtension> {
