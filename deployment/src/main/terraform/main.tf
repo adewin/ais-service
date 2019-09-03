@@ -11,10 +11,6 @@ terraform {
   }
 }
 
-module network {
-  source = "./modules/network"
-}
-
 # DEPRECATED - Use storage for future buckets
 module s3_buckets {
   source                   = "./modules/legacy-buckets"
@@ -25,12 +21,10 @@ module s3_buckets {
 }
 
 module batch {
-  source                     = "./modules/batch"
-  heatmap_store              = data.external.secrets.result["heatmap_bucket"]
-  network_subnet_ids         = module.network.network_subnet_ids
-  network_security_group_ids = [module.network.network_security_group_id]
-  docker_registry_url        = var.DOCKER_REGISTRY_URL
-  project_version            = var.PROJECT_VERSION
+  source              = "./modules/batch"
+  docker_registry_url = var.DOCKER_REGISTRY_URL
+  project_version     = var.PROJECT_VERSION
+  batch_job_queue_id  = "arn:aws:batch:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:job-queue/${var.BATCH_JOB_QUEUE_NAME}"
 }
 
 module storage {

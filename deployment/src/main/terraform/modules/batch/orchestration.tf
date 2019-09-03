@@ -39,7 +39,7 @@ resource aws_sfn_state_machine batch_heatmap_step_fn {
               "Resource": "arn:aws:states:::batch:submitJob.sync",
               "Parameters": {
                 "JobName": "Create6hr30kmHeatmap",
-                "JobQueue": "${aws_batch_job_queue.queue.arn}",
+                "JobQueue": "${var.batch_job_queue_id}",
                 "JobDefinition": "${aws_batch_job_definition.monthly_heatmap_job_definition.arn}",
                 "Parameters": {
                   "distance_threshold": "30000",
@@ -64,7 +64,7 @@ resource aws_sfn_state_machine batch_heatmap_step_fn {
               "Resource": "arn:aws:states:::batch:submitJob.sync",
               "Parameters": {
                 "JobName": "Create18hr100kmHeatmap",
-                "JobQueue": "${aws_batch_job_queue.queue.arn}",
+                "JobQueue":  "${var.batch_job_queue_id}",
                 "JobDefinition": "${aws_batch_job_definition.monthly_heatmap_job_definition.arn}",
                 "Parameters": {
                   "distance_threshold": "100000",
