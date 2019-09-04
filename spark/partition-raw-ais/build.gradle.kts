@@ -20,6 +20,8 @@ dependencies {
     implementation(project(":spark:libraries:spark-job"))
     implementation(project(":spark:libraries:ais-schemata"))
 
+    implementation(rootProject.files("libs/${Versions.athenaJdbcLib}"))
+
     constraints {
         implementation("io.spray:spray-json_${Versions.scalaCompat}:${Versions.sprayJson}") {
             because("Version brought in by Scala version 2.11.2 has vulnerabilities")

@@ -9,6 +9,8 @@ public class EmrLambdaConfiguration extends EmrConfiguration {
   private final String jobFullyQualifiedClassName;
   private final String jobLocation;
   private final String outputLocation;
+  private final String outputDatabase;
+  private final String outputTable;
 
   private EmrLambdaConfiguration() {
     super(
@@ -22,9 +24,12 @@ public class EmrLambdaConfiguration extends EmrConfiguration {
         System.getenv("INSTANCE_COUNT"),
         System.getenv("DRIVER_MEMORY"),
         System.getenv("EXECUTOR_MEMORY"));
+
     jobFullyQualifiedClassName = System.getenv("JOB_FULLY_QUALIFIED_CLASS_NAME");
     jobLocation = System.getenv("JOB_LOCATION");
     outputLocation = System.getenv("OUTPUT_LOCATION");
+    outputDatabase = System.getenv("OUTPUT_DATABASE");
+    outputTable = System.getenv("OUTPUT_TABLE");
   }
 
   public static EmrLambdaConfiguration getInstance() {
@@ -45,5 +50,13 @@ public class EmrLambdaConfiguration extends EmrConfiguration {
 
   public String getOutputLocation() {
     return outputLocation;
+  }
+
+  public String getOutputDatabase() {
+    return outputDatabase;
+  }
+
+  public String getOutputTable() {
+    return outputTable;
   }
 }

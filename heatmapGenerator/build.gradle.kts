@@ -9,7 +9,7 @@ plugins {
 dependencies {
     implementation("org.scala-lang:scala-library:${Versions.scala}")
     compile("org.scala-lang:scala-library:${Versions.scala}")
-    implementation(files("libs/AthenaJDBC42_2.0.7.jar"))
+    implementation(rootProject.files("libs/${Versions.athenaJdbcLib}"))
     implementation("com.amazonaws:aws-java-sdk-core:1.11.610")
     implementation("com.github.scopt:scopt_${Versions.scalaCompat}:${Versions.scopt}")
     implementation("org.locationtech.geotrellis:geotrellis-spark_${Versions.scalaCompat}:${Versions.geotrellis}")

@@ -17,6 +17,8 @@ module trigger_raw_partition_function {
     EXECUTOR_MEMORY                = "11000m"
     JOB_FULLY_QUALIFIED_CLASS_NAME = "uk.gov.ukho.ais.partitioning.PartitionRawAis"
     OUTPUT_LOCATION                = "s3a://${var.ais_raw_partitioned_store_name}/"
+    OUTPUT_DATABASE                = var.ais_database_name
+    OUTPUT_TABLE                   = var.processed_ais_table_name
   }
 }
 

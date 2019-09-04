@@ -38,6 +38,7 @@
         <cve>CVE-2005-3747</cve>
         <cve>CVE-2007-5615</cve>
         <cve>CVE-2015-8559</cve>
+        <cve>CVE-2019-15544</cve>
     </suppress>
     <suppress until="2019-10-01Z">
         <notes><![CDATA[

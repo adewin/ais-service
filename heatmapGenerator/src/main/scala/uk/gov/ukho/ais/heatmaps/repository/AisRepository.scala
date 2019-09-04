@@ -29,7 +29,7 @@ class AisRepository(val dataSource: DataSource) {
           (0 until DEFAULT_NUMBER_OF_BUCKETS)
             .map(bucket => s"""
                               |SELECT mmsi, acquisition_time, lat, lon
-                              |FROM ukho_ais_data.andy
+                              |FROM ukho_ais_data.processed_ais_data
                               |WHERE (
                               |(year = $year AND month = $month)
                               |OR (year = $nextYear AND month = $nextMonth AND day=1)

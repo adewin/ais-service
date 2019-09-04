@@ -33,5 +33,19 @@ object PartitionRawAis {
       .option("timestampFormat", "yyyy-MM-dd HH:mm:ss")
       .mode(SaveMode.Append)
       .save(config.outputDirectory)
+
+    (config.outputDatabase, config.outputTable) match {
+      case (Some(outputDatabase), Some(outputTable)) =>
+        val connection = AthenaDataSourceProvider.dataSource.getConnection
+        val repairPartitionsStatement =
+          connection.prepareStatement(
+            s"MSCK REPAIR TABLE `$outputDatabase`.`$outputTable`")
+
+        repairPartitionsStatement.execute()
+
+        connection.close()
+
+      case _ =>
+    }
   }
 }

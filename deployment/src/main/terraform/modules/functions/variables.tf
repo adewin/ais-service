@@ -27,3 +27,7 @@ variable ais_resampled_partitioned_store_name {}
 variable process_static_data_file_zip {}
 
 variable processed_static_data_store_name {}
+
+variable ais_database_name {}
+
+variable processed_ais_table_name {}

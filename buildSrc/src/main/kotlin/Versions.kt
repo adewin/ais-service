@@ -19,7 +19,8 @@ object Versions {
     const val springCloudFunction = "2.0.2.RELEASE"
     const val springBoot = "2.1.6.RELEASE"
     const val commonsMath3 = "3.6.1"
-    const val commonsCompress = "1.18"
+    const val commonsCompress = "1.19"
+    const val athenaJdbcLib = "AthenaJDBC42_2.0.7.jar"
 
     // Test dependencies
     const val junit = "4.12"

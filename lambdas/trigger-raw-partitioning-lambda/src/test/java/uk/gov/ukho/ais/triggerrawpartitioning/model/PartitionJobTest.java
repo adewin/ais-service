@@ -26,6 +26,8 @@ public class PartitionJobTest {
   private final String executorMemory = "executorMemory";
   private final String className = "className";
   private final String jobLocation = "jobLocation";
+  private final String outputDatabase = "outputDatabase";
+  private final String outputTable = "outputTable";
 
   @Rule public EnvironmentVariables environmentVariables = new EnvironmentVariables();
   private final String outputLocation = "outputLocation";
@@ -45,6 +47,8 @@ public class PartitionJobTest {
     environmentVariables.set("JOB_FULLY_QUALIFIED_CLASS_NAME", className);
     environmentVariables.set("JOB_LOCATION", jobLocation);
     environmentVariables.set("OUTPUT_LOCATION", outputLocation);
+    environmentVariables.set("OUTPUT_DATABASE", outputDatabase);
+    environmentVariables.set("OUTPUT_TABLE", outputTable);
   }
 
   @Test
@@ -62,6 +66,10 @@ public class PartitionJobTest {
             "-i",
             "s3a://" + bucket + "/" + key,
             "-o",
-            outputLocation);
+            outputLocation,
+            "-d",
+            outputDatabase,
+            "-t",
+            outputTable);
   }
 }

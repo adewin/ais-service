@@ -11,6 +11,11 @@ terraform {
   }
 }
 
+locals {
+  ais_database_name        = "ukho_ais_data"
+  processed_ais_table_name = "processed_ais_data"
+}
+
 # DEPRECATED - Use storage for future buckets
 module s3_buckets {
   source                   = "./modules/legacy-buckets"
@@ -63,6 +68,8 @@ module functions {
   static_data_upload_store_name        = data.external.secrets.result["static_data_upload_store"]
   process_static_data_file_zip         = var.PROCESS_STATIC_DATA_ZIP_PATH
   processed_static_data_store_name     = data.external.secrets.result["processed_static_data_store"]
+  ais_database_name                    = local.ais_database_name
+  processed_ais_table_name             = local.processed_ais_table_name
 }
 
 module notifications {
@@ -71,8 +78,8 @@ module notifications {
 
 module data_query {
   source                                       = "./modules/data-query"
-  ais_database_name                            = "ukho_ais_data"
-  processed_ais_table_name                     = "processed_ais_data"
+  ais_database_name                            = local.ais_database_name
+  processed_ais_table_name                     = local.processed_ais_table_name
   processed_ais_store_name                     = data.external.secrets.result["raw_partitioned_ais_store"]
   processed_static_data_table_name             = "processed_static_data"
   processed_static_data_store_name             = data.external.secrets.result["processed_static_data_store"]

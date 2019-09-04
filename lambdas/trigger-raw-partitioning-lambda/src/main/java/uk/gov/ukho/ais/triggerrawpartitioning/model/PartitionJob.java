@@ -23,6 +23,10 @@ public class PartitionJob extends AbstractJob {
         "-i",
         fileReference,
         "-o",
-        EmrLambdaConfiguration.getInstance().getOutputLocation());
+        EmrLambdaConfiguration.getInstance().getOutputLocation(),
+        "-d",
+        EmrLambdaConfiguration.getInstance().getOutputDatabase(),
+        "-t",
+        EmrLambdaConfiguration.getInstance().getOutputTable());
   }
 }
