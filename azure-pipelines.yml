@@ -77,7 +77,7 @@ stages:
         pool: $(poolName)
         container: jdk
         steps:
-          - bash: ./gradlew clean jib terraformApply --auto-approve
+          - bash: ./gradlew clean jib terraformApply -Djib.console=plain --auto-approve
             displayName: 'Run Gradle `jib` and `terraformApply` task'
             env:
               AWS_ACCESS_KEY_ID: $(AWS_ACCESS_KEY_ID)
