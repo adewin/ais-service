@@ -58,3 +58,32 @@ The parameters are specified as key-value in JSON, for example:
   "output": ""
 }
 ```
+
+## Deploying and updating the Batch compute environment
+
+Due to Terraform limitations the Batch Compute Environment and Queue have been created manually using CloudFormation.
+Complete CloudFormation documentation can be found here: [AWS CloudFormation Docs](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/Welcome.html)
+
+The CloudFormation template is available from  [./deployment/src/cloudformation/batch-compute-cfn.yml](./deployment/src/cloudformation/batch-compute-cfn.yml)
+
+### To deploy the Cloudformation
+
+1. Go to the AWS Console online and login to the account that the environment is to be deployed into
+2. Select 'Cloudformation' from the list of Services
+3. If the stack ```manual-batch-compute-environment``` exists then these have been created and if there are any updates to be
+applied then the stack needs to be updated in place
+
+    1) Select the stack and click the update button
+    2) If the template has changed select replace current template and use the file picker to select the file
+    3) Navigate through the wizard to apply the changes, ensure you check the checkbox acknowledging it is creating/updating IAM resources
+
+4. Otherwise click 'Create stack'
+
+    1) Give the stack the name ```manual-batch-compute-environment``` and select the file [./deployment/src/cloudformation/batch-compute-cfn.yml](./deployment/src/cloudformation/batch-compute-cfn.yml)
+    as the template
+    2) Give values for the parameters
+
+        * ```ResourceNamePrefix``` - Prefix to give to the resources, should be ```manual```
+        * ```SecurityGroupId``` - Default Security Group
+        * ```Subnets``` - Select all the subnets available
+    3) Navigate through the wizard to apply the changes, ensure you check the checkbox acknowledging it is creating/updating IAM resources
