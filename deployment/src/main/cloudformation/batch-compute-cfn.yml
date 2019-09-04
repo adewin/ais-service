@@ -1,0 +1,203 @@
+Parameters:
+  ResourceNamePrefix:
+    Type: String
+  SecurityGroupId:
+    Type: AWS::EC2::SecurityGroup::Id
+  Subnets:
+    Type: List<AWS::EC2::Subnet::Id>
+
+Outputs:
+  BatchQueueId:
+    Value: !Ref BatchJobQueue
+    Export:
+      Name: BatchQueueId
+
+Resources:
+
+  GlueFullAccessManagedPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: GlueFullAccess
+      PolicyDocument: {
+        "Version": "2012-10-17",
+        "Statement": [
+        {
+          "Sid": "VisualEditor0",
+          "Effect": "Allow",
+          "Action": "glue:*",
+          "Resource": "*"
+        }
+        ]
+    }
+
+  AthenaFullAccessManagedPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: AthenaFullAccess
+      PolicyDocument: {
+        "Version": "2012-10-17",
+        "Statement": [
+        {
+          "Sid": "VisualEditor0",
+          "Effect": "Allow",
+          "Action": [
+            "s3:PutAnalyticsConfiguration",
+            "s3:GetObjectVersionTagging",
+            "s3:CreateBucket",
+            "s3:ReplicateObject",
+            "s3:GetObjectAcl",
+            "s3:GetBucketObjectLockConfiguration",
+            "s3:DeleteBucketWebsite",
+            "s3:PutLifecycleConfiguration",
+            "s3:GetObjectVersionAcl",
+            "s3:HeadBucket",
+            "s3:DeleteObject",
+            "s3:GetBucketPolicyStatus",
+            "s3:GetObjectRetention",
+            "s3:GetBucketWebsite",
+            "s3:ListJobs",
+            "s3:PutReplicationConfiguration",
+            "s3:PutObjectLegalHold",
+            "s3:GetObjectLegalHold",
+            "s3:GetBucketNotification",
+            "s3:PutBucketCORS",
+            "s3:GetReplicationConfiguration",
+            "s3:ListMultipartUploadParts",
+            "s3:PutObject",
+            "s3:GetObject",
+            "s3:PutBucketNotification",
+            "s3:DescribeJob",
+            "s3:PutBucketLogging",
+            "s3:GetAnalyticsConfiguration",
+            "s3:PutBucketObjectLockConfiguration",
+            "s3:GetObjectVersionForReplication",
+            "s3:CreateJob",
+            "s3:GetLifecycleConfiguration",
+            "s3:ListBucketByTags",
+            "s3:GetInventoryConfiguration",
+            "s3:GetBucketTagging",
+            "s3:PutAccelerateConfiguration",
+            "s3:DeleteObjectVersion",
+            "s3:GetBucketLogging",
+            "s3:ListBucketVersions",
+            "s3:RestoreObject",
+            "s3:ListBucket",
+            "s3:GetAccelerateConfiguration",
+            "s3:GetBucketPolicy",
+            "s3:PutEncryptionConfiguration",
+            "s3:GetEncryptionConfiguration",
+            "s3:GetObjectVersionTorrent",
+            "s3:AbortMultipartUpload",
+            "s3:GetBucketRequestPayment",
+            "s3:UpdateJobPriority",
+            "s3:GetObjectTagging",
+            "s3:GetMetricsConfiguration",
+            "s3:DeleteBucket",
+            "s3:PutBucketVersioning",
+            "s3:GetBucketPublicAccessBlock",
+            "s3:ListBucketMultipartUploads",
+            "s3:PutMetricsConfiguration",
+            "s3:UpdateJobStatus",
+            "s3:GetBucketVersioning",
+            "s3:GetBucketAcl",
+            "s3:PutInventoryConfiguration",
+            "s3:GetObjectTorrent",
+            "s3:GetAccountPublicAccessBlock",
+            "s3:PutBucketWebsite",
+            "s3:ListAllMyBuckets",
+            "s3:PutBucketRequestPayment",
+            "s3:PutObjectRetention",
+            "s3:GetBucketCORS",
+            "s3:GetBucketLocation",
+            "s3:ReplicateDelete",
+            "s3:GetObjectVersion"
+          ],
+          "Resource": "*"
+        },
+        {
+          "Sid": "VisualEditor1",
+          "Effect": "Allow",
+          "Action": "athena:*",
+          "Resource": {"Fn::Sub": "arn:aws:athena:${AWS::Region}:${AWS::AccountId}:workgroup/primary"}
+        }
+        ]
+      }
+
+  EcsInstanceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: ecsInstanceRole
+      AssumeRolePolicyDocument: {
+        "Version": "2012-10-17",
+        "Statement": [
+        {
+          "Effect": "Allow",
+          "Principal": {
+            "Service": "ec2.amazonaws.com"
+          },
+          "Action": "sts:AssumeRole"
+        }
+        ]
+      }
+      ManagedPolicyArns:
+        - "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role"
+        - !Ref GlueFullAccessManagedPolicy
+        - !Ref AthenaFullAccessManagedPolicy
+
+  BatchServiceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: AWSBatchServiceRole
+      Path: /service-role/
+      AssumeRolePolicyDocument: {
+        "Version": "2012-10-17",
+        "Statement": [
+        {
+          "Effect": "Allow",
+          "Principal": {
+            "Service": "batch.amazonaws.com"
+          },
+          "Action": "sts:AssumeRole"
+        }
+        ]
+      }
+      ManagedPolicyArns:
+        - "arn:aws:iam::aws:policy/service-role/AWSBatchServiceRole"
+
+  BatchComputeInstanceProfile:
+    Type: "AWS::IAM::InstanceProfile"
+    Properties:
+      InstanceProfileName: ecsInstanceRole
+      Roles:
+        - !Ref EcsInstanceRole
+
+  BatchComputeEnvironment:
+    Type: "AWS::Batch::ComputeEnvironment"
+    Properties:
+      ComputeEnvironmentName: !Sub "${ResourceNamePrefix}-compute-environment"
+      Type: Managed
+      ServiceRole: !GetAtt BatchServiceRole.Arn
+      ComputeResources:
+        Type: EC2
+        DesiredvCpus: 0
+        MinvCpus: 0
+        MaxvCpus: 64
+        InstanceTypes:
+          - optimal
+        Tags: {
+          "Name": { "Fn::Sub": "${ResourceNamePrefix}-environment" },
+          "manual": "true"
+        }
+        Subnets: !Ref Subnets
+        InstanceRole: !GetAtt BatchComputeInstanceProfile.Arn
+        SecurityGroupIds:
+          - !Ref SecurityGroupId
+
+  BatchJobQueue:
+    Type: "AWS::Batch::JobQueue"
+    Properties:
+      JobQueueName: !Sub "${ResourceNamePrefix}-queue"
+      Priority: 1
+      ComputeEnvironmentOrder:
+        - ComputeEnvironment: !Ref BatchComputeEnvironment
+          Order: 1
