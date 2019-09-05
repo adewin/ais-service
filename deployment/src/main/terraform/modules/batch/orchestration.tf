@@ -17,6 +17,7 @@ EOF
 }
 
 resource aws_sfn_state_machine batch_heatmap_step_fn {
+  depends_on = [aws_iam_role.batch_heatmap_step_fn_execution_role, aws_batch_job_definition.monthly_heatmap_job_definition]
   name = "heatmap-step-function"
   role_arn = aws_iam_role.batch_heatmap_step_fn_execution_role.arn
   definition = <<EOF
