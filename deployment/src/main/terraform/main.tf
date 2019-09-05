@@ -29,7 +29,7 @@ module batch {
   source              = "./modules/batch"
   docker_registry_url = var.DOCKER_REGISTRY_URL
   project_version     = var.PROJECT_VERSION
-  batch_job_queue_id  = data.aws_cloudformation_export.batch_queue_url
+  batch_job_queue_id  = data.aws_cloudformation_export.batch_queue_url.value
 }
 
 module storage {
