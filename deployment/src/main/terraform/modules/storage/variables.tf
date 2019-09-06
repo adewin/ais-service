@@ -13,3 +13,7 @@ variable static_data_store_name {}
 variable static_data_upload_store_name {}
 
 variable processed_static_data_store_name {}
+
+variable heatmap_job_submission_store_name {}
+
+variable heatmap_sql_archive_store_name {}

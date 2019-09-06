@@ -8,7 +8,7 @@ data "external" "secrets" {
     "-md",
     "md5",
     "-k",
-    "${var.PASSWORD}",
+    var.PASSWORD,
     "-in",
     "${path.module}/parameters.json.enc",
   ]

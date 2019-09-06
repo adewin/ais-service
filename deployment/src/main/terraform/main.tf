@@ -42,6 +42,8 @@ module storage {
   static_data_store_name               = data.external.secrets.result["static_data_store"]
   static_data_upload_store_name        = data.external.secrets.result["static_data_upload_store"]
   processed_static_data_store_name     = data.external.secrets.result["processed_static_data_store"]
+  heatmap_job_submission_store_name    = data.external.secrets.result["heatmap_job_submission_store"]
+  heatmap_sql_archive_store_name       = data.external.secrets.result["heatmap_sql_archive_store"]
 }
 
 module partitioning_spark_jar {
