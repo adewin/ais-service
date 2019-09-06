@@ -11,8 +11,14 @@ object GeoTiffS3KeyService {
   def generateS3Key()(implicit config: Config): String = {
     val interpolationDescriptor = createInterpolationDescriptor(config)
     val dateDescriptor = createDateDescriptor(config)
+    val sqlFilenameDescriptor = "unfiltered"
 
-    s"interpolation=$interpolationDescriptor/unfiltered-$interpolationDescriptor-$dateDescriptor.tif"
+    val objectPrefix = s"sqlFilename=$sqlFilenameDescriptor/resample=$interpolationDescriptor/type=monthly" +
+      s"/year=${config.year}/month=${config.month}/"
+    val filename =
+      s"$sqlFilenameDescriptor-1km-res-$interpolationDescriptor-monthly-$dateDescriptor.tif"
+
+    s"$objectPrefix$filename"
   }
 
   private def createDateDescriptor(config: Config): String =
