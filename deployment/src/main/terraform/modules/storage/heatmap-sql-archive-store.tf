@@ -1,6 +1,6 @@
 module heatmap_sql_archive_store {
   source     = "./store"
-  store_name = var.static_data_store_name
+  store_name = var.heatmap_sql_archive_store_name
 }
 
 module heatmap_sql_archive_store_read_only_perms {
