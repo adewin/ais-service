@@ -23,12 +23,9 @@ object GeoTiffRepository {
     .withLocale(Locale.UK)
     .withZone(ZoneId.of("UTC"))
 
-  lazy val s3Client: AmazonS3 = AmazonS3ClientBuilder
-    .standard()
-    .build()
-
   def createOutputFiles(raster: (RasterExtent, IntArrayTile))(
-      implicit config: Config): Unit = {
+      implicit config: Config,
+      s3Client: AmazonS3): Unit = {
     val (rasterExtent, rasterMatrix) = raster
 
     val cm =
@@ -54,7 +51,8 @@ object GeoTiffRepository {
   }
 
   private def uploadFileToS3AndDelete(localFileToUpload: File)(
-      implicit config: Config): Unit = {
+      implicit config: Config,
+      s3Client: AmazonS3): Unit = {
     s3Client.putObject(
       new PutObjectRequest(
         config.outputDirectory,

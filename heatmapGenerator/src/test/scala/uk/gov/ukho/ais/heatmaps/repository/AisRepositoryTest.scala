@@ -3,18 +3,21 @@ package uk.gov.ukho.ais.heatmaps.repository
 import java.sql.{Connection, PreparedStatement, ResultSet}
 import java.util.Comparator
 
-import uk.gov.ukho.ais.heatmaps.utility.TestPingCreator.ping
-import uk.gov.ukho.ais.heatmaps.utility.TimeUtilities.makeTimestamp
 import javax.sql.DataSource
 import org.apache.commons.math3.util.Precision
 import org.assertj.core.api.SoftAssertions
 import org.junit.runner.RunWith
 import org.junit.{Before, Test}
+import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito._
 import org.mockito.junit.MockitoJUnitRunner
+import uk.gov.ukho.ais.heatmaps.utility.TestPingCreator.ping
+import uk.gov.ukho.ais.heatmaps.utility.TimeUtilities.makeTimestamp
 
 import scala.collection.JavaConverters._
+import scala.collection.mutable
+
 @RunWith(classOf[MockitoJUnitRunner])
 class AisRepositoryTest {
   val DOUBLE_COMPARISON_PRECISION: Double = 0.00000001
@@ -29,6 +32,8 @@ class AisRepositoryTest {
     classOf[PreparedStatement])
   val resultSetMock: ResultSet = mock(classOf[ResultSet])
   var aisRepository: AisRepository = _
+  var filterQuery =
+    "SELECT * ukho_ais_data.test_data WHERE message_type_id IN (1, 2, 3, 18, 19)"
 
   @Before
   def setup(): Unit = {
@@ -46,7 +51,7 @@ class AisRepositoryTest {
     SoftAssertions.assertSoftly { softly =>
       when(resultSetMock.next()).thenReturn(false)
 
-      val results = aisRepository.getPingsByDate(2018, 1)
+      val results = aisRepository.getFilteredPingsByDate(filterQuery, 2018, 1)
 
       softly.assertThat(results.asJava).isEmpty()
     }
@@ -71,7 +76,7 @@ class AisRepositoryTest {
       when(resultSetMock.getDouble("lon")).thenReturn(1.1, 3.3, 5.5)
       when(resultSetMock.getDouble("lat")).thenReturn(2.2, 4.4, 6.6)
 
-      val results = aisRepository.getPingsByDate(2019, 1)
+      val results = aisRepository.getFilteredPingsByDate(filterQuery, 2019, 1)
 
       softly
         .assertThat(results.asJava)
@@ -80,4 +85,31 @@ class AisRepositoryTest {
                                                  classOf[Double])
     }
 
+  @Test
+  def whenFilterStatementAppliedThenTheFilterStatementIsIncludedAsSubQuery()
+    : Unit = SoftAssertions.assertSoftly { softly =>
+    when(resultSetMock.next()).thenReturn(false)
+
+    val results = aisRepository.getFilteredPingsByDate(filterQuery, 2018, 1)
+
+    softly.assertThat(results.asJava).isEmpty()
+
+    val preparedStatementArgCaptor: ArgumentCaptor[String] =
+      ArgumentCaptor.forClass(classOf[String])
+
+    verify(connectionMock, times(31))
+      .prepareStatement(preparedStatementArgCaptor.capture())
+
+    softly
+      .assertThat(preparedStatementArgCaptor.getAllValues.iterator())
+      .allMatch { sqlStatement =>
+        sqlStatement.startsWith(
+          """
+            |SELECT mmsi, acquisition_time, lat, lon
+            |FROM (SELECT * ukho_ais_data.test_data WHERE message_type_id IN (1, 2, 3, 18, 19))
+            |WHERE (
+            |(year = 2018 AND month = 1)
+            |""".stripMargin)
+      }
+  }
 }

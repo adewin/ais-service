@@ -1,17 +1,21 @@
 package uk.gov.ukho.ais.heatmaps
 
-import java.nio.file.Paths
+import java.io.File
+import java.nio.charset.StandardCharsets
+import java.nio.file.{Files, Paths}
 import java.sql.{Connection, PreparedStatement, ResultSet, Timestamp}
 import java.time.{LocalDateTime, ZoneOffset}
 
+import com.amazonaws.services.s3.AmazonS3
 import geotrellis.raster.io.geotiff.reader.GeoTiffReader
 import uk.gov.ukho.ais.heatmaps.FileUtilities.findGeneratedFiles
 import javax.sql.DataSource
-import org.apache.commons.io.FilenameUtils
+import org.apache.commons.io.{FileUtils, FilenameUtils, IOUtils}
 import org.assertj.core.api.SoftAssertions
 import org.junit.{Before, Rule, Test}
 import org.junit.rules.TemporaryFolder
 import org.junit.runner.RunWith
+import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mockito._
 import org.mockito.junit.MockitoJUnitRunner
@@ -31,11 +35,14 @@ class ComponentTest {
     classOf[PreparedStatement])
   val resultSetMock: ResultSet = mock(classOf[ResultSet])
 
+  val filterQuery = "SELECT * FROM table"
+
   private final val TOTAL_CELL_COUNT_WHOLE_WORLD_AT_1K = 65884
   private final val DEFAULT_INTERPOLATION_METERS = 30000
   private final val DEFAULT_INTERPOLATION_TIME = 6 * 60 * 60 * 1000
 
   private var testConfig: Config = _
+  private implicit val mockAmazonS3: AmazonS3 = mock(classOf[AmazonS3])
 
   @Before
   def setup(): Unit = {
@@ -44,12 +51,13 @@ class ComponentTest {
       .thenReturn(preparedStatementMock)
     when(preparedStatementMock.executeQuery()).thenReturn(resultSetMock)
 
-    testConfig = Config.default.copy(outputDirectory =
-                                       tempDir.getRoot.getAbsolutePath,
-                                     resolution = 1,
-                                     isLocal = true,
-                                     month = 1,
-                                     year = 1970)
+    testConfig = Config.default.copy(
+      outputDirectory = tempDir.getRoot.getAbsolutePath,
+      filterSqlFile = createFilterSqlFile.getAbsolutePath,
+      resolution = 1,
+      isLocal = true,
+      month = 1,
+      year = 1970)
   }
 
   @Test
@@ -203,6 +211,41 @@ class ComponentTest {
       }
     }
 
+  @Test
+  def whenHeatmapGeneratedThenSqlFilterIsUsed(): Unit =
+    SoftAssertions.assertSoftly { softly =>
+      implicit val config: Config = testConfig
+
+      setDataReturnedFromDataSource(
+        ("123", 10, 179.9, -89.9),
+        ("456", 20, -179.9, 89.9),
+        ("789", 30, 0, 0),
+        ("234", 40, 179.9, 89.9),
+        ("567", 50, -179.9, -89.9),
+        ("890", 60, 179.9, -89.9)
+      )
+
+      HeatmapOrchestrator.orchestrateHeatmapGeneration(datasourceMock)
+
+      val preparedStatementArgCaptor: ArgumentCaptor[String] =
+        ArgumentCaptor.forClass(classOf[String])
+
+      verify(connectionMock, times(31))
+        .prepareStatement(preparedStatementArgCaptor.capture())
+
+      softly
+        .assertThat(preparedStatementArgCaptor.getAllValues.iterator())
+        .allMatch { sqlStatement =>
+          sqlStatement.startsWith(s"""
+            |SELECT mmsi, acquisition_time, lat, lon
+            |FROM ($filterQuery)
+            |WHERE (
+            |(year = ${config.year} AND month = ${config.month})
+            |""".stripMargin)
+        }
+
+    }
+
   private def openTiffFile(filename: String) =
     new CreatedTiff(GeoTiffReader.readSingleband(filename))
 
@@ -230,5 +273,13 @@ class ComponentTest {
           .thenReturn(false)
       case _ => when(resultSetMock.next()).thenReturn(false)
     }
+  }
+
+  private def createFilterSqlFile = {
+    val tmpSqlFile = Files.createTempFile("unfiltered", ".sql").toFile
+    FileUtils.writeStringToFile(tmpSqlFile,
+                                filterQuery,
+                                StandardCharsets.UTF_8.toString)
+    tmpSqlFile
   }
 }

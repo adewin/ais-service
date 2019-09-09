@@ -27,7 +27,9 @@ resource aws_batch_job_definition monthly_heatmap_job_definition {
         "-p",
         "Ref::prefix",
         "--output",
-        "Ref::output"
+        "Ref::output",
+        "-f",
+        "Ref::filter_sql_file"
     ],
     "volumes": [],
     "environment": [],

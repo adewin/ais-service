@@ -46,7 +46,7 @@ This project provides a simple Terraform plugin to Gradle.
 
 ## Running heatmap generation via step function console
 
-To orchestrate the generation of heatmaps with both combinations of resampling parameters, a step function is used which passes the `year`, `month`, `prefix` and `output` parameters through to the Batch job.
+To orchestrate the generation of heatmaps with both combinations of resampling parameters, a step function is used which passes the `filter_sql_file`, `year`, `month`, `prefix` and `output` parameters through to the Batch job.
 
 The parameters are specified as key-value in JSON, for example:
 
@@ -55,7 +55,8 @@ The parameters are specified as key-value in JSON, for example:
   "year": "",
   "month": "",
   "prefix": "",
-  "output": ""
+  "output": "",
+  "filter_sql_file": ""
 }
 ```
 

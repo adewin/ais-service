@@ -10,6 +10,8 @@ class ConfigParserTest {
     val args: Array[String] = Array(
       "-o",
       "out",
+      "-f",
+      "filter.sql",
       "-p",
       "heatmap",
       "-l",
@@ -29,6 +31,7 @@ class ConfigParserTest {
       Config.default.copy(
         outputDirectory = "out",
         outputFilePrefix = "heatmap",
+        filterSqlFile = "filter.sql",
         isLocal = true,
         interpolationTimeThresholdMilliseconds = 12L,
         interpolationDistanceThresholdMeters = 13L,

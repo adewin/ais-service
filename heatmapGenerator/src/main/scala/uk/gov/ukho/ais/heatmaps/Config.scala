@@ -2,6 +2,7 @@ package uk.gov.ukho.ais.heatmaps
 
 case class Config(athenaRegion: String,
                   athenaResultsBucket: String,
+                  filterSqlFile: String,
                   outputDirectory: String,
                   outputFilePrefix: String,
                   isLocal: Boolean,
@@ -15,6 +16,7 @@ object Config {
   val default = Config(
     athenaRegion = "eu-west-2",
     athenaResultsBucket = "ukho-data-query-results",
+    filterSqlFile = "",
     outputDirectory = ".",
     outputFilePrefix = "",
     isLocal = false,

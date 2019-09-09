@@ -15,7 +15,9 @@ class AisRepository(val dataSource: DataSource) {
   val FETCH_BUFFER_SIZE_ONE_MILLION: Int = 1000000
   val DEFAULT_NUMBER_OF_BUCKETS: Int = 31
 
-  def getPingsByDate(year: Int, month: Int): Iterator[Ping] =
+  def getFilteredPingsByDate(filterQuery: String,
+                             year: Int,
+                             month: Int): Iterator[Ping] =
     new Iterator[Ping] {
       val connection: Connection = dataSource.getConnection()
       var bucket: Int = 1
@@ -29,14 +31,13 @@ class AisRepository(val dataSource: DataSource) {
           (0 until DEFAULT_NUMBER_OF_BUCKETS)
             .map(bucket => s"""
                               |SELECT mmsi, acquisition_time, lat, lon
-                              |FROM ukho_ais_data.processed_ais_data
+                              |FROM ($filterQuery)
                               |WHERE (
                               |(year = $year AND month = $month)
                               |OR (year = $nextYear AND month = $nextMonth AND day=1)
                               |OR (year = $prevYear AND month = $prevMonth AND day=$prevDay)
                               |)
                               |AND mod(cast(mmsi as integer), $DEFAULT_NUMBER_OF_BUCKETS) = $bucket
-                              |AND message_type_id IN (1, 2, 3, 18, 19)
                               |ORDER BY mmsi, acquisition_time
               """.stripMargin)
             .map(sqlStatement => connection.prepareStatement(sqlStatement)): _*)

@@ -48,6 +48,11 @@ object ConfigParser {
         .valueName("<output directory/S3 bucket>")
         .text("location to output the resulting GeoTIFF and PNG")
         .action((value, config) => config.copy(outputDirectory = value)),
+      opt[String]('f', "filter-sql-file")
+        .required()
+        .valueName("<path to SQL file>")
+        .text("location of filter SQL file")
+        .action((value, config) => config.copy(filterSqlFile = value)),
       opt[String]('p', "prefix")
         .valueName("<output filename prefix>")
         .text("prefix to prepend to filenames")

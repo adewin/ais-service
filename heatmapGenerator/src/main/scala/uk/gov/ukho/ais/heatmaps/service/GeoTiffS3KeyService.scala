@@ -4,6 +4,7 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.concurrent.TimeUnit
 
+import org.apache.commons.io.FilenameUtils
 import uk.gov.ukho.ais.heatmaps.Config
 
 object GeoTiffS3KeyService {
@@ -11,15 +12,18 @@ object GeoTiffS3KeyService {
   def generateS3Key()(implicit config: Config): String = {
     val interpolationDescriptor = createInterpolationDescriptor(config)
     val dateDescriptor = createDateDescriptor(config)
-    val sqlFilenameDescriptor = "unfiltered"
+    val sqlFilenameDescriptor = createSqlFilenameDescriptor(config)
 
-    val objectPrefix = s"sqlFilename=$sqlFilenameDescriptor/resample=$interpolationDescriptor/type=monthly" +
+    val objectPrefix = s"sqlFilename=$sqlFilenameDescriptor.sql/resample=$interpolationDescriptor/type=monthly" +
       s"/year=${config.year}/month=${config.month}/"
     val filename =
       s"$sqlFilenameDescriptor-1km-res-$interpolationDescriptor-monthly-$dateDescriptor.tif"
 
     s"$objectPrefix$filename"
   }
+
+  private def createSqlFilenameDescriptor(config: Config): String =
+    FilenameUtils.getBaseName(config.filterSqlFile.split("/").last)
 
   private def createDateDescriptor(config: Config): String =
     LocalDate

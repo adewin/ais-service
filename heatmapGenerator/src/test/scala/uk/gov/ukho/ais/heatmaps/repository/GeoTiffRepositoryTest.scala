@@ -1,5 +1,6 @@
 package uk.gov.ukho.ais.heatmaps.repository
 
+import com.amazonaws.services.s3.AmazonS3
 import geotrellis.raster.{CellSize, IntArrayTile, RasterExtent}
 import geotrellis.vector.Extent
 import uk.gov.ukho.ais.heatmaps.Config
@@ -7,14 +8,20 @@ import uk.gov.ukho.ais.heatmaps.FileUtilities.findGeneratedFiles
 import org.apache.commons.io.FilenameUtils
 import org.assertj.core.api.SoftAssertions
 import org.junit.rules.TemporaryFolder
+import org.junit.runner.RunWith
 import org.junit.{Rule, Test}
+import org.mockito.IdiomaticMockito
+import org.mockito.junit.MockitoJUnitRunner
 
-class GeoTiffRepositoryTest {
+@RunWith(classOf[MockitoJUnitRunner])
+class GeoTiffRepositoryTest extends IdiomaticMockito {
 
   val _tempDir = new TemporaryFolder()
 
   @Rule
   def tempDir: TemporaryFolder = _tempDir
+
+  implicit val mockAmazonS3: AmazonS3 = mock[AmazonS3]
 
   @Test
   def whenExtentAndRasterPassedThenPngAndTiffCreated(): Unit =

@@ -49,7 +49,8 @@ resource aws_sfn_state_machine batch_heatmap_step_fn {
                   "year.$": "$.year",
                   "month.$": "$.month",
                   "prefix.$": "$.prefix",
-                  "output.$": "$.output"
+                  "output.$": "$.output",
+                  "filter_sql_file.$": "$.filter_sql_file"
                 }
               }
             }
@@ -74,7 +75,8 @@ resource aws_sfn_state_machine batch_heatmap_step_fn {
                   "year.$": "$.year",
                   "month.$": "$.month",
                   "prefix.$": "$.prefix",
-                  "output.$": "$.output"
+                  "output.$": "$.output",
+                  "filter_sql_file.$": "$.filter_sql_file"
                 }
               }
             }
