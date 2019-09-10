@@ -27,4 +27,5 @@ include("deployment",
         "spark:libraries:ais-schemata",
         "spark:libraries:test-support",
         "spark:partition-raw-ais",
-        "lambdas:process_new_static_file")
+        "lambdas:process_new_static_file",
+        "systemtests")
