@@ -5,6 +5,7 @@ import java.sql.{Connection, PreparedStatement, ResultSet}
 import uk.gov.ukho.ais.resampler.model.Ping
 import uk.gov.ukho.ais.resampler.utility.TimeUtilities.{getLastDayOfPreviousMonth, getNextMonth}
 import javax.sql.DataSource
+import org.slf4j.{Logger, LoggerFactory}
 import uk.gov.ukho.ais.resampler.Config
 
 import scala.collection.mutable
@@ -12,6 +13,8 @@ import scala.collection.mutable
 class AisRepository(val dataSource: DataSource)(implicit config: Config) {
   val FETCH_BUFFER_SIZE_ONE_MILLION: Int = 1000000
   val DEFAULT_NUMBER_OF_BUCKETS: Int = 31
+
+  private val logger: Logger = LoggerFactory.getLogger(classOf[AisRepository])
 
   def getDistinctYearAndMonthPairsForFile(inputFile: String): Iterator[(Int, Int)] = {
     val connection: Connection = dataSource.getConnection()
@@ -57,8 +60,8 @@ class AisRepository(val dataSource: DataSource)(implicit config: Config) {
             .map(sqlStatement => connection.prepareStatement(sqlStatement)): _*)
       }
 
-      println(s"Running query for bucket: $bucket")
-      bucket += 1
+      logger.info(s"prepared SQL statement for year $year, month $month " +
+        s"(bucket $bucket of $DEFAULT_NUMBER_OF_BUCKETS)")
 
       var results: ResultSet = sqlStatements.dequeue().executeQuery()
 
@@ -84,7 +87,8 @@ class AisRepository(val dataSource: DataSource)(implicit config: Config) {
         _hasNext = results.next()
 
         if (!_hasNext && sqlStatements.nonEmpty) {
-          println(s"Running query for bucket: $bucket")
+          logger.info(s"executing SQL query for year $year, month $month " +
+            s"(bucket $bucket of $DEFAULT_NUMBER_OF_BUCKETS)...")
           bucket += 1
           results = sqlStatements.dequeue().executeQuery()
           _hasNext = results.next()

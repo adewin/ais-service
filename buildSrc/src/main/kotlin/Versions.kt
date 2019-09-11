@@ -6,6 +6,7 @@ object Versions {
     // Dependencies
     const val scopt = "4.0.0-RC2"
     const val spark = "2.4.3"
+    const val sl4j = "1.7.28"
     const val geotrellis = "2.3.1"
     const val mavenAwsBom = "1.11.571"
     const val lambdaJavaCore = "1.2.0"

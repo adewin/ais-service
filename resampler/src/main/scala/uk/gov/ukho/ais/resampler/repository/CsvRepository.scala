@@ -1,19 +1,32 @@
 package uk.gov.ukho.ais.resampler.repository
 
-import java.io.FileOutputStream
-import java.nio.file.{Path, Paths}
+import java.io.{File, FileOutputStream}
 import java.time.ZoneOffset
 
-import uk.gov.ukho.ais.resampler.model.Ping
+import com.amazonaws.services.s3.AmazonS3
+import com.amazonaws.services.s3.model.PutObjectRequest
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorOutputStream
 import org.apache.commons.io.IOUtils
+import org.slf4j.{Logger, LoggerFactory}
+import uk.gov.ukho.ais.resampler.model.Ping
+import uk.gov.ukho.ais.resampler.service.CsvS3KeyService
+import uk.gov.ukho.ais.resampler.{Config, ResamplerOrchestrator}
 
-import scala.collection.mutable.ArrayBuffer
+object CsvRepository {
 
-class CsvRepository(path: Path) {
+  private val PART_MAX_ROW_SIZE = 100 * 100 * 100
 
-  def writePings(pings: Iterator[Ping]): Unit = {
-    val file = Paths.get(path.toString, "fred.csv.bz2").toFile
+  private val logger: Logger = LoggerFactory.getLogger(CsvRepository.getClass)
+
+  def writePingsForMonth(year: Int, month: Int, pings: Iterator[Ping])
+                        (implicit config: Config, s3Client: AmazonS3): Unit = {
+    val fileName = generateFilename(year, month, 0)
+    val directory =
+      if (config.isLocal) config.outputDirectory
+      else s"/tmp"
+
+    val filePath = s"$directory/$fileName.csv.bz2"
+    val file = new File(filePath)
 
     val outputStream = new BZip2CompressorOutputStream(
       new FileOutputStream(file))
@@ -22,7 +35,7 @@ class CsvRepository(path: Path) {
 
     pings.foreach { ping =>
       val acquisitionTime =
-        ping.acquisitionTime.toInstant.atOffset(ZoneOffset.UTC).toString
+        ping.acquisitionTime.toString
       val line =
         s"${ping.mmsi}\t$acquisitionTime\t${ping.longitude}\t${ping.latitude}\n"
 
@@ -30,10 +43,31 @@ class CsvRepository(path: Path) {
 
       count += 1
 
-      if (count % 100000 == 0) {
-        println(s"\twrote $count pings...")
+      if (count % 10000 == 0) {
+        logger.info(s"wrote ${count / 1000}k pings for year $year, month $month to $filePath")
       }
     }
     outputStream.close()
+
+    if (!config.isLocal) uploadFileToS3AndDelete(year, month, file)
   }
+
+  private def uploadFileToS3AndDelete(year: Int, month: Int, localFileToUpload: File)
+                                     (implicit config: Config, s3Client: AmazonS3): Unit = {
+    logger.info(s"uploading file '${localFileToUpload.getAbsolutePath}' " +
+      s"for year $year, month $month to ${config.outputDirectory}...")
+
+    s3Client.putObject(
+      new PutObjectRequest(
+        config.outputDirectory,
+        CsvS3KeyService.generateS3Key(year, month, 0),
+        localFileToUpload
+      )
+    )
+
+    localFileToUpload.delete()
+  }
+
+  private def generateFilename(year: Int, month: Int, part: Int): String =
+    f"$year-$month-part-$part%06d"
 }

@@ -19,9 +19,9 @@ class CsvS3KeyServiceTest {
         interpolationTimeThresholdMilliseconds
     )
 
-    val generatedPath = CsvS3KeyService.generateS3Key(2019, 1)
+    val generatedPath = CsvS3KeyService.generateS3Key(2019, 1, 0)
 
     assertThat(generatedPath).isEqualTo(
-      "sqlFilename=unfiltered.sql/resample=3hr-3km/type=monthly/year=2019/month=1/unfiltered-1km-res-3hr-3km-monthly-Jan-2019.tif")
+      "resample=3hr-3km/year=2019/month=1/1km-res-3hr-3km-monthly-Jan-2019.csv.bz2")
   }
 }

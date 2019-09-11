@@ -1,25 +1,27 @@
 package uk.gov.ukho.ais.resampler
 
-import java.io.File
+import java.io.{File, FileInputStream}
 import java.nio.charset.StandardCharsets
 import java.nio.file.{Files, Paths}
 import java.sql.{Connection, PreparedStatement, ResultSet, Timestamp}
 import java.time.{LocalDateTime, ZoneOffset}
 
 import com.amazonaws.services.s3.AmazonS3
-import geotrellis.raster.io.geotiff.reader.GeoTiffReader
-import uk.gov.ukho.ais.resampler.FileUtilities.findGeneratedFiles
 import javax.sql.DataSource
+import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream
 import org.apache.commons.io.{FileUtils, FilenameUtils, IOUtils}
 import org.assertj.core.api.SoftAssertions
-import org.junit.{Before, Rule, Test}
 import org.junit.rules.TemporaryFolder
 import org.junit.runner.RunWith
+import org.junit.{Before, Rule, Test}
 import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mockito._
 import org.mockito.junit.MockitoJUnitRunner
+import uk.gov.ukho.ais.resampler.FileUtilities.findGeneratedFiles
 import uk.gov.ukho.ais.resampler.utility.TimeUtilities.makeTimestamp
+
+import scala.collection.JavaConverters._
 
 @RunWith(classOf[MockitoJUnitRunner])
 class ComponentTest {
@@ -38,12 +40,18 @@ class ComponentTest {
 
   val filterQuery = "SELECT * FROM table"
 
+  private val BZ2_EXTENSION: String = "bz2"
+
   private final val TOTAL_CELL_COUNT_WHOLE_WORLD_AT_1K = 65884
   private final val DEFAULT_INTERPOLATION_METERS = 30000
   private final val DEFAULT_INTERPOLATION_TIME = 6 * 60 * 60 * 1000
 
   private var testConfig: Config = _
   private implicit val mockAmazonS3: AmazonS3 = mock(classOf[AmazonS3])
+
+  val baseYear = 2019
+  val baseMonth = 1
+  val baseDateTime: LocalDateTime = LocalDateTime.of(baseYear, baseMonth, 1, 0, 0, 0)
 
   @Before
   def setup(): Unit = {
@@ -53,85 +61,75 @@ class ComponentTest {
     when(preparedStatementMock.executeQuery()).thenReturn(pairResultSetMock, resultSetMock)
 
     setYearAndMonthPairsReturnedFromDataSource(
-      (2019, 1),
-      (2019, 2)
+      (2018, 1)
     )
 
     testConfig = Config.default.copy(
       outputDirectory = tempDir.getRoot.getAbsolutePath,
+      database = "database",
+      table = "table",
       inputFiles = Seq("s3://test/input-ais.tar.bz2"),
       resolution = 1,
       isLocal = true)
   }
 
   @Test
-  def whenGivenAnEmptySetOfPingsThenCSVIsGenerated(): Unit =
+  def whenGivenAnEmptySetOfPingsThenEmptyCsvIsGenerated(): Unit =
     SoftAssertions.assertSoftly { softly =>
       implicit val config: Config = testConfig
 
-      setDataReturnedFromDataSource()
-
-      ResamplerOrchestrator.orchestrateResampling(datasourceMock)
-
-      val files =
-        findGeneratedFiles(tempDir.getRoot.getAbsolutePath).map(file =>
-          FilenameUtils.getExtension(file))
-
-      softly.assertThat(files).containsExactly("tif")
-    }
-
-  @Test
-  def whenGivenASetOfPingsThenCSVHasPingsInCorrectPlaces(): Unit =
-    SoftAssertions.assertSoftly { softly =>
-      implicit val config: Config = testConfig
-
-      setDataReturnedFromDataSource(
-        ("123", 10, 179.9, -89.9),
-        ("456", 20, -179.9, 89.9),
-        ("789", 30, 0, 0),
-        ("234", 40, 179.9, 89.9),
-        ("567", 50, -179.9, -89.9),
-        ("890", 60, 179.9, -89.9)
-      )
+      setDataReturnedFromDataSource(Seq.empty)
 
       ResamplerOrchestrator.orchestrateResampling(datasourceMock)
 
       val filePath = findGeneratedFiles(tempDir.getRoot.getAbsolutePath)
-        .find(file => FilenameUtils.getExtension(file) == "tif")
+        .find(file => FilenameUtils.getExtension(file) == BZ2_EXTENSION)
         .map(filename =>
           Paths.get(tempDir.getRoot.getAbsolutePath, filename).toString)
 
       filePath match {
         case Some(filePath) =>
-          val geoTiff = openTiffFile(filePath)
+          val csv = openCsvFile(filePath)
 
-          val (sum, count) = geoTiff.calculateSumAndCount()
+          softly.assertThat(csv.size).isEqualTo(0)
+
+        case None => softly.fail("csv file not found")
+      }
+    }
+
+  @Test
+  def whenGivenASetOfPingsThenCsvHasPingsInCorrectPlaces(): Unit =
+    SoftAssertions.assertSoftly { softly =>
+      implicit val config: Config = testConfig
+
+      val expectedPings = Seq(
+        ("123", baseDateTime.plusSeconds(10).toEpochSecond(ZoneOffset.UTC), 179.9, -89.9),
+        ("456", baseDateTime.plusSeconds(20).toEpochSecond(ZoneOffset.UTC), -179.9, 89.9),
+        ("789", baseDateTime.plusSeconds(30).toEpochSecond(ZoneOffset.UTC), 0d, 0d),
+        ("234", baseDateTime.plusSeconds(40).toEpochSecond(ZoneOffset.UTC), 179.9, 89.9),
+        ("567", baseDateTime.plusSeconds(50).toEpochSecond(ZoneOffset.UTC), -179.9, -89.9),
+        ("890", baseDateTime.plusSeconds(60).toEpochSecond(ZoneOffset.UTC), 179.9, -89.9)
+      )
+
+      setDataReturnedFromDataSource(expectedPings)
+
+      ResamplerOrchestrator.orchestrateResampling(datasourceMock)
+
+      val filePath = findGeneratedFiles(tempDir.getRoot.getAbsolutePath)
+        .find(file => FilenameUtils.getExtension(file) == BZ2_EXTENSION)
+        .map(filename =>
+          Paths.get(tempDir.getRoot.getAbsolutePath, filename).toString)
+
+      filePath match {
+        case Some(filePath) =>
+          val csv = openCsvFile(filePath)
 
           val expectedNumberOfPings = 6
 
-          softly.assertThat(sum).isEqualTo(expectedNumberOfPings)
-          softly.assertThat(count).isEqualTo(TOTAL_CELL_COUNT_WHOLE_WORLD_AT_1K)
+          softly.assertThat(csv.size).isEqualTo(expectedNumberOfPings)
+          softly.assertThat(csv.toArray).containsExactlyElementsOf(expectedPings.asJava)
 
-          val (min, max) = geoTiff.tile.findMinMax
-          softly.assertThat(min).isEqualTo(0)
-          softly.assertThat(max).isEqualTo(2)
-
-          val sumPingsTopLeftCorner =
-            geoTiff.getSumInRange(-180, 89.0, -179.0, 90.0)
-          val sumPingsTopRightCorner =
-            geoTiff.getSumInRange(178.9, 89.0, 180.0, 90.0)
-          val sumPingsCentre = geoTiff.getSumInRange(-1.0, -1.0, 1.0, 1.0)
-          val sumPingsBottomLeftCorner =
-            geoTiff.getSumInRange(-180, -90.0, -179.0, -89.0)
-          val sumPingsBottomRightCorner =
-            geoTiff.getSumInRange(179.0, -90.0, 180.0, -89.0)
-
-          softly.assertThat(sumPingsTopLeftCorner).isEqualTo(1)
-          softly.assertThat(sumPingsTopRightCorner).isEqualTo(1)
-          softly.assertThat(sumPingsCentre).isEqualTo(1)
-          softly.assertThat(sumPingsBottomLeftCorner).isEqualTo(1)
-          softly.assertThat(sumPingsBottomRightCorner).isEqualTo(2)
-        case None => softly.fail("tif file not found")
+        case None => softly.fail("csv file not found")
       }
     }
 
@@ -142,31 +140,31 @@ class ComponentTest {
         interpolationTimeThresholdMilliseconds = DEFAULT_INTERPOLATION_TIME,
         interpolationDistanceThresholdMeters = DEFAULT_INTERPOLATION_METERS)
 
-      setDataReturnedFromDataSource(
-        ("123456793", 0, -1.216151956, 50.77512703),
-        ("123456793", 60 * 6, -1.198185651, 50.78648692),
-        ("123456793", 60 * 12, -1.180219345, 50.77512703),
-        ("123456793", 60 * 13, -1.180202123, 50.77235519),
-        ("123456793", 60 * 15, -1.180219345, 50.76944604)
+      val expectedPings = Seq(
+        ("123456793", baseDateTime.toEpochSecond(ZoneOffset.UTC), -1.216151956, 50.77512703),
+        ("123456793", baseDateTime.plusMinutes(6).toEpochSecond(ZoneOffset.UTC), -1.198185651, 50.78648692),
+        ("123456793", baseDateTime.plusMinutes(12).toEpochSecond(ZoneOffset.UTC), -1.180219345, 50.77512703),
+        ("123456793", baseDateTime.plusMinutes(13).toEpochSecond(ZoneOffset.UTC), -1.180202123, 50.77235519),
+        ("123456793", baseDateTime.plusMinutes(15).toEpochSecond(ZoneOffset.UTC), -1.180219345, 50.76944604)
       )
+
+      setDataReturnedFromDataSource(expectedPings)
 
       ResamplerOrchestrator.orchestrateResampling(datasourceMock)
 
       val filePath = findGeneratedFiles(tempDir.getRoot.getAbsolutePath)
-        .find(file => FilenameUtils.getExtension(file) == "tif")
+        .find(file => FilenameUtils.getExtension(file) == BZ2_EXTENSION)
         .map(filename =>
           Paths.get(tempDir.getRoot.getAbsolutePath, filename).toString)
 
       filePath match {
         case Some(filePath) =>
-          val geoTiff = openTiffFile(filePath)
-
-          val (sum, count) = geoTiff.calculateSumAndCount()
+          val csv = openCsvFile(filePath)
 
           val expectedNumberOfPings = 6
 
-          softly.assertThat(sum).isEqualTo(expectedNumberOfPings)
-          softly.assertThat(count).isEqualTo(TOTAL_CELL_COUNT_WHOLE_WORLD_AT_1K)
+          softly.assertThat(csv.size).isEqualTo(expectedNumberOfPings)
+        case None => softly.fail("csv file not found")
       }
     }
 
@@ -177,9 +175,7 @@ class ComponentTest {
         interpolationTimeThresholdMilliseconds = DEFAULT_INTERPOLATION_TIME,
         interpolationDistanceThresholdMeters = DEFAULT_INTERPOLATION_METERS)
 
-      val baseDateTime = LocalDateTime.of(2018, 1, 1, 0, 0, 0)
-
-      setDataReturnedFromDataSource(
+      setDataReturnedFromDataSource(Seq(
         ("123456793",
          baseDateTime.minusMinutes(24).toEpochSecond(ZoneOffset.UTC),
          -1.216151956,
@@ -192,25 +188,24 @@ class ComponentTest {
          baseDateTime.plusMinutes(12).toEpochSecond(ZoneOffset.UTC),
          -1.180219345,
          50.77512703)
-      )
+      ))
 
       ResamplerOrchestrator.orchestrateResampling(datasourceMock)
 
       val filePath = findGeneratedFiles(tempDir.getRoot.getAbsolutePath)
-        .find(file => FilenameUtils.getExtension(file) == "tif")
+        .find(file => FilenameUtils.getExtension(file) == BZ2_EXTENSION)
         .map(filename =>
           Paths.get(tempDir.getRoot.getAbsolutePath, filename).toString)
 
       filePath match {
         case Some(filePath) =>
-          val geoTiff = openTiffFile(filePath)
-
-          val (sum, count) = geoTiff.calculateSumAndCount()
+          val csv = openCsvFile(filePath)
 
           val expectedNumberOfPings = 5
 
-          softly.assertThat(sum).isEqualTo(expectedNumberOfPings)
-          softly.assertThat(count).isEqualTo(TOTAL_CELL_COUNT_WHOLE_WORLD_AT_1K)
+          softly.assertThat(csv.size).isEqualTo(expectedNumberOfPings)
+
+        case None => softly.fail("csv file not found")
       }
     }
 
@@ -219,42 +214,59 @@ class ComponentTest {
     SoftAssertions.assertSoftly { softly =>
       implicit val config: Config = testConfig
 
-      setDataReturnedFromDataSource(
+      setDataReturnedFromDataSource(Seq(
         ("123", 10, 179.9, -89.9),
         ("456", 20, -179.9, 89.9),
         ("789", 30, 0, 0),
         ("234", 40, 179.9, 89.9),
         ("567", 50, -179.9, -89.9),
         ("890", 60, 179.9, -89.9)
-      )
+      ))
 
       ResamplerOrchestrator.orchestrateResampling(datasourceMock)
 
       val preparedStatementArgCaptor: ArgumentCaptor[String] =
         ArgumentCaptor.forClass(classOf[String])
 
-      verify(connectionMock, times(31))
+      verify(connectionMock, times(32))
         .prepareStatement(preparedStatementArgCaptor.capture())
 
+      val preparedStatementIterator = preparedStatementArgCaptor.getAllValues.iterator()
+
+      softly.assertThat(preparedStatementIterator.next())
+        .startsWith(s"""
+                       |SELECT DISTINCT year, month FROM `database`.`table`
+                       |WHERE input_ais_file_name = "${config.inputFiles.head}"
+                       |""".stripMargin)
+
       softly
-        .assertThat(preparedStatementArgCaptor.getAllValues.iterator())
+        .assertThat(preparedStatementIterator)
         .allMatch { sqlStatement =>
           sqlStatement.startsWith(s"""
             |SELECT mmsi, acquisition_time, lat, lon
-            |FROM ($filterQuery)
+            |FROM `database`.`table`
             |WHERE (
-            |(year = ... AND month = ...)
-            |""".stripMargin) /* TODO: replace ... */
+            |""".stripMargin)
         }
 
     }
 
-  private def openTiffFile(filename: String) =
-    new CreatedTiff(GeoTiffReader.readSingleband(filename))
+  private def openCsvFile(filename: String): Seq[(String, Long, Double, Double)] = {
+    val lines: java.util.List[_] = IOUtils.readLines(
+      new BZip2CompressorInputStream(new FileInputStream(new File(filename))))
+
+    lines
+      .asScala
+      .map(_.toString)
+      .map(_.split("\t") match {
+        case Array(mmsi, timestamp, lat, lon) =>
+          (mmsi, Timestamp.valueOf(timestamp).toLocalDateTime.toEpochSecond(ZoneOffset.UTC), lat.toDouble, lon.toDouble)
+      })
+  }
 
   private def setYearAndMonthPairsReturnedFromDataSource(pairs: (Int, Int)*): Unit = {
     val (years, months) = pairs.unzip
-    val nexts = months.map { _ => true }.tail :+ false
+    val nexts = months.map { _ => true } :+ false
 
     when(pairResultSetMock.next()).thenReturn(nexts.head, nexts.tail: _*)
     when(pairResultSetMock.getInt("year")).thenReturn(years.head, years.tail: _*)
@@ -262,7 +274,7 @@ class ComponentTest {
   }
 
   private def setDataReturnedFromDataSource(
-      data: (String, Long, Double, Double)*): Unit = {
+      data: Seq[(String, Long, Double, Double)]): Unit = {
     data.map {
       case (mmsi: String, timeSeconds: Long, lon: Double, lat: Double) =>
         List(mmsi, makeTimestamp(timeSeconds), lon, lat, true)

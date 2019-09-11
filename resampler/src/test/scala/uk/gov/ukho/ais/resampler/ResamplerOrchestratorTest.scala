@@ -10,7 +10,7 @@ class ResamplerOrchestratorTest {
   @Test
   def whenGetMonthsToUpdateFromEmptySetThenEmptySetReturned(): Unit =
     SoftAssertions.assertSoftly { softly =>
-      val updates = ResamplerOrchestrator.getMonthsToUpdateFromModifiedMonths(Seq.empty)
+      val updates = ResamplerOrchestrator.getMonthsToResampleFromModifiedMonths(Seq.empty)
 
       softly.assertThat(updates.toArray).isEmpty()
     }
@@ -23,7 +23,7 @@ class ResamplerOrchestratorTest {
         (2019, 5),
         (2019, 6)
       )
-      val updates = ResamplerOrchestrator.getMonthsToUpdateFromModifiedMonths(Seq((2019, 5)))
+      val updates = ResamplerOrchestrator.getMonthsToResampleFromModifiedMonths(Seq((2019, 5)))
 
       softly.assertThat(updates.toArray).containsExactlyElementsOf(expectedMonths.asJava)
     }
@@ -38,7 +38,7 @@ class ResamplerOrchestratorTest {
         (2019, 7),
         (2019, 8)
       )
-      val updates = ResamplerOrchestrator.getMonthsToUpdateFromModifiedMonths(Seq(
+      val updates = ResamplerOrchestrator.getMonthsToResampleFromModifiedMonths(Seq(
         (2019, 5),
         (2019, 6),
         (2019, 7)

@@ -9,6 +9,7 @@ plugins {
 dependencies {
     implementation("org.scala-lang:scala-library:${Versions.scala}")
     compile("org.scala-lang:scala-library:${Versions.scala}")
+    implementation("org.slf4j:slf4j-simple:${Versions.sl4j}")
     implementation(rootProject.files("libs/${Versions.athenaJdbcLib}"))
     implementation("com.amazonaws:aws-java-sdk-core:1.11.610")
     implementation("com.github.scopt:scopt_${Versions.scalaCompat}:${Versions.scopt}")
@@ -19,7 +20,6 @@ dependencies {
     implementation("org.apache.commons:commons-compress:${Versions.commonsCompress}")
     testImplementation("junit:junit:${Versions.junit}")
     testImplementation("org.assertj:assertj-core:${Versions.assertJ}")
-    testImplementation("org.apache.commons:commons-math3:${Versions.commonsMath3}")
     testImplementation("org.mockito:mockito-scala_${Versions.scalaCompat}:${Versions.mockitoScala}")
 
     constraints {
