@@ -117,11 +117,13 @@ class AisRepositoryTest {
   }
 
   @Test
-  def whenGetYearAndMonthPairsForNonExistentFileThenIteratorDoesNotHaveNext(): Unit =
+  def whenGetYearAndMonthPairsForNonExistentFileThenIteratorDoesNotHaveNext()
+    : Unit =
     SoftAssertions.assertSoftly { softly =>
       when(resultSetMock.next()).thenReturn(false)
 
-      val iterator = aisRepository.getDistinctYearAndMonthPairsForFile("i-dont-exist")
+      val iterator =
+        aisRepository.getDistinctYearAndMonthPairsForFile("i-dont-exist")
 
       softly.assertThat(iterator.hasNext).isFalse()
     }
@@ -134,7 +136,8 @@ class AisRepositoryTest {
 
       when(resultSetMock.next()).thenReturn(true, true, true, false)
       when(resultSetMock.getInt("year")).thenReturn(years.head, years.tail: _*)
-      when(resultSetMock.getInt("month")).thenReturn(months.head, months.tail: _*)
+      when(resultSetMock.getInt("month"))
+        .thenReturn(months.head, months.tail: _*)
 
       val results = aisRepository.getDistinctYearAndMonthPairsForFile("")
 

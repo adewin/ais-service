@@ -51,14 +51,16 @@ class ComponentTest {
 
   val baseYear = 2019
   val baseMonth = 1
-  val baseDateTime: LocalDateTime = LocalDateTime.of(baseYear, baseMonth, 1, 0, 0, 0)
+  val baseDateTime: LocalDateTime =
+    LocalDateTime.of(baseYear, baseMonth, 1, 0, 0, 0)
 
   @Before
   def setup(): Unit = {
     when(datasourceMock.getConnection()).thenReturn(connectionMock)
     when(connectionMock.prepareStatement(anyString()))
       .thenReturn(preparedStatementMock)
-    when(preparedStatementMock.executeQuery()).thenReturn(pairResultSetMock, resultSetMock)
+    when(preparedStatementMock.executeQuery())
+      .thenReturn(pairResultSetMock, resultSetMock)
 
     setYearAndMonthPairsReturnedFromDataSource(
       (2018, 1)
@@ -70,7 +72,8 @@ class ComponentTest {
       table = "table",
       inputFiles = Seq("s3://test/input-ais.tar.bz2"),
       resolution = 1,
-      isLocal = true)
+      isLocal = true
+    )
   }
 
   @Test
@@ -103,12 +106,30 @@ class ComponentTest {
       implicit val config: Config = testConfig
 
       val expectedPings = Seq(
-        ("123", baseDateTime.plusSeconds(10).toEpochSecond(ZoneOffset.UTC), 179.9, -89.9),
-        ("456", baseDateTime.plusSeconds(20).toEpochSecond(ZoneOffset.UTC), -179.9, 89.9),
-        ("789", baseDateTime.plusSeconds(30).toEpochSecond(ZoneOffset.UTC), 0d, 0d),
-        ("234", baseDateTime.plusSeconds(40).toEpochSecond(ZoneOffset.UTC), 179.9, 89.9),
-        ("567", baseDateTime.plusSeconds(50).toEpochSecond(ZoneOffset.UTC), -179.9, -89.9),
-        ("890", baseDateTime.plusSeconds(60).toEpochSecond(ZoneOffset.UTC), 179.9, -89.9)
+        ("123",
+         baseDateTime.plusSeconds(10).toEpochSecond(ZoneOffset.UTC),
+         179.9,
+         -89.9),
+        ("456",
+         baseDateTime.plusSeconds(20).toEpochSecond(ZoneOffset.UTC),
+         -179.9,
+         89.9),
+        ("789",
+         baseDateTime.plusSeconds(30).toEpochSecond(ZoneOffset.UTC),
+         0d,
+         0d),
+        ("234",
+         baseDateTime.plusSeconds(40).toEpochSecond(ZoneOffset.UTC),
+         179.9,
+         89.9),
+        ("567",
+         baseDateTime.plusSeconds(50).toEpochSecond(ZoneOffset.UTC),
+         -179.9,
+         -89.9),
+        ("890",
+         baseDateTime.plusSeconds(60).toEpochSecond(ZoneOffset.UTC),
+         179.9,
+         -89.9)
       )
 
       setDataReturnedFromDataSource(expectedPings)
@@ -127,7 +148,9 @@ class ComponentTest {
           val expectedNumberOfPings = 6
 
           softly.assertThat(csv.size).isEqualTo(expectedNumberOfPings)
-          softly.assertThat(csv.toArray).containsExactlyElementsOf(expectedPings.asJava)
+          softly
+            .assertThat(csv.toArray)
+            .containsExactlyElementsOf(expectedPings.asJava)
 
         case None => softly.fail("csv file not found")
       }
@@ -141,11 +164,26 @@ class ComponentTest {
         interpolationDistanceThresholdMeters = DEFAULT_INTERPOLATION_METERS)
 
       val expectedPings = Seq(
-        ("123456793", baseDateTime.toEpochSecond(ZoneOffset.UTC), -1.216151956, 50.77512703),
-        ("123456793", baseDateTime.plusMinutes(6).toEpochSecond(ZoneOffset.UTC), -1.198185651, 50.78648692),
-        ("123456793", baseDateTime.plusMinutes(12).toEpochSecond(ZoneOffset.UTC), -1.180219345, 50.77512703),
-        ("123456793", baseDateTime.plusMinutes(13).toEpochSecond(ZoneOffset.UTC), -1.180202123, 50.77235519),
-        ("123456793", baseDateTime.plusMinutes(15).toEpochSecond(ZoneOffset.UTC), -1.180219345, 50.76944604)
+        ("123456793",
+         baseDateTime.toEpochSecond(ZoneOffset.UTC),
+         -1.216151956,
+         50.77512703),
+        ("123456793",
+         baseDateTime.plusMinutes(6).toEpochSecond(ZoneOffset.UTC),
+         -1.198185651,
+         50.78648692),
+        ("123456793",
+         baseDateTime.plusMinutes(12).toEpochSecond(ZoneOffset.UTC),
+         -1.180219345,
+         50.77512703),
+        ("123456793",
+         baseDateTime.plusMinutes(13).toEpochSecond(ZoneOffset.UTC),
+         -1.180202123,
+         50.77235519),
+        ("123456793",
+         baseDateTime.plusMinutes(15).toEpochSecond(ZoneOffset.UTC),
+         -1.180219345,
+         50.76944604)
       )
 
       setDataReturnedFromDataSource(expectedPings)
@@ -175,20 +213,21 @@ class ComponentTest {
         interpolationTimeThresholdMilliseconds = DEFAULT_INTERPOLATION_TIME,
         interpolationDistanceThresholdMeters = DEFAULT_INTERPOLATION_METERS)
 
-      setDataReturnedFromDataSource(Seq(
-        ("123456793",
-         baseDateTime.minusMinutes(24).toEpochSecond(ZoneOffset.UTC),
-         -1.216151956,
-         50.77512703),
-        ("123456793",
-         baseDateTime.plusMinutes(6).toEpochSecond(ZoneOffset.UTC),
-         -1.198185651,
-         50.78648692),
-        ("123456793",
-         baseDateTime.plusMinutes(12).toEpochSecond(ZoneOffset.UTC),
-         -1.180219345,
-         50.77512703)
-      ))
+      setDataReturnedFromDataSource(
+        Seq(
+          ("123456793",
+           baseDateTime.minusMinutes(24).toEpochSecond(ZoneOffset.UTC),
+           -1.216151956,
+           50.77512703),
+          ("123456793",
+           baseDateTime.plusMinutes(6).toEpochSecond(ZoneOffset.UTC),
+           -1.198185651,
+           50.78648692),
+          ("123456793",
+           baseDateTime.plusMinutes(12).toEpochSecond(ZoneOffset.UTC),
+           -1.180219345,
+           50.77512703)
+        ))
 
       ResamplerOrchestrator.orchestrateResampling(datasourceMock)
 
@@ -214,14 +253,15 @@ class ComponentTest {
     SoftAssertions.assertSoftly { softly =>
       implicit val config: Config = testConfig
 
-      setDataReturnedFromDataSource(Seq(
-        ("123", 10, 179.9, -89.9),
-        ("456", 20, -179.9, 89.9),
-        ("789", 30, 0, 0),
-        ("234", 40, 179.9, 89.9),
-        ("567", 50, -179.9, -89.9),
-        ("890", 60, 179.9, -89.9)
-      ))
+      setDataReturnedFromDataSource(
+        Seq(
+          ("123", 10, 179.9, -89.9),
+          ("456", 20, -179.9, 89.9),
+          ("789", 30, 0, 0),
+          ("234", 40, 179.9, 89.9),
+          ("567", 50, -179.9, -89.9),
+          ("890", 60, 179.9, -89.9)
+        ))
 
       ResamplerOrchestrator.orchestrateResampling(datasourceMock)
 
@@ -231,9 +271,11 @@ class ComponentTest {
       verify(connectionMock, times(32))
         .prepareStatement(preparedStatementArgCaptor.capture())
 
-      val preparedStatementIterator = preparedStatementArgCaptor.getAllValues.iterator()
+      val preparedStatementIterator =
+        preparedStatementArgCaptor.getAllValues.iterator()
 
-      softly.assertThat(preparedStatementIterator.next())
+      softly
+        .assertThat(preparedStatementIterator.next())
         .startsWith(s"""
                        |SELECT DISTINCT year, month FROM `database`.`table`
                        |WHERE input_ais_file_name = "${config.inputFiles.head}"
@@ -251,26 +293,37 @@ class ComponentTest {
 
     }
 
-  private def openCsvFile(filename: String): Seq[(String, Long, Double, Double)] = {
+  private def openCsvFile(
+      filename: String): Seq[(String, Long, Double, Double)] = {
     val lines: java.util.List[_] = IOUtils.readLines(
       new BZip2CompressorInputStream(new FileInputStream(new File(filename))))
 
-    lines
-      .asScala
+    lines.asScala
       .map(_.toString)
       .map(_.split("\t") match {
         case Array(mmsi, timestamp, lat, lon) =>
-          (mmsi, Timestamp.valueOf(timestamp).toLocalDateTime.toEpochSecond(ZoneOffset.UTC), lat.toDouble, lon.toDouble)
+          (mmsi,
+           Timestamp
+             .valueOf(timestamp)
+             .toLocalDateTime
+             .toEpochSecond(ZoneOffset.UTC),
+           lat.toDouble,
+           lon.toDouble)
       })
   }
 
-  private def setYearAndMonthPairsReturnedFromDataSource(pairs: (Int, Int)*): Unit = {
+  private def setYearAndMonthPairsReturnedFromDataSource(
+      pairs: (Int, Int)*): Unit = {
     val (years, months) = pairs.unzip
-    val nexts = months.map { _ => true } :+ false
+    val nexts = months.map { _ =>
+      true
+    } :+ false
 
     when(pairResultSetMock.next()).thenReturn(nexts.head, nexts.tail: _*)
-    when(pairResultSetMock.getInt("year")).thenReturn(years.head, years.tail: _*)
-    when(pairResultSetMock.getInt("month")).thenReturn(months.head, months.tail: _*)
+    when(pairResultSetMock.getInt("year"))
+      .thenReturn(years.head, years.tail: _*)
+    when(pairResultSetMock.getInt("month"))
+      .thenReturn(months.head, months.tail: _*)
   }
 
   private def setDataReturnedFromDataSource(

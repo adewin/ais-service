@@ -18,8 +18,9 @@ object CsvRepository {
 
   private val logger: Logger = LoggerFactory.getLogger(CsvRepository.getClass)
 
-  def writePingsForMonth(year: Int, month: Int, pings: Iterator[Ping])
-                        (implicit config: Config, s3Client: AmazonS3): Unit = {
+  def writePingsForMonth(year: Int, month: Int, pings: Iterator[Ping])(
+      implicit config: Config,
+      s3Client: AmazonS3): Unit = {
     val fileName = generateFilename(year, month, 0)
     val directory =
       if (config.isLocal) config.outputDirectory
@@ -44,7 +45,8 @@ object CsvRepository {
       count += 1
 
       if (count % 10000 == 0) {
-        logger.info(s"wrote ${count / 1000}k pings for year $year, month $month to $filePath")
+        logger.info(
+          s"wrote ${count / 1000}k pings for year $year, month $month to $filePath")
       }
     }
     outputStream.close()
@@ -52,10 +54,14 @@ object CsvRepository {
     if (!config.isLocal) uploadFileToS3AndDelete(year, month, file)
   }
 
-  private def uploadFileToS3AndDelete(year: Int, month: Int, localFileToUpload: File)
-                                     (implicit config: Config, s3Client: AmazonS3): Unit = {
-    logger.info(s"uploading file '${localFileToUpload.getAbsolutePath}' " +
-      s"for year $year, month $month to ${config.outputDirectory}...")
+  private def uploadFileToS3AndDelete(year: Int,
+                                      month: Int,
+                                      localFileToUpload: File)(
+      implicit config: Config,
+      s3Client: AmazonS3): Unit = {
+    logger.info(
+      s"uploading file '${localFileToUpload.getAbsolutePath}' " +
+        s"for year $year, month $month to ${config.outputDirectory}...")
 
     s3Client.putObject(
       new PutObjectRequest(

@@ -6,10 +6,12 @@ import uk.gov.ukho.ais.resampler.Config
 
 object CsvS3KeyService {
 
-  def generateS3Key(year: Int, month: Int, part: Int)(implicit config: Config): String = {
+  def generateS3Key(year: Int, month: Int, part: Int)(
+      implicit config: Config): String = {
     val interpolationDescriptor = createInterpolationDescriptor(config)
 
-    val objectPrefix = s"resample=$interpolationDescriptor/year=$year/month=$month/"
+    val objectPrefix =
+      s"resample=$interpolationDescriptor/year=$year/month=$month/"
     val filename = f"part-$part%06d.csv.bz2"
 
     s"$objectPrefix$filename"

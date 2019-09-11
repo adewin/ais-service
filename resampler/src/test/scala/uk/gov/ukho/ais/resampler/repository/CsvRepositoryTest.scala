@@ -25,8 +25,8 @@ class CsvRepositoryTest extends IdiomaticMockito {
     SoftAssertions.assertSoftly { softly =>
       implicit val config: Config =
         Config.default.copy(outputDirectory = tempDir.getRoot.getAbsolutePath,
-          resolution = 1,
-          isLocal = true)
+                            resolution = 1,
+                            isLocal = true)
 
       val year = 2019
       val month = 1

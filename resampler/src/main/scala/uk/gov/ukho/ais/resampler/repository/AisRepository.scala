@@ -3,7 +3,10 @@ package uk.gov.ukho.ais.resampler.repository
 import java.sql.{Connection, PreparedStatement, ResultSet}
 
 import uk.gov.ukho.ais.resampler.model.Ping
-import uk.gov.ukho.ais.resampler.utility.TimeUtilities.{getLastDayOfPreviousMonth, getNextMonth}
+import uk.gov.ukho.ais.resampler.utility.TimeUtilities.{
+  getLastDayOfPreviousMonth,
+  getNextMonth
+}
 import javax.sql.DataSource
 import org.slf4j.{Logger, LoggerFactory}
 import uk.gov.ukho.ais.resampler.Config
@@ -16,11 +19,11 @@ class AisRepository(val dataSource: DataSource)(implicit config: Config) {
 
   private val logger: Logger = LoggerFactory.getLogger(classOf[AisRepository])
 
-  def getDistinctYearAndMonthPairsForFile(inputFile: String): Iterator[(Int, Int)] = {
+  def getDistinctYearAndMonthPairsForFile(
+      inputFile: String): Iterator[(Int, Int)] = {
     val connection: Connection = dataSource.getConnection()
 
-    val sqlStatement: PreparedStatement = connection.prepareStatement(
-      s"""
+    val sqlStatement: PreparedStatement = connection.prepareStatement(s"""
          |SELECT DISTINCT year, month FROM `${config.database}`.`${config.table}`
          |WHERE input_ais_file_name = \"$inputFile\"
          """.stripMargin)
@@ -29,12 +32,12 @@ class AisRepository(val dataSource: DataSource)(implicit config: Config) {
 
     new Iterator[(Int, Int)] {
       override def hasNext: Boolean = results.next()
-      override def next(): (Int, Int) = (results.getInt("year"), results.getInt("month"))
+      override def next(): (Int, Int) =
+        (results.getInt("year"), results.getInt("month"))
     }
   }
 
-  def getFilteredPingsByDate(year: Int,
-                             month: Int): Iterator[Ping] =
+  def getFilteredPingsByDate(year: Int, month: Int): Iterator[Ping] =
     new Iterator[Ping] {
       val connection: Connection = dataSource.getConnection()
       var bucket: Int = 1
@@ -60,8 +63,9 @@ class AisRepository(val dataSource: DataSource)(implicit config: Config) {
             .map(sqlStatement => connection.prepareStatement(sqlStatement)): _*)
       }
 
-      logger.info(s"prepared SQL statement for year $year, month $month " +
-        s"(bucket $bucket of $DEFAULT_NUMBER_OF_BUCKETS)")
+      logger.info(
+        s"prepared SQL statement for year $year, month $month " +
+          s"(bucket $bucket of $DEFAULT_NUMBER_OF_BUCKETS)")
 
       var results: ResultSet = sqlStatements.dequeue().executeQuery()
 
@@ -87,8 +91,9 @@ class AisRepository(val dataSource: DataSource)(implicit config: Config) {
         _hasNext = results.next()
 
         if (!_hasNext && sqlStatements.nonEmpty) {
-          logger.info(s"executing SQL query for year $year, month $month " +
-            s"(bucket $bucket of $DEFAULT_NUMBER_OF_BUCKETS)...")
+          logger.info(
+            s"executing SQL query for year $year, month $month " +
+              s"(bucket $bucket of $DEFAULT_NUMBER_OF_BUCKETS)...")
           bucket += 1
           results = sqlStatements.dequeue().executeQuery()
           _hasNext = results.next()
