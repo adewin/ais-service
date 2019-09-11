@@ -16,6 +16,7 @@ object ResamplerOrchestrator {
 
     val modifiedMonths = config.inputFiles
       .flatMap { path =>
+        println(s"querying for months contained in input AIS data file: $path...")
         aisRepository.getDistinctYearAndMonthPairsForFile(path)
       }
 
