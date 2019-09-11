@@ -34,7 +34,7 @@ object ConfigParser {
         .valueName("<database>")
         .text("database holding input AIS pings")
         .action((value, config) => config.copy(database = value)),
-      opt[String]('l', "table")
+      opt[String]('e', "table")
         .required()
         .valueName("<table>")
         .text("table holding input AIS pings")
