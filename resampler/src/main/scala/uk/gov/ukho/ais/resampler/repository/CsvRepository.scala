@@ -23,7 +23,10 @@ object CsvRepository {
     val filePath = s"$directory/$fileName.csv.bz2"
     val file = new File(filePath)
 
-    val outputStream = new BufferedOutputStream(new FileOutputStream(file), 256 * 1024 * 1024)
+    val outputStream = new BufferedOutputStream(
+      new BZip2CompressorOutputStream(new FileOutputStream(file),
+                                      BZip2CompressorOutputStream.MAX_BLOCKSIZE),
+      512 * 1024 * 1024)
 
     var count = 0
 
@@ -37,7 +40,7 @@ object CsvRepository {
 
       count += 1
 
-      if (count % 10000 == 0) {
+      if (count % 100000 == 0) {
         println(
           s"wrote ${count / 1000}k pings for year $year, month $month to $filePath")
       }
