@@ -1,0 +1,3 @@
+archive:
+  bucketName: ${FILTER_SQL_ARCHIVE_BUCKET_NAME|""}
+  prefix: ${FILTER_SQL_ARCHIVE_PREFIX|""}

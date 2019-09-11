@@ -18,6 +18,7 @@ rootProject.name = "ais-service"
 include("deployment",
         "heatmapGenerator",
         "lambdas:ingest-upload-file-lambda",
+        "lambdas:validate-new-job-config-lambda",
         "lambdas:libraries:s3-event-handling",
         "lambdas:libraries:s3-test-util",
         "lambdas:libraries:emr-job-runner",
