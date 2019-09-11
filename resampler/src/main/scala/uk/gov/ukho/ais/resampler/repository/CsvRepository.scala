@@ -1,6 +1,6 @@
 package uk.gov.ukho.ais.resampler.repository
 
-import java.io.{File, FileOutputStream}
+import java.io.{BufferedOutputStream, File, FileOutputStream}
 
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.s3.model.PutObjectRequest
@@ -11,8 +11,6 @@ import uk.gov.ukho.ais.resampler.model.Ping
 import uk.gov.ukho.ais.resampler.service.CsvS3KeyService
 
 object CsvRepository {
-
-  private val PART_MAX_ROW_SIZE = 100 * 100 * 100
 
   def writePingsForMonth(year: Int, month: Int, pings: Iterator[Ping])(
       implicit config: Config,
@@ -25,8 +23,7 @@ object CsvRepository {
     val filePath = s"$directory/$fileName.csv.bz2"
     val file = new File(filePath)
 
-    val outputStream = new BZip2CompressorOutputStream(
-      new FileOutputStream(file))
+    val outputStream = new BufferedOutputStream(new FileOutputStream(file), 256 * 1024 * 1024)
 
     var count = 0
 
