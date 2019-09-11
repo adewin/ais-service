@@ -63,7 +63,7 @@ class ComponentTest {
       .thenReturn(pairResultSetMock, resultSetMock)
 
     setYearAndMonthPairsReturnedFromDataSource(
-      (2018, 1)
+      (baseYear, baseMonth)
     )
 
     testConfig = Config.default.copy(
@@ -277,8 +277,8 @@ class ComponentTest {
       softly
         .assertThat(preparedStatementIterator.next())
         .startsWith(s"""
-                       |SELECT DISTINCT year, month FROM `database`.`table`
-                       |WHERE input_ais_file_name = "${config.inputFiles.head}"
+                       |SELECT DISTINCT year, month FROM "database"."table"
+                       |WHERE input_ais_file_name = '${config.inputFiles.head}'
                        |""".stripMargin)
 
       softly
@@ -286,7 +286,7 @@ class ComponentTest {
         .allMatch { sqlStatement =>
           sqlStatement.startsWith(s"""
             |SELECT mmsi, acquisition_time, lat, lon
-            |FROM `database`.`table`
+            |FROM "database"."table"
             |WHERE (
             |""".stripMargin)
         }

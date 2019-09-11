@@ -24,7 +24,7 @@ class AisRepository(val dataSource: DataSource)(implicit config: Config) {
     val connection: Connection = dataSource.getConnection()
 
     val sqlStatement: PreparedStatement = connection.prepareStatement(s"""
-         |SELECT DISTINCT year, month FROM `${config.database}`.`${config.table}`
+         |SELECT DISTINCT year, month FROM "${config.database}"."${config.table}"
          |WHERE input_ais_file_name = '$inputFile'
          """.stripMargin)
 
@@ -51,7 +51,7 @@ class AisRepository(val dataSource: DataSource)(implicit config: Config) {
           (0 until DEFAULT_NUMBER_OF_BUCKETS)
             .map(bucket => s"""
                               |SELECT mmsi, acquisition_time, lat, lon
-                              |FROM `${config.database}`.`${config.table}`
+                              |FROM "${config.database}"."${config.table}"
                               |WHERE (
                               |(year = $year AND month = $month)
                               |OR (year = $nextYear AND month = $nextMonth AND day=1)
