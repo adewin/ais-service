@@ -1,9 +1,9 @@
 package uk.gov.ukho.ais.resampler
 
-import scala.collection.JavaConverters._
-
 import org.assertj.core.api.SoftAssertions
 import org.junit.Test
+
+import scala.collection.JavaConverters._
 
 class ResamplerOrchestratorTest {
 

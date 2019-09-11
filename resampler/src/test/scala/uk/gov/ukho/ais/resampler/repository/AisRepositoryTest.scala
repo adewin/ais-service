@@ -17,7 +17,6 @@ import uk.gov.ukho.ais.resampler.utility.TestPingCreator.ping
 import uk.gov.ukho.ais.resampler.utility.TimeUtilities.makeTimestamp
 
 import scala.collection.JavaConverters._
-import scala.collection.mutable
 
 @RunWith(classOf[MockitoJUnitRunner])
 class AisRepositoryTest {

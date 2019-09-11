@@ -2,7 +2,6 @@ package uk.gov.ukho.ais.resampler
 
 import com.amazonaws.services.s3.AmazonS3
 import javax.sql.DataSource
-import org.slf4j.{Logger, LoggerFactory}
 import uk.gov.ukho.ais.resampler.processor.Resampler
 import uk.gov.ukho.ais.resampler.processor.YearMonthFilter.Filter
 import uk.gov.ukho.ais.resampler.repository.{AisRepository, CsvRepository}

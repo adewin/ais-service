@@ -2,15 +2,15 @@ package uk.gov.ukho.ais.resampler.processor
 
 import java.util.Comparator
 
-import uk.gov.ukho.ais.resampler.model.Ping
-import uk.gov.ukho.ais.resampler.utility.TestPingCreator.ping
 import org.apache.commons.math3.util.Precision
 import org.assertj.core.api.SoftAssertions
 import org.junit.Test
+import uk.gov.ukho.ais.resampler.model.Ping
+import uk.gov.ukho.ais.resampler.processor.YearMonthFilter.Filter
+import uk.gov.ukho.ais.resampler.utility.TestPingCreator.ping
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable.ArrayBuffer
-import uk.gov.ukho.ais.resampler.processor.YearMonthFilter.Filter
 
 class YearMonthFilterTest {
 

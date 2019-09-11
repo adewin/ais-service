@@ -2,14 +2,10 @@ package uk.gov.ukho.ais.resampler.repository
 
 import java.sql.{Connection, PreparedStatement, ResultSet}
 
-import uk.gov.ukho.ais.resampler.model.Ping
-import uk.gov.ukho.ais.resampler.utility.TimeUtilities.{
-  getLastDayOfPreviousMonth,
-  getNextMonth
-}
 import javax.sql.DataSource
-import org.slf4j.{Logger, LoggerFactory}
 import uk.gov.ukho.ais.resampler.Config
+import uk.gov.ukho.ais.resampler.model.Ping
+import uk.gov.ukho.ais.resampler.utility.TimeUtilities.{getLastDayOfPreviousMonth, getNextMonth}
 
 import scala.collection.mutable
 

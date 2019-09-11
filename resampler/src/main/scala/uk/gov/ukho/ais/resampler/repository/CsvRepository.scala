@@ -1,16 +1,14 @@
 package uk.gov.ukho.ais.resampler.repository
 
 import java.io.{File, FileOutputStream}
-import java.time.ZoneOffset
 
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.s3.model.PutObjectRequest
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorOutputStream
 import org.apache.commons.io.IOUtils
-import org.slf4j.{Logger, LoggerFactory}
+import uk.gov.ukho.ais.resampler.Config
 import uk.gov.ukho.ais.resampler.model.Ping
 import uk.gov.ukho.ais.resampler.service.CsvS3KeyService
-import uk.gov.ukho.ais.resampler.{Config, ResamplerOrchestrator}
 
 object CsvRepository {
 

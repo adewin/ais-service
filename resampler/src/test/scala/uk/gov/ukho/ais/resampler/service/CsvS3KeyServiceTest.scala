@@ -1,8 +1,8 @@
 package uk.gov.ukho.ais.resampler.service
 
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
 import uk.gov.ukho.ais.resampler.Config
-import org.assertj.core.api.Assertions.assertThat
 
 class CsvS3KeyServiceTest {
 

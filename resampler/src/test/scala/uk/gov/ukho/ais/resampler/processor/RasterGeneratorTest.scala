@@ -1,10 +1,10 @@
 package uk.gov.ukho.ais.resampler.processor
 
 import geotrellis.raster.{IntArrayTile, RasterExtent}
-import uk.gov.ukho.ais.resampler.Config
-import uk.gov.ukho.ais.resampler.model.Ping
 import org.assertj.core.api.SoftAssertions
 import org.junit.Test
+import uk.gov.ukho.ais.resampler.Config
+import uk.gov.ukho.ais.resampler.model.Ping
 import uk.gov.ukho.ais.resampler.utility.TestPingCreator.ping
 
 import scala.collection.mutable.ArrayBuffer

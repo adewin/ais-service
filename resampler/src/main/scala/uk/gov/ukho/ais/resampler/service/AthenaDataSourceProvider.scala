@@ -1,7 +1,7 @@
 package uk.gov.ukho.ais.resampler.service
 
-import uk.gov.ukho.ais.resampler.Config
 import javax.sql.DataSource
+import uk.gov.ukho.ais.resampler.Config
 
 object AthenaDataSourceProvider {
   val DRIVER_CLASS: String = "com.simba.athena.jdbc.Driver"
