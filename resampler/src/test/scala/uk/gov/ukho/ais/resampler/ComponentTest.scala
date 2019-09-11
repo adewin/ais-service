@@ -278,7 +278,7 @@ class ComponentTest {
         .assertThat(preparedStatementIterator.next())
         .startsWith(s"""
                        |SELECT DISTINCT year, month FROM "database"."table"
-                       |WHERE input_ais_file_name = '${config.inputFiles.head}'
+                       |WHERE input_ais_data_file = '${config.inputFiles.head}'
                        |""".stripMargin)
 
       softly

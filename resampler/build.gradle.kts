@@ -9,7 +9,6 @@ plugins {
 dependencies {
     implementation("org.scala-lang:scala-library:${Versions.scala}")
     compile("org.scala-lang:scala-library:${Versions.scala}")
-    implementation("org.slf4j:slf4j-simple:${Versions.sl4j}")
     implementation(rootProject.files("libs/${Versions.athenaJdbcLib}"))
     implementation("com.amazonaws:aws-java-sdk-core:1.11.610")
     implementation("com.github.scopt:scopt_${Versions.scalaCompat}:${Versions.scopt}")

@@ -16,8 +16,6 @@ object CsvRepository {
 
   private val PART_MAX_ROW_SIZE = 100 * 100 * 100
 
-  private val logger: Logger = LoggerFactory.getLogger(CsvRepository.getClass)
-
   def writePingsForMonth(year: Int, month: Int, pings: Iterator[Ping])(
       implicit config: Config,
       s3Client: AmazonS3): Unit = {
@@ -45,7 +43,7 @@ object CsvRepository {
       count += 1
 
       if (count % 10000 == 0) {
-        logger.info(
+        println(
           s"wrote ${count / 1000}k pings for year $year, month $month to $filePath")
       }
     }
@@ -59,7 +57,7 @@ object CsvRepository {
                                       localFileToUpload: File)(
       implicit config: Config,
       s3Client: AmazonS3): Unit = {
-    logger.info(
+    println(
       s"uploading file '${localFileToUpload.getAbsolutePath}' " +
         s"for year $year, month $month to ${config.outputDirectory}...")
 

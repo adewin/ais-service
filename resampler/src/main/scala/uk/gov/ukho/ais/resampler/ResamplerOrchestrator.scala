@@ -10,9 +10,6 @@ import uk.gov.ukho.ais.resampler.utility.TimeUtilities
 
 object ResamplerOrchestrator {
 
-  private val logger: Logger =
-    LoggerFactory.getLogger(ResamplerOrchestrator.getClass)
-
   def orchestrateResampling(source: DataSource)(implicit config: Config,
                                                 amazonS3: AmazonS3): Unit = {
     val aisRepository = new AisRepository(source)
@@ -22,19 +19,19 @@ object ResamplerOrchestrator {
         aisRepository.getDistinctYearAndMonthPairsForFile(path)
       }
 
-    logger.info(s"will resample ${modifiedMonths.size} month(s)")
+    println(s"will resample ${modifiedMonths.size} month(s)")
 
     modifiedMonths.foreach {
       case (year: Int, month: Int) =>
         val monthOfPings =
           aisRepository.getFilteredPingsByDate(year, month)
 
-        logger.info(s"resampling pings for year $year, month $month...")
+        println(s"resampling pings for year $year, month $month...")
         val resampledPings = Resampler
           .resamplePings(monthOfPings)
           .filterPingsByYearAndMonth(year, month)
 
-        logger.info(s"creating CSV for year $year, month $month...")
+        println(s"creating CSV for year $year, month $month...")
         CsvRepository.writePingsForMonth(year, month, resampledPings)
     }
   }
