@@ -11,20 +11,20 @@ module validate_job_config_function {
 
 module validate_job_config_read_job_permissions {
   source                       = "./permissions/store/get-objects"
-  function_execution_role_name = module.validate_job_config_function.function_id
+  function_execution_role_name = module.validate_job_config_function.function_execution_role_name
   function_name                = module.validate_job_config_function.function_name
   store_name                   = var.heatmap_job_submission_store_name
 }
 
 module validate_job_config_validate_sql_file_permissions {
   source                       = "./permissions/store/get-objects"
-  function_execution_role_name = module.validate_job_config_function.function_id
+  function_execution_role_name = module.validate_job_config_function.function_execution_role_name
   function_name                = module.validate_job_config_function.function_name
   store_name                   = var.heatmap_sql_store_name
 }
 
 module validate_job_config_get_store_info {
   source                       = "./permissions/store/get-store-info"
-  function_execution_role_name = module.validate_job_config_function.function_id
+  function_execution_role_name = module.validate_job_config_function.function_execution_role_name
   function_name                = module.validate_job_config_function.function_name
 }
