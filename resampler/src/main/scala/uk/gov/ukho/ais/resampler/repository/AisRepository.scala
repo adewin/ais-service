@@ -25,7 +25,7 @@ class AisRepository(val dataSource: DataSource)(implicit config: Config) {
 
     val sqlStatement: PreparedStatement = connection.prepareStatement(s"""
          |SELECT DISTINCT year, month FROM `${config.database}`.`${config.table}`
-         |WHERE input_ais_file_name = \'$inputFile\'
+         |WHERE input_ais_file_name = '$inputFile'
          """.stripMargin)
 
     val results: ResultSet = sqlStatement.executeQuery()
