@@ -1,6 +1,6 @@
 package uk.gov.ukho.ais.resampler.repository
 
-import java.io.{BufferedOutputStream, File, FileOutputStream}
+import java.io._
 
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.s3.model.PutObjectRequest
@@ -13,20 +13,10 @@ import uk.gov.ukho.ais.resampler.service.CsvS3KeyService
 object CsvRepository {
 
   def writePingsForMonth(year: Int, month: Int, pings: Iterator[Ping])(
-      implicit config: Config,
-      s3Client: AmazonS3): Unit = {
-    val fileName = generateFilename(year, month, 0)
-    val directory =
-      if (config.isLocal) config.outputDirectory
-      else s"/tmp"
+    implicit config: Config,
+    s3Client: AmazonS3): Unit = {
 
-    val filePath = s"$directory/$fileName.csv.bz2"
-    val file = new File(filePath)
-
-    val outputStream = new BufferedOutputStream(
-      new BZip2CompressorOutputStream(new FileOutputStream(file),
-                                      BZip2CompressorOutputStream.MAX_BLOCKSIZE),
-      512 * 1024 * 1024)
+    val (outputStream, writerThread) = asyncWriteAndUpload(year, month)
 
     var count = 0
 
@@ -41,20 +31,50 @@ object CsvRepository {
       count += 1
 
       if (count % 100000 == 0) {
-        println(
-          s"wrote ${count / 1000}k pings for year $year, month $month to $filePath")
+        println(s"wrote ${count / 1000}k pings for year $year, month $month")
       }
     }
     outputStream.close()
+    writerThread.join()
+  }
 
-    if (!config.isLocal) uploadFileToS3AndDelete(year, month, file)
+  private def asyncWriteAndUpload(year: Int, month: Int)(implicit config: Config, amazonS3: AmazonS3): (OutputStream, Thread) = {
+    val fileName = generateFilename(year, month, 0)
+    val directory =
+      if (config.isLocal) config.outputDirectory
+      else s"/tmp"
+
+    val filePath = s"$directory/$fileName.csv.bz2"
+    val file = new File(filePath)
+
+    val pipedOut = new PipedOutputStream()
+    val pipedIn = new PipedInputStream(pipedOut)
+
+    val fileOut = new BZip2CompressorOutputStream(
+      new BufferedOutputStream(
+        new FileOutputStream(file),
+        512 * 1024 * 1024),
+      BZip2CompressorOutputStream.MAX_BLOCKSIZE)
+
+    val writerThread = new Thread {
+      override def run() {
+        IOUtils.copyLarge(pipedIn, fileOut)
+        fileOut.close()
+
+        if (!config.isLocal) uploadFileToS3AndDelete(year, month, file)
+      }
+    }
+
+    writerThread.start()
+
+    (pipedOut, writerThread)
   }
 
   private def uploadFileToS3AndDelete(year: Int,
                                       month: Int,
                                       localFileToUpload: File)(
-      implicit config: Config,
-      s3Client: AmazonS3): Unit = {
+                                       implicit config: Config,
+                                       s3Client: AmazonS3): Unit = {
     println(
       s"uploading file '${localFileToUpload.getAbsolutePath}' " +
         s"for year $year, month $month to ${config.outputDirectory}...")
