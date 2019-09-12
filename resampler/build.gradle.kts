@@ -10,7 +10,6 @@ dependencies {
     implementation("org.scala-lang:scala-library:${Versions.scala}")
     compile("org.scala-lang:scala-library:${Versions.scala}")
     implementation(rootProject.files("libs/${Versions.athenaJdbcLib}"))
-    implementation("com.amazonaws:aws-java-sdk-core:1.11.610")
     implementation("com.github.scopt:scopt_${Versions.scalaCompat}:${Versions.scopt}")
     implementation("org.locationtech.geotrellis:geotrellis-spark_${Versions.scalaCompat}:${Versions.geotrellis}")
     implementation("org.locationtech.geotrellis:geotrellis-s3_${Versions.scalaCompat}:${Versions.geotrellis}")

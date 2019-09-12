@@ -11,6 +11,7 @@ object AthenaDataSourceProvider {
 
     val JDBC_CONNECTION_URL
       : String = s"jdbc:awsathena://AwsRegion=${config.athenaRegion};" +
+      s"S3OutputLocation=s3://${config.athenaResultsBucket};" +
       "AWSCredentialsProviderClass=com.amazonaws.auth.DefaultAWSCredentialsProviderChain;" +
       "RowsToFetchPerBlock=1000000"
 

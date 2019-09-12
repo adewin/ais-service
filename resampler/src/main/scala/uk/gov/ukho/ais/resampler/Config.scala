@@ -1,6 +1,7 @@
 package uk.gov.ukho.ais.resampler
 
 case class Config(athenaRegion: String,
+                  athenaResultsBucket: String,
                   database: String,
                   table: String,
                   inputFiles: Seq[String],
@@ -14,6 +15,7 @@ case class Config(athenaRegion: String,
 object Config {
   val default = Config(
     athenaRegion = "eu-west-2",
+    athenaResultsBucket = "ukho-data-query-results",
     database = "",
     table = "",
     inputFiles = Seq.empty,
