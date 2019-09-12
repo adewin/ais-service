@@ -72,6 +72,10 @@ module functions {
   processed_static_data_store_name     = data.external.secrets.result["processed_static_data_store"]
   ais_database_name                    = local.ais_database_name
   processed_ais_table_name             = local.processed_ais_table_name
+  heatmap_job_submission_store_name    = data.external.secrets.result["heatmap_job_submission_store"]
+  heatmap_sql_archive_prefix           = "archive"
+  heatmap_sql_store_name               = data.external.secrets.result["heatmap_sql_archive_store"]
+  validate_job_config_jar              = var.VALIDATE_JOB_CONFIG_LAMBDA_JAR_PATH
 }
 
 module notifications {

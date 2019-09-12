@@ -3,7 +3,7 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 plugins {
     scala
     application
-    id("com.google.cloud.tools.jib") version "1.5.1"
+    id("com.google.cloud.tools.jib")
 }
 
 dependencies {
@@ -33,8 +33,7 @@ dependencies {
 }
 
 application {
-    mainClassName = "uk.gov.ukho.ais.heatmaps.Main"
-    applicationDefaultJvmArgs = listOf("-Dspark.master=local[*]")
+    mainClassName = "uk.gov.ukho.ais.heatmaps.generator.Main"
 }
 
 jib {

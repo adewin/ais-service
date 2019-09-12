@@ -26,3 +26,4 @@ variable "PASSWORD" {}
 variable "PROCESS_STATIC_DATA_ZIP_PATH" {}
 variable "DOCKER_REGISTRY_URL" {}
 variable "PROJECT_VERSION" {}
+variable "VALIDATE_JOB_CONFIG_LAMBDA_JAR_PATH" {}

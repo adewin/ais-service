@@ -31,3 +31,11 @@ variable processed_static_data_store_name {}
 variable ais_database_name {}
 
 variable processed_ais_table_name {}
+
+variable validate_job_config_jar {}
+
+variable heatmap_sql_store_name {}
+
+variable heatmap_sql_archive_prefix {}
+
+variable heatmap_job_submission_store_name {}
