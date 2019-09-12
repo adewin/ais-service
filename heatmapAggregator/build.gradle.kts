@@ -37,7 +37,7 @@ application {
 jib {
     to {
         image = "${System.getenv("DOCKER_REGISTRY_URL")}/ais-aggregate-heatmaps"
-        tags = setOf("latest", project.version.toString())
+        tags = setOf(project.version.toString())
         auth {
             username = System.getenv("DOCKER_REGISTRY_USERNAME")
             password = System.getenv("DOCKER_REGISTRY_PASSWORD")
