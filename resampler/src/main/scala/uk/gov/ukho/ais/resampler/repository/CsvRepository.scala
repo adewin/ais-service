@@ -9,14 +9,14 @@ import org.apache.commons.io.IOUtils
 import uk.gov.ukho.ais.resampler.Config
 import uk.gov.ukho.ais.resampler.model.Ping
 import uk.gov.ukho.ais.resampler.service.CsvS3KeyService
-import uk.gov.ukho.ais.resampler.utility.JobSet
 import uk.gov.ukho.ais.resampler.utility.JobSet.Job
+import uk.gov.ukho.ais.resampler.utility.{IOStreamUtils, JobSet}
 
 object CsvRepository {
 
-  case class Output(year: Int, month: Int)(implicit config: Config) {
+  case class Output(year: Int, month: Int, part: Int = 0)(implicit config: Config) {
     val localFile: File = {
-      val fileName = f"$year-$month-part-${0}%06d"
+      val fileName = f"$year-$month-part-$part%06d"
 
       val directory =
         if (config.isLocal) config.outputDirectory
@@ -35,9 +35,19 @@ object CsvRepository {
 
     val output = Output(year, month)
 
+    val (jobOutputStreams: Seq[OutputStream], jobs: Seq[Job]) = (0 until 8).map { i =>
+      val threadPipedOut = new PipedOutputStream()
+      val threadPipedIn = new PipedInputStream(threadPipedOut)
+
+      val newOutput = output.copy(part = i)
+
+      (threadPipedOut, () => writeAndUpload(newOutput, threadPipedIn))
+    }.unzip
+
     JobSet(
-      () => writePingsForMonth(pipedOut, pings),
-      () => writeAndUpload(output, pipedIn)
+      Seq(() => writePingsForMonth(pipedOut, pings),
+        () => IOStreamUtils.roundRobinCopy(pipedIn, jobOutputStreams)) ++
+        jobs
     )
   }
 
@@ -59,7 +69,7 @@ object CsvRepository {
   private def writeAndUpload(output: Output, inputStream: InputStream)
                             (implicit config: Config, s3Client: AmazonS3): Unit = {
 
-    val bufferedReader = new BufferedReader(new InputStreamReader(inputStream))
+//    val bufferedReader = new BufferedReader(new InputStreamReader(inputStream))
 
     // create file
 

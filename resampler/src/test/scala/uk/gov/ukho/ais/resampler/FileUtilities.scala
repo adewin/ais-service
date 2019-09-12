@@ -9,7 +9,7 @@ object FileUtilities {
       .filter(file => file.isFile)
       .map(file => file.getName)
 
-    println("found generated files: " + files.mkString)
+    println("found generated files: " + files.mkString(", "))
 
     files
   }

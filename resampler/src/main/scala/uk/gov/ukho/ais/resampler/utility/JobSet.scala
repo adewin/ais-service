@@ -6,13 +6,13 @@ object JobSet {
   type Job = () => Unit
 }
 
-case class JobSet(jobs: Job*) {
+case class JobSet(jobs: Seq[Job]) {
 
   private val threads: Seq[Thread] = jobs.map { job =>
     val thread = new Thread {
       override def run(): Unit = job()
     }
-    thread.setUncaughtExceptionHandler((_, _) => stop())
+    thread.setUncaughtExceptionHandler((_, _) => interrupt())
     thread
   }
 
@@ -22,6 +22,6 @@ case class JobSet(jobs: Job*) {
   def join(): Unit =
     threads.foreach(_.join())
 
-  def stop(): Unit =
-    threads.foreach(_.stop())
+  def interrupt(): Unit =
+    threads.foreach(_.interrupt())
 }

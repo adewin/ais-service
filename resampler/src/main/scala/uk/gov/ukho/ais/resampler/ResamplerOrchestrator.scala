@@ -5,7 +5,7 @@ import javax.sql.DataSource
 import uk.gov.ukho.ais.resampler.processor.Resampler
 import uk.gov.ukho.ais.resampler.processor.YearMonthFilter.Filter
 import uk.gov.ukho.ais.resampler.repository.{AisRepository, CsvRepository}
-import uk.gov.ukho.ais.resampler.utility.{JobSet, TimeUtilities}
+import uk.gov.ukho.ais.resampler.utility.TimeUtilities
 
 object ResamplerOrchestrator {
 

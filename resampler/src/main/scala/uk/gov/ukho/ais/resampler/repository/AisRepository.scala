@@ -43,23 +43,24 @@ class AisRepository(val dataSource: DataSource)(implicit config: Config) {
 
         mutable.Queue(
           (0 until DEFAULT_NUMBER_OF_BUCKETS)
-            .map(bucket => s"""
-                              |SELECT mmsi, acquisition_time, lat, lon
-                              |FROM "${config.database}"."${config.table}"
-                              |WHERE (
-                              |(year = $year AND month = $month)
-                              |OR (year = $nextYear AND month = $nextMonth AND day=1)
-                              |OR (year = $prevYear AND month = $prevMonth AND day=$prevDay)
-                              |)
-                              |AND mod(cast(mmsi as integer), $DEFAULT_NUMBER_OF_BUCKETS) = $bucket
-                              |ORDER BY mmsi, acquisition_time
-              """.stripMargin)
+            .map(bucket => {
+              println(
+                s"preparing SQL statement for year $year, month $month " +
+                  s"(bucket $bucket of ${DEFAULT_NUMBER_OF_BUCKETS - 1})")
+              s"""
+                 |SELECT mmsi, acquisition_time, lat, lon
+                 |FROM "${config.database}"."${config.table}"
+                 |WHERE (
+                 |(year = $year AND month = $month)
+                 |OR (year = $nextYear AND month = $nextMonth AND day=1)
+                 |OR (year = $prevYear AND month = $prevMonth AND day=$prevDay)
+                 |)
+                 |AND mod(cast(mmsi as integer), $DEFAULT_NUMBER_OF_BUCKETS) = $bucket
+                 |ORDER BY mmsi, acquisition_time
+              """.stripMargin
+            })
             .map(sqlStatement => connection.prepareStatement(sqlStatement)): _*)
       }
-
-      println(
-        s"prepared SQL statement for year $year, month $month " +
-          s"(bucket $bucket of $DEFAULT_NUMBER_OF_BUCKETS)")
 
       var results: ResultSet = sqlStatements.dequeue().executeQuery()
 
@@ -87,7 +88,7 @@ class AisRepository(val dataSource: DataSource)(implicit config: Config) {
         if (!_hasNext && sqlStatements.nonEmpty) {
           println(
             s"executing SQL query for year $year, month $month " +
-              s"(bucket $bucket of $DEFAULT_NUMBER_OF_BUCKETS)...")
+              s"(bucket $bucket of ${DEFAULT_NUMBER_OF_BUCKETS - 1})...")
           bucket += 1
           results = sqlStatements.dequeue().executeQuery()
           _hasNext = results.next()

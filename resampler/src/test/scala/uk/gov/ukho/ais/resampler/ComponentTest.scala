@@ -85,19 +85,13 @@ class ComponentTest {
 
       ResamplerOrchestrator.orchestrateResampling(datasourceMock)
 
-      val filePath = findGeneratedFiles(tempDir.getRoot.getAbsolutePath)
-        .find(file => FilenameUtils.getExtension(file) == BZ2_EXTENSION)
+      val files = findGeneratedFiles(tempDir.getRoot.getAbsolutePath)
+        .filter(file => FilenameUtils.getExtension(file) == BZ2_EXTENSION)
         .map(filename =>
           Paths.get(tempDir.getRoot.getAbsolutePath, filename).toString)
 
-      filePath match {
-        case Some(filePath) =>
-          val csv = openCsvFile(filePath)
-
-          softly.assertThat(csv.size).isEqualTo(0)
-
-        case None => softly.fail("csv localFile not found")
-      }
+      val count = files.foldLeft(0)(_ + openCsvFile(_).size)
+      softly.assertThat(count).isEqualTo(0)
     }
 
   @Test
@@ -132,28 +126,19 @@ class ComponentTest {
          -89.9)
       )
 
+      val expectedNumberOfPings = 6
+
       setDataReturnedFromDataSource(expectedPings)
 
       ResamplerOrchestrator.orchestrateResampling(datasourceMock)
 
-      val filePath = findGeneratedFiles(tempDir.getRoot.getAbsolutePath)
-        .find(file => FilenameUtils.getExtension(file) == BZ2_EXTENSION)
+      val files = findGeneratedFiles(tempDir.getRoot.getAbsolutePath)
+        .filter(file => FilenameUtils.getExtension(file) == BZ2_EXTENSION)
         .map(filename =>
           Paths.get(tempDir.getRoot.getAbsolutePath, filename).toString)
 
-      filePath match {
-        case Some(filePath) =>
-          val csv = openCsvFile(filePath)
-
-          val expectedNumberOfPings = 6
-
-          softly.assertThat(csv.size).isEqualTo(expectedNumberOfPings)
-          softly
-            .assertThat(csv.toArray)
-            .containsExactlyElementsOf(expectedPings.asJava)
-
-        case None => softly.fail("csv localFile not found")
-      }
+      val count = files.foldLeft(0)(_ + openCsvFile(_).size)
+      softly.assertThat(count).isEqualTo(expectedNumberOfPings)
     }
 
   @Test
@@ -186,24 +171,19 @@ class ComponentTest {
          50.76944604)
       )
 
+      val expectedNumberOfPings = 6
+
       setDataReturnedFromDataSource(expectedPings)
 
       ResamplerOrchestrator.orchestrateResampling(datasourceMock)
 
-      val filePath = findGeneratedFiles(tempDir.getRoot.getAbsolutePath)
-        .find(file => FilenameUtils.getExtension(file) == BZ2_EXTENSION)
+      val files = findGeneratedFiles(tempDir.getRoot.getAbsolutePath)
+        .filter(file => FilenameUtils.getExtension(file) == BZ2_EXTENSION)
         .map(filename =>
           Paths.get(tempDir.getRoot.getAbsolutePath, filename).toString)
 
-      filePath match {
-        case Some(filePath) =>
-          val csv = openCsvFile(filePath)
-
-          val expectedNumberOfPings = 6
-
-          softly.assertThat(csv.size).isEqualTo(expectedNumberOfPings)
-        case None => softly.fail("csv localFile not found")
-      }
+      val count = files.foldLeft(0)(_ + openCsvFile(_).size)
+      softly.assertThat(count).isEqualTo(expectedNumberOfPings)
     }
 
   @Test
@@ -229,23 +209,17 @@ class ComponentTest {
            50.77512703)
         ))
 
+      val expectedNumberOfPings = 5
+
       ResamplerOrchestrator.orchestrateResampling(datasourceMock)
 
-      val filePath = findGeneratedFiles(tempDir.getRoot.getAbsolutePath)
-        .find(file => FilenameUtils.getExtension(file) == BZ2_EXTENSION)
+      val files = findGeneratedFiles(tempDir.getRoot.getAbsolutePath)
+        .filter(file => FilenameUtils.getExtension(file) == BZ2_EXTENSION)
         .map(filename =>
           Paths.get(tempDir.getRoot.getAbsolutePath, filename).toString)
 
-      filePath match {
-        case Some(filePath) =>
-          val csv = openCsvFile(filePath)
-
-          val expectedNumberOfPings = 5
-
-          softly.assertThat(csv.size).isEqualTo(expectedNumberOfPings)
-
-        case None => softly.fail("csv localFile not found")
-      }
+      val count = files.foldLeft(0)(_ + openCsvFile(_).size)
+      softly.assertThat(count).isEqualTo(expectedNumberOfPings)
     }
 
   @Test
@@ -350,13 +324,5 @@ class ComponentTest {
           .thenReturn(false)
       case _ => when(resultSetMock.next()).thenReturn(false)
     }
-  }
-
-  private def createFilterSqlFile = {
-    val tmpSqlFile = Files.createTempFile("unfiltered", ".sql").toFile
-    FileUtils.writeStringToFile(tmpSqlFile,
-                                filterQuery,
-                                StandardCharsets.UTF_8.toString)
-    tmpSqlFile
   }
 }
