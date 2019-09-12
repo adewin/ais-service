@@ -84,7 +84,7 @@ object CsvRepository {
     implicit config: Config,
     s3Client: AmazonS3): Unit = {
     println(
-      s"uploading localFile '${output.localFile.getAbsolutePath}' " +
+      s"uploading file '${output.localFile.getAbsolutePath}' " +
         s"for year ${output.year}, month ${output.month} to ${config.outputDirectory}...")
 
     s3Client.putObject(

@@ -68,7 +68,7 @@ object ConfigParser {
         .action((value, config) =>
           config.copy(interpolationDistanceThresholdMeters = value))
         .validate(validatePositive),
-      arg[String]("<localFile>...")
+      arg[String]("<file>...")
         .unbounded()
         .required()
         .text("raw data files for which resampling should be performed")
