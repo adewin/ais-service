@@ -23,12 +23,37 @@ resource aws_sfn_state_machine batch_heatmap_step_fn {
   definition = <<EOF
 {
   "Comment": "A state machine that orchestrates heatmap creation",
-  "StartAt": "Generate Heatmaps",
-  "TimeoutSeconds": ${var.step_execution_timeout_seconds + 10},
+  "StartAt": "Validate Input",
+  "TimeoutSeconds": ${var.step_function_timeout_seconds},
   "States": {
+    "Validate Input": {
+      "Type": "Task",
+      "Resource": "${var.validate_job_config_function_id}",
+      "ResultPath": "$.jobConfig",
+      "Next": "Is Valid Request",
+      "Catch": [{
+        "ErrorEquals": ["States.ALL"],
+        "ResultPath": "$.validationFailure",
+        "Next": "Failure"
+      }]
+    },
+    "Is Valid Request": {
+      "Type": "Choice",
+      "Choices": [{
+          "BooleanEquals": false,
+          "Variable": "$.jobConfig.success",
+          "Next": "Failure"
+      }],
+      "Default": "Generate Heatmaps"
+    },
     "Generate Heatmaps": {
       "Type": "Parallel",
-      "End": true,
+      "Next": "Aggregate Heatmaps",
+      "Catch": [{
+        "ErrorEquals": ["States.ALL"],
+        "ResultPath": "$.heatmapGenerationFailure",
+        "Next": "Failure"
+      }],
       "Branches": [
         {
           "StartAt": "Submit 6hr/30km Heatmap",
@@ -38,6 +63,8 @@ resource aws_sfn_state_machine batch_heatmap_step_fn {
               "TimeoutSeconds": ${var.step_execution_timeout_seconds},
               "End": true,
               "Resource": "arn:aws:states:::batch:submitJob.sync",
+              "InputPath": "$.jobConfig.data",
+              "ResultPath": "$.6hr30kmHeatmap",
               "Parameters": {
                 "JobName": "Create6hr30kmHeatmap",
                 "JobQueue": "${var.batch_job_queue_id}",
@@ -48,9 +75,8 @@ resource aws_sfn_state_machine batch_heatmap_step_fn {
                   "resolution": "0.008983031",
                   "year.$": "$.year",
                   "month.$": "$.month",
-                  "prefix.$": "$.prefix",
                   "output.$": "$.output",
-                  "filter_sql_file.$": "$.filter_sql_file"
+                  "filterSqlFile.$": "$.filterSqlFile"
                 }
               }
             }
@@ -64,6 +90,8 @@ resource aws_sfn_state_machine batch_heatmap_step_fn {
               "TimeoutSeconds": ${var.step_execution_timeout_seconds},
               "End": true,
               "Resource": "arn:aws:states:::batch:submitJob.sync",
+              "InputPath": "$.jobConfig.data",
+              "ResultPath": "$.18hr100kmHeatmap",
               "Parameters": {
                 "JobName": "Create18hr100kmHeatmap",
                 "JobQueue":  "${var.batch_job_queue_id}",
@@ -74,9 +102,8 @@ resource aws_sfn_state_machine batch_heatmap_step_fn {
                   "resolution": "0.008983031",
                   "year.$": "$.year",
                   "month.$": "$.month",
-                  "prefix.$": "$.prefix",
                   "output.$": "$.output",
-                  "filter_sql_file.$": "$.filter_sql_file"
+                  "filterSqlFile.$": "$.filterSqlFile"
                 }
               }
             }
@@ -84,6 +111,33 @@ resource aws_sfn_state_machine batch_heatmap_step_fn {
         }
       ]
     }
+  },
+  "Aggregate Heatmaps": {
+    "Type": "Task",
+    "TimeoutSeconds": ${var.step_execution_timeout_seconds},
+    "Resource": "arn:aws:states:::batch:submitJob.sync",
+    "InputPath": "$.jobConfig.data",
+    "ResultPath": "$.heatmapAggregation",
+    "Next": "Success",
+    "Catch": [{
+      "ErrorEquals": ["States.ALL"],
+      "ResultPath": "$.heatmapAggregationFailure",
+      "Next": "Failure"
+    }],
+    "Parameters": {
+      "JobName": "AggregateHeatmaps",
+      "JobQueue": "${var.batch_job_queue_id}",
+      "JobDefinition": "${aws_batch_job_definition.aggregation_heatmap_job_definition.arn}",
+      "Parameters": {
+        "heatmaps_store.$": "$.output",
+      }
+    }
+  },
+  "Failure": {
+    "Type": "Fail"
+  },
+  "Success": {
+    "Type": "Succeed"
   }
 }
 EOF
@@ -99,6 +153,13 @@ resource aws_iam_policy step_function_policy {
                 "batch:SubmitJob",
                 "batch:DescribeJobs",
                 "batch:TerminateJob"
+            ],
+            "Resource": "*",
+            "Effect": "Allow"
+        },
+        {
+            "Action": [
+              "lambda:InvokeFunction"
             ],
             "Resource": "*",
             "Effect": "Allow"

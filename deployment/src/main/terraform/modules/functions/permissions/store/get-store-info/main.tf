@@ -7,7 +7,7 @@ resource aws_iam_policy get_store_info {
     {
       "Effect": "Allow",
       "Action": [
-        "s3:Head*"
+        "s3:GetBucketAcl"
       ],
       "Resource": "*"
     }

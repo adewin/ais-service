@@ -1,17 +1,28 @@
-import org.springframework.boot.gradle.tasks.bundling.BootJar
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import com.github.jengelman.gradle.plugins.shadow.transformers.PropertiesFileTransformer
 
 plugins {
     java
     id("org.springframework.boot")
 }
 
-tasks.getByName("assemble").dependsOn("bootJar")
+tasks.getByName("assemble").dependsOn("shadowJar")
 
-tasks.withType<BootJar> {
+tasks.withType<ShadowJar> {
     isZip64 = true
+    classifier = "aws"
+    // Required for Spring
+    mergeServiceFiles()
+    append("META-INF/spring.handlers")
+    append("META-INF/spring.schemas")
+    append("META-INF/spring.tooling")
     manifest {
         attributes["Main-Class"] = "uk.gov.ukho.ais.validatenewjobconfiglambda.ValidateJobConfigLambdaApplication"
         attributes["Start-Class"] = "uk.gov.ukho.ais.validatenewjobconfiglambda.ValidateJobConfigLambdaApplication"
+    }
+    transform(PropertiesFileTransformer::class.java) {
+        paths = listOf("META-INF/spring.factories")
+        mergeStrategy = "append"
     }
 }
 

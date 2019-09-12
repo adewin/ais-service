@@ -25,13 +25,6 @@ module s3_buckets {
   emr_logs_bucket          = data.external.secrets.result["emr_logs_bucket"]
 }
 
-module batch {
-  source              = "./modules/batch"
-  docker_registry_url = var.DOCKER_REGISTRY_URL
-  project_version     = var.PROJECT_VERSION
-  batch_job_queue_id  = data.aws_cloudformation_export.batch_queue_url.value
-}
-
 module storage {
   source                               = "./modules/storage"
   ais_data_upload_store_name           = data.external.secrets.result["ais_data_upload_store"]
@@ -76,6 +69,14 @@ module functions {
   heatmap_sql_archive_prefix           = "archive"
   heatmap_sql_store_name               = data.external.secrets.result["heatmap_sql_archive_store"]
   validate_job_config_jar              = var.VALIDATE_JOB_CONFIG_LAMBDA_JAR_PATH
+}
+
+module batch {
+  source                          = "./modules/batch"
+  docker_registry_url             = var.DOCKER_REGISTRY_URL
+  project_version                 = var.PROJECT_VERSION
+  batch_job_queue_id              = data.aws_cloudformation_export.batch_queue_url.value
+  validate_job_config_function_id = module.functions.validate_job_config_function_id
 }
 
 module notifications {

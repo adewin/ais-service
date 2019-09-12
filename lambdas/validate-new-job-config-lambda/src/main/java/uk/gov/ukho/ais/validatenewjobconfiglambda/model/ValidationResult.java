@@ -9,6 +9,7 @@ public class ValidationResult {
 
   private final Option<JobConfig> data;
   private final List<ValidationFailure> error;
+  private final boolean success;
 
   @JsonCreator
   public ValidationResult(
@@ -16,6 +17,7 @@ public class ValidationResult {
       @JsonProperty("error") final List<ValidationFailure> error) {
     this.data = data;
     this.error = error;
+    this.success = this.data.isPresent() && this.error.isEmpty();
   }
 
   public Option<JobConfig> getData() {
@@ -24,5 +26,9 @@ public class ValidationResult {
 
   public List<ValidationFailure> getError() {
     return error;
+  }
+
+  public boolean isSuccess() {
+    return success;
   }
 }

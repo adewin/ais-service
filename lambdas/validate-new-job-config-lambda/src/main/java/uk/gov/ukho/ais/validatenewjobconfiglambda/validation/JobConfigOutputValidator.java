@@ -1,7 +1,6 @@
 package uk.gov.ukho.ais.validatenewjobconfiglambda.validation;
 
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.model.HeadBucketRequest;
 import cyclops.control.Either;
 import cyclops.control.Option;
 import cyclops.control.Try;
@@ -34,8 +33,8 @@ public class JobConfigOutputValidator implements Validator {
         .fold(l -> Option.<JobConfig>none(), Option::of)
         .map(JobConfig::getOutput)
         .filter(Objects::nonNull)
-        .map(output -> Try.runWithCatch(() -> amazonS3.headBucket(new HeadBucketRequest(output))))
-        .filter(Try::isFailure)
+        .map(output -> Try.withCatch(() -> amazonS3.doesBucketExistV2(output)))
+        .filter(existTry -> existTry.toEither().fold(exception -> true, value -> !value))
         .map(
             headBucketResult ->
                 Validated.<ValidationFailure, JobConfig>invalid(
