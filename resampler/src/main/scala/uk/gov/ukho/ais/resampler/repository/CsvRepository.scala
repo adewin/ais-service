@@ -53,17 +53,19 @@ object CsvRepository {
 
   private def writePingsForMonth(outputStream: OutputStream, pings: Iterator[Ping])
                                 (implicit config: Config, s3Client: AmazonS3): Unit = {
+    val bufferedOutputStream = new BufferedOutputStream(outputStream, 2 * 1024 * 1024 * 1024)
+
     pings.zipWithIndex.foreach { case (ping, index) =>
       val line =
         s"${ping.mmsi}\t${ping.acquisitionTime}\t${ping.longitude}\t${ping.latitude}\n"
 
-      IOUtils.write(line, outputStream)
+      IOUtils.write(line, bufferedOutputStream)
 
       if (index % 1000000 == 0) {
         println(s"processed ${index / 1000000}m pings")
       }
     }
-    outputStream.close()
+    bufferedOutputStream.close()
   }
 
   private def writeAndUpload(output: Output, inputStream: InputStream)
