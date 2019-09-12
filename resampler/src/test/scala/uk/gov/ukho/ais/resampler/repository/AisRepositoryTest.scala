@@ -26,7 +26,10 @@ class AisRepositoryTest {
     (a: Double, b: Double) =>
       Precision.compareTo(a, b, DOUBLE_COMPARISON_PRECISION)
 
-  private implicit val config: Config = Config.default
+  private implicit val config: Config = Config.default.copy(
+    database = "database",
+    table = "table"
+  )
 
   val datasourceMock: DataSource = mock(classOf[DataSource])
   val connectionMock: Connection = mock(classOf[Connection])
@@ -34,8 +37,6 @@ class AisRepositoryTest {
     classOf[PreparedStatement])
   val resultSetMock: ResultSet = mock(classOf[ResultSet])
   var aisRepository: AisRepository = _
-  var filterQuery =
-    "SELECT * ukho_ais_data.test_data WHERE message_type_id IN (1, 2, 3, 18, 19)"
 
   @Before
   def setup(): Unit = {
@@ -108,7 +109,7 @@ class AisRepositoryTest {
         sqlStatement.startsWith(
           """
             |SELECT mmsi, acquisition_time, lat, lon
-            |FROM (SELECT * ukho_ais_data.test_data WHERE message_type_id IN (1, 2, 3, 18, 19))
+            |FROM "database"."table"
             |WHERE (
             |(year = 2018 AND month = 1)
             |""".stripMargin)

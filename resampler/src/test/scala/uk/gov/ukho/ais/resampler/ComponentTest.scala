@@ -96,7 +96,7 @@ class ComponentTest {
 
           softly.assertThat(csv.size).isEqualTo(0)
 
-        case None => softly.fail("csv file not found")
+        case None => softly.fail("csv localFile not found")
       }
     }
 
@@ -152,7 +152,7 @@ class ComponentTest {
             .assertThat(csv.toArray)
             .containsExactlyElementsOf(expectedPings.asJava)
 
-        case None => softly.fail("csv file not found")
+        case None => softly.fail("csv localFile not found")
       }
     }
 
@@ -202,7 +202,7 @@ class ComponentTest {
           val expectedNumberOfPings = 6
 
           softly.assertThat(csv.size).isEqualTo(expectedNumberOfPings)
-        case None => softly.fail("csv file not found")
+        case None => softly.fail("csv localFile not found")
       }
     }
 
@@ -244,7 +244,7 @@ class ComponentTest {
 
           softly.assertThat(csv.size).isEqualTo(expectedNumberOfPings)
 
-        case None => softly.fail("csv file not found")
+        case None => softly.fail("csv localFile not found")
       }
     }
 

@@ -11,8 +11,8 @@ object CsvS3KeyService {
     val interpolationDescriptor = createInterpolationDescriptor(config)
 
     val objectPrefix =
-      s"resample=$interpolationDescriptor/year=$year/month=$month/"
-    val filename = f"part-$part%06d.csv.bz2"
+      s"$interpolationDescriptor/year=$year/month=$month/"
+    val filename = f"part-$part%05d.csv.bz2"
 
     s"$objectPrefix$filename"
   }
@@ -21,6 +21,6 @@ object CsvS3KeyService {
     val interpolationTimeHours = TimeUnit.MILLISECONDS.toHours(
       config.interpolationTimeThresholdMilliseconds)
     val interpolationDistanceKms = config.interpolationDistanceThresholdMeters / 1000
-    s"${interpolationTimeHours}hr-${interpolationDistanceKms}km"
+    s"${interpolationDistanceKms}km_${interpolationTimeHours}hr"
   }
 }

@@ -35,7 +35,10 @@ class CsvRepositoryTest extends IdiomaticMockito {
         Ping("123", makeTimestamp(0), 179.0, 179.0)
       ).toIterator
 
-      CsvRepository.writePingsForMonth(year, month, pings)
+      val jobSet = CsvRepository.buildJobSet(year, month, pings)
+
+      jobSet.dispatch()
+      jobSet.join()
 
       val files =
         findGeneratedFiles(tempDir.getRoot.getAbsolutePath).map(file =>

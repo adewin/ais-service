@@ -25,10 +25,6 @@ object ConfigParser {
         .valueName("<region identifier>")
         .text("region in which Athena queries will execute")
         .action((value, config) => config.copy(athenaRegion = value)),
-      opt[String]('b', "athena-results-bucket")
-        .valueName("<S3 bucket>")
-        .text("bucket for storing Athena query results")
-        .action((value, config) => config.copy(athenaResultsBucket = value)),
       opt[String]('s', "database")
         .required()
         .valueName("<database>")
@@ -72,7 +68,7 @@ object ConfigParser {
         .action((value, config) =>
           config.copy(interpolationDistanceThresholdMeters = value))
         .validate(validatePositive),
-      arg[String]("<file>...")
+      arg[String]("<localFile>...")
         .unbounded()
         .required()
         .text("raw data files for which resampling should be performed")

@@ -5,7 +5,7 @@ import javax.sql.DataSource
 import uk.gov.ukho.ais.resampler.processor.Resampler
 import uk.gov.ukho.ais.resampler.processor.YearMonthFilter.Filter
 import uk.gov.ukho.ais.resampler.repository.{AisRepository, CsvRepository}
-import uk.gov.ukho.ais.resampler.utility.TimeUtilities
+import uk.gov.ukho.ais.resampler.utility.{JobSet, TimeUtilities}
 
 object ResamplerOrchestrator {
 
@@ -15,7 +15,7 @@ object ResamplerOrchestrator {
 
     val modifiedMonths = config.inputFiles
       .flatMap { path =>
-        println(s"querying for months contained in input AIS data file: $path...")
+        println(s"querying for months contained in input AIS data localFile: $path...")
         aisRepository.getDistinctYearAndMonthPairsForFile(path)
       }
 
@@ -32,17 +32,21 @@ object ResamplerOrchestrator {
           .filterPingsByYearAndMonth(year, month)
 
         println(s"creating CSV for year $year, month $month...")
-        CsvRepository.writePingsForMonth(year, month, resampledPings)
+
+        val jobSet = CsvRepository.buildJobSet(year, month, resampledPings)
+
+        jobSet.dispatch()
+        jobSet.join()
     }
   }
 
   def getMonthsToResampleFromModifiedMonths(
-      list: Seq[(Int, Int)]): Set[(Int, Int)] = {
+                                             list: Seq[(Int, Int)]): Set[(Int, Int)] = {
     list.flatMap {
       case (year: Int, month: Int) =>
         Seq(TimeUtilities.getPrevMonth(year, month),
-            (year, month),
-            TimeUtilities.getNextMonth(year, month))
+          (year, month),
+          TimeUtilities.getNextMonth(year, month))
     }.toSet
   }
 }
