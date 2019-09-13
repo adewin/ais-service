@@ -47,6 +47,8 @@ object CsvRepository {
     }
     outputStream.close()
 
+    pbzip2.waitFor()
+
     if (!config.isLocal) uploadFileToS3AndDelete(year, month, file)
   }
 
