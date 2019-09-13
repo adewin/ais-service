@@ -77,6 +77,8 @@ module batch {
   project_version                 = var.PROJECT_VERSION
   batch_job_queue_id              = data.aws_cloudformation_export.batch_queue_url.value
   validate_job_config_function_id = module.functions.validate_job_config_function_id
+  invoke_step_function_jar        = var.INVOKE_STEP_FUNCTION_LAMBDA_JAR_PATH
+  heatmap_job_submission_bucket   = data.external.secrets.result["heatmap_job_submission_store"]
 }
 
 module notifications {

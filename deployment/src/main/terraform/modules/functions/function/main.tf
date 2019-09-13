@@ -35,7 +35,7 @@ resource aws_cloudwatch_log_group lambda_log_group {
 }
 
 resource aws_iam_role_policy_attachment lambda_logs {
-  policy_arn = aws_iam_role.lambda_role.name
-  role = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+  role = aws_iam_role.lambda_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
