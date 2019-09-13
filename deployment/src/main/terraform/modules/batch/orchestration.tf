@@ -202,7 +202,7 @@ module start_heatmap_statemachine_permissions {
 
 module new_job_config_submission_trigger {
   source = "../functions/triggers/storage_file_upload"
-  function_id = module.invoke_heatmap_state_machine_function.function_name
+  function_id = module.invoke_heatmap_state_machine_function.function_id
   store_name = var.heatmap_job_submission_bucket
   item_prefix = "submit/"
 }
