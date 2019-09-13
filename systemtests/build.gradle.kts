@@ -11,7 +11,6 @@ sourceSets {
     }
 }
 
-
 tasks {
     register<Test>("systemTest") {
         description = "Runs the system tests."
