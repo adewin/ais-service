@@ -73,7 +73,7 @@ stages:
   - stage: CD
     condition: and(succeeded(), eq(variables['build.sourceBranch'], 'refs/heads/master'), ne(variables['Build.Reason'], 'Schedule'))
     jobs:
-      - job: buildAndPushDocker
+      - job: deploy
         pool: $(poolName)
         container: jdk
         steps:
@@ -83,10 +83,6 @@ stages:
               DOCKER_REGISTRY_URL: $(DOCKER_REGISTRY_URL)
               DOCKER_REGISTRY_USERNAME: $(DOCKER_REGISTRY_USERNAME)
               DOCKER_REGISTRY_PASSWORD: $(DOCKER_REGISTRY_PASSWORD)
-      - job: deploy
-        pool: $(poolName)
-        container: jdk
-        steps:
           - bash: ./gradlew clean terraformApply --auto-approve
             displayName: 'Run Gradle  `terraformApply` task'
             env:

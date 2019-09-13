@@ -129,7 +129,7 @@ resource aws_sfn_state_machine batch_heatmap_step_fn {
       "JobQueue": "${var.batch_job_queue_id}",
       "JobDefinition": "${aws_batch_job_definition.aggregation_heatmap_job_definition.arn}",
       "Parameters": {
-        "heatmaps_store.$": "$.output",
+        "heatmaps_store.$": "$.output"
       }
     }
   },
