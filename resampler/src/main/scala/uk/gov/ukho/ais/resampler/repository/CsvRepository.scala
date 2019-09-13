@@ -40,7 +40,7 @@ object CsvRepository {
 
       count += 1
 
-      if (count % 1E6 == 0) {
+      if (count % 1E5 == 0) {
         println(
           f"wrote ${count / 1E6d}%.1fm pings for year $year, month $month to $filePath")
       }

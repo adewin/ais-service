@@ -21,7 +21,7 @@ object ResamplerOrchestrator {
 
     println(s"will resample ${modifiedMonths.size} month(s)")
 
-    modifiedMonths.foreach {
+    modifiedMonths.par.foreach {
       case (year: Int, month: Int) =>
         val monthOfPings =
           aisRepository.getFilteredPingsByDate(year, month)
