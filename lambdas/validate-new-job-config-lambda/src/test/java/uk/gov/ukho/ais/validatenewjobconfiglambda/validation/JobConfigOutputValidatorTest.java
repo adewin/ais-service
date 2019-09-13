@@ -1,14 +1,11 @@
 package uk.gov.ukho.ais.validatenewjobconfiglambda.validation;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
 
-import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.model.HeadBucketRequest;
-import com.amazonaws.services.s3.model.HeadBucketResult;
+import com.amazonaws.services.s3.model.AmazonS3Exception;
 import cyclops.control.Either;
 import cyclops.control.Validated;
 import cyclops.data.NonEmptyList;
@@ -36,8 +33,7 @@ public class JobConfigOutputValidatorTest {
           final JobConfig jobConfig = new JobConfig(outputBucketName, 2019, 9, "filterSqlFile.sql");
           final Either<ValidationFailure, JobConfig> jobConfigOrFailure = Either.right(jobConfig);
 
-          when(mockAmazonS3.headBucket(any(HeadBucketRequest.class)))
-              .thenReturn(new HeadBucketResult());
+          when(mockAmazonS3.doesBucketExistV2(outputBucketName)).thenReturn(true);
 
           final Validated<ValidationFailure, JobConfig> validated =
               jobConfigOutputValidator.validate(jobConfigOrFailure);
@@ -53,11 +49,11 @@ public class JobConfigOutputValidatorTest {
     final JobConfig jobConfig = new JobConfig(outputBucketName, 2019, 9, "filterSqlFile.sql");
     final Either<ValidationFailure, JobConfig> jobConfigOrFailure = Either.right(jobConfig);
 
-    when(mockAmazonS3.headBucket(any(HeadBucketRequest.class))).thenReturn(new HeadBucketResult());
+    when(mockAmazonS3.doesBucketExistV2(outputBucketName)).thenReturn(true);
 
     jobConfigOutputValidator.validate(jobConfigOrFailure);
 
-    verify(mockAmazonS3, times(1)).headBucket(any(HeadBucketRequest.class));
+    verify(mockAmazonS3, times(1)).doesBucketExistV2(outputBucketName);
   }
 
   @Test
@@ -86,8 +82,29 @@ public class JobConfigOutputValidatorTest {
           final JobConfig jobConfig = new JobConfig(outputBucketName, 2019, 9, "filterSqlFile.sql");
           final Either<ValidationFailure, JobConfig> jobConfigOrFailure = Either.right(jobConfig);
 
-          when(mockAmazonS3.headBucket(any(HeadBucketRequest.class)))
-              .thenThrow(new AmazonServiceException("Bucket does not exist"));
+          when(mockAmazonS3.doesBucketExistV2(outputBucketName)).thenReturn(false);
+
+          final Validated<ValidationFailure, JobConfig> unvalidatedResult =
+              jobConfigOutputValidator.validate(jobConfigOrFailure);
+
+          softly.assertThat(unvalidatedResult.isInvalid()).isTrue();
+          softly
+              .assertThat(unvalidatedResult.toEither().leftOrElse(null))
+              .containsExactlyInAnyOrderElementsOf(
+                  NonEmptyList.of(ValidationFailure.OUTPUT_S3_BUCKET_DOES_NOT_EXIST));
+        });
+  }
+
+  @Test
+  public void whenQueryingS3FailsThenReturnsUnvalidatedResult() {
+    SoftAssertions.assertSoftly(
+        softly -> {
+          final String outputBucketName = "output";
+          final JobConfig jobConfig = new JobConfig(outputBucketName, 2019, 9, "filterSqlFile.sql");
+          final Either<ValidationFailure, JobConfig> jobConfigOrFailure = Either.right(jobConfig);
+
+          when(mockAmazonS3.doesBucketExistV2(outputBucketName))
+              .thenThrow(new AmazonS3Exception("Unauthorized"));
 
           final Validated<ValidationFailure, JobConfig> unvalidatedResult =
               jobConfigOutputValidator.validate(jobConfigOrFailure);

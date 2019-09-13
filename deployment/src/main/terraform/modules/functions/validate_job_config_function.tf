@@ -3,6 +3,7 @@ module validate_job_config_function {
   function_code    = var.validate_job_config_jar
   function_handler = "uk.gov.ukho.ais.validatenewjobconfiglambda.ValidateJobConfigLambdaHandler"
   function_name    = "ValidateJobConfig"
+  memory           = 512
   function_environment_variables = {
     FILTER_SQL_ARCHIVE_BUCKET_NAME = var.heatmap_sql_store_name
     FILTER_SQL_ARCHIVE_PREFIX      = var.heatmap_sql_archive_prefix
