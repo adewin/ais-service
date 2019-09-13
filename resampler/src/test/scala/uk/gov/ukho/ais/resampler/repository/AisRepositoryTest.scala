@@ -63,9 +63,9 @@ class AisRepositoryTest {
   def whenGetPingsWithDateValidThenSeqReturned(): Unit =
     SoftAssertions.assertSoftly { softly =>
       val expectedPings = Seq(
-        ping("123", 10, 1.1, 2.2),
-        ping("456", 20, 3.3, 4.4),
-        ping("789", 30, 5.5, 6.6)
+        ping("123", makeTimestamp(10 * 60), 1.1, 2.2),
+        ping("456", makeTimestamp(20 * 60), 3.3, 4.4),
+        ping("789", makeTimestamp(30 * 60), 5.5, 6.6)
       )
 
       when(resultSetMock.next()).thenReturn(true, true, true, false)
@@ -108,7 +108,7 @@ class AisRepositoryTest {
       .allMatch { sqlStatement =>
         sqlStatement.startsWith(
           """
-            |SELECT mmsi, acquisition_time, lat, lon
+            |SELECT *
             |FROM "database"."table"
             |WHERE (
             |(year = 2018 AND month = 1)

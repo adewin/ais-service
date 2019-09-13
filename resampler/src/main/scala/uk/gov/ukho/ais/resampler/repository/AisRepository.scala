@@ -44,7 +44,7 @@ class AisRepository(val dataSource: DataSource)(implicit config: Config) {
         mutable.Queue(
           (0 until DEFAULT_NUMBER_OF_BUCKETS)
             .map(bucket => s"""
-                              |SELECT mmsi, acquisition_time, lat, lon
+                              |SELECT *
                               |FROM "${config.database}"."${config.table}"
                               |WHERE (
                               |(year = $year AND month = $month)
@@ -74,12 +74,24 @@ class AisRepository(val dataSource: DataSource)(implicit config: Config) {
       }
 
       override def next(): Ping = {
-
         val ping = Ping(
+          results.getString("arkposid"),
           results.getString("mmsi"),
           results.getTimestamp("acquisition_time"),
           results.getDouble("lon"),
-          results.getDouble("lat")
+          results.getDouble("lat"),
+          results.getString("vessel_class"),
+          results.getInt("message_type_id"),
+          results.getString("navigational_status"),
+          results.getString("rot"),
+          results.getString("sog"),
+          results.getString("cog"),
+          results.getString("true_heading"),
+          results.getString("altitude"),
+          results.getString("special_manoeuvre"),
+          results.getString("radio_status"),
+          results.getString("flags"),
+          results.getString("input_ais_data_file")
         )
 
         _hasNext = results.next()

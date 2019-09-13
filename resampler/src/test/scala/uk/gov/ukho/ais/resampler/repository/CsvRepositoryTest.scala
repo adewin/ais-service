@@ -8,7 +8,7 @@ import org.junit.{Rule, Test}
 import org.mockito.IdiomaticMockito
 import uk.gov.ukho.ais.resampler.Config
 import uk.gov.ukho.ais.resampler.FileUtilities.findGeneratedFiles
-import uk.gov.ukho.ais.resampler.model.Ping
+import uk.gov.ukho.ais.resampler.utility.TestPingCreator.ping
 import uk.gov.ukho.ais.resampler.utility.TimeUtilities.makeTimestamp
 
 class CsvRepositoryTest extends IdiomaticMockito {
@@ -32,7 +32,7 @@ class CsvRepositoryTest extends IdiomaticMockito {
       val month = 1
 
       val pings = Seq(
-        Ping("123", makeTimestamp(0), 179.0, 179.0)
+        ping("123", makeTimestamp(0), 179.0, 179.0)
       ).toIterator
 
       CsvRepository.writePingsForMonth(year, month, pings)

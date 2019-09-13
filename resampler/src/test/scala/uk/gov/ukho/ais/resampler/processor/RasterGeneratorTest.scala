@@ -6,6 +6,7 @@ import org.junit.Test
 import uk.gov.ukho.ais.resampler.Config
 import uk.gov.ukho.ais.resampler.model.Ping
 import uk.gov.ukho.ais.resampler.utility.TestPingCreator.ping
+import uk.gov.ukho.ais.resampler.utility.TimeUtilities.makeTimestamp
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -25,11 +26,11 @@ class RasterGeneratorTest {
   def whenListOfPingsIsGivenThenCorrectRasterIsReturned(): Unit =
     SoftAssertions.assertSoftly { softly =>
       val inPings: ArrayBuffer[Ping] = ArrayBuffer(
-        ping("", 0, 179.0, 89.9D),
-        ping("", 0, 179.0, 89.9D),
-        ping("", 0, 179.0, 0D),
-        ping("", 0, 179.0, 10D),
-        ping("", 0, -179.0, 10D)
+        ping("", makeTimestamp(0), 179.0, 89.9D),
+        ping("", makeTimestamp(0), 179.0, 89.9D),
+        ping("", makeTimestamp(0), 179.0, 0D),
+        ping("", makeTimestamp(0), 179.0, 10D),
+        ping("", makeTimestamp(0), -179.0, 10D)
       )
 
       RasterGenerator.mapToRaster(inPings.iterator) match {

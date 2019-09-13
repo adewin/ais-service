@@ -28,23 +28,14 @@ object CsvRepository {
     // val outputStream = new BufferedOutputStream(new FileOutputStream(file), 256 * 1024 * 1024)
     val outputStream = pbzip2.getOutputStream
 
-    var count = 0
+    pings.zipWithIndex
+      .foreach {
+        case (ping, i: Int) =>
+          IOUtils.write(ping.toString, outputStream)
 
-    pings.foreach { ping =>
-      val acquisitionTime =
-        ping.acquisitionTime.toString
-      val line =
-        s"${ping.mmsi}\t$acquisitionTime\t${ping.longitude}\t${ping.latitude}\n"
-
-      IOUtils.write(line, outputStream)
-
-      count += 1
-
-      if (count % 1E5 == 0) {
-        println(
-          f"wrote ${count / 1E6d}%.1fm pings for year $year, month $month to $filePath")
+          if (i % 1E6 == 0)
+            println(f"wrote ${i / 1E6}m pings for year $year, month $month to $filePath")
       }
-    }
     outputStream.close()
 
     pbzip2.waitFor()
