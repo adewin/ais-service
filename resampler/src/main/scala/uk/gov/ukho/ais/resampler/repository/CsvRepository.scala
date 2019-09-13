@@ -22,7 +22,11 @@ object CsvRepository {
     val filePath = s"$directory/$fileName.csv.bz2"
     val file = new File(filePath)
 
-    val outputStream = new BufferedOutputStream(new FileOutputStream(file), 256 * 1024 * 1024)
+    val pbzip2 = new ProcessBuilder("/bin/bash", "-c", s"pbzip2 -c > ${file.getAbsolutePath}")
+      .start()
+
+    // val outputStream = new BufferedOutputStream(new FileOutputStream(file), 256 * 1024 * 1024)
+    val outputStream = pbzip2.getOutputStream
 
     var count = 0
 
@@ -36,9 +40,9 @@ object CsvRepository {
 
       count += 1
 
-      if (count % 100000 == 0) {
+      if (count % 1E6 == 0) {
         println(
-          f"wrote ${count / 100000d}%.1fm pings for year $year, month $month to $filePath")
+          f"wrote ${count / 1E6d}%.1fm pings for year $year, month $month to $filePath")
       }
     }
     outputStream.close()
