@@ -19,15 +19,17 @@ class ConfigParserTest {
       "12",
       "-d",
       "13",
-      "-y",
-      "2019",
-      "-m",
-      "1",
+      "-s",
+      "database",
+      "-e",
+      "table",
       "input-ais.csv.bz2"
     )
 
     val expectedConfig =
       Config.default.copy(
+        database = "database",
+        table = "table",
         outputDirectory = "out",
         outputFilePrefix = "heatmap",
         inputFiles = Seq("input-ais.csv.bz2"),
@@ -47,6 +49,8 @@ class ConfigParserTest {
     val args: Array[String] = Array(
       "-o",
       "out",
+      "-p",
+      "heatmap",
       "-l",
       "-r",
       "1",
@@ -57,7 +61,8 @@ class ConfigParserTest {
       "-y",
       "2019",
       "-m",
-      "1"
+      "1",
+      "input-ais.csv.bz2"
     )
 
     ConfigParser.parse(args)

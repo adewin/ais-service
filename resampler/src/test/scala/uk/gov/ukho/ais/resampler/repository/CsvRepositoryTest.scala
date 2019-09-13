@@ -41,6 +41,6 @@ class CsvRepositoryTest extends IdiomaticMockito {
         findGeneratedFiles(tempDir.getRoot.getAbsolutePath).map(file =>
           FilenameUtils.getExtension(file))
 
-      softly.assertThat(files).containsExactly("bz2")
+      softly.assertThat(files).containsOnly("bz2")
     }
 }

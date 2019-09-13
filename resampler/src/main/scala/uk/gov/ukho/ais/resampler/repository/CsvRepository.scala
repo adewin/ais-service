@@ -4,7 +4,6 @@ import java.io.{BufferedOutputStream, File, FileOutputStream}
 
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.s3.model.PutObjectRequest
-import org.apache.commons.compress.compressors.bzip2.BZip2CompressorOutputStream
 import org.apache.commons.io.IOUtils
 import uk.gov.ukho.ais.resampler.Config
 import uk.gov.ukho.ais.resampler.model.Ping
@@ -37,9 +36,9 @@ object CsvRepository {
 
       count += 1
 
-      if (count % 10000 == 0) {
+      if (count % 100000 == 0) {
         println(
-          s"wrote ${count / 1000}k pings for year $year, month $month to $filePath")
+          f"wrote ${count / 100000d}%.1fm pings for year $year, month $month to $filePath")
       }
     }
     outputStream.close()
@@ -68,5 +67,5 @@ object CsvRepository {
   }
 
   private def generateFilename(year: Int, month: Int, part: Int): String =
-    f"$year-$month-part-$part%06d"
+    f"$year-$month-part-$part%05d"
 }
