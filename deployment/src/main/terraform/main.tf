@@ -25,13 +25,6 @@ module s3_buckets {
   emr_logs_bucket          = data.external.secrets.result["emr_logs_bucket"]
 }
 
-module batch {
-  source              = "./modules/batch"
-  docker_registry_url = var.DOCKER_REGISTRY_URL
-  project_version     = var.PROJECT_VERSION
-  batch_job_queue_id  = data.aws_cloudformation_export.batch_queue_url.value
-}
-
 module storage {
   source                               = "./modules/storage"
   ais_data_upload_store_name           = data.external.secrets.result["ais_data_upload_store"]
@@ -72,6 +65,20 @@ module functions {
   processed_static_data_store_name     = data.external.secrets.result["processed_static_data_store"]
   ais_database_name                    = local.ais_database_name
   processed_ais_table_name             = local.processed_ais_table_name
+  heatmap_job_submission_store_name    = data.external.secrets.result["heatmap_job_submission_store"]
+  heatmap_sql_archive_prefix           = "archive"
+  heatmap_sql_store_name               = data.external.secrets.result["heatmap_sql_archive_store"]
+  validate_job_config_jar              = var.VALIDATE_JOB_CONFIG_LAMBDA_JAR_PATH
+}
+
+module batch {
+  source                          = "./modules/batch"
+  docker_registry_url             = var.DOCKER_REGISTRY_URL
+  project_version                 = var.PROJECT_VERSION
+  batch_job_queue_id              = data.aws_cloudformation_export.batch_queue_url.value
+  validate_job_config_function_id = module.functions.validate_job_config_function_id
+  invoke_step_function_jar        = var.INVOKE_STEP_FUNCTION_LAMBDA_JAR_PATH
+  heatmap_job_submission_bucket   = data.external.secrets.result["heatmap_job_submission_store"]
 }
 
 module notifications {

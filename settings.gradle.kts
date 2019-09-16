@@ -8,6 +8,7 @@ pluginManagement {
                 "org.owasp.dependencycheck" -> useVersion(Versions.dependencyCheckGradle)
                 "com.github.spotbugs" -> useVersion(Versions.spotbugs)
                 "org.springframework.boot" -> useVersion(Versions.springBoot)
+                "com.google.cloud.tools.jib" -> useVersion(Versions.googleJib)
             }
         }
     }
@@ -17,8 +18,11 @@ rootProject.name = "ais-service"
 
 include("deployment",
         "heatmapGenerator",
+        "heatmapAggregator",
         "resampler",
         "lambdas:ingest-upload-file-lambda",
+        "lambdas:validate-new-job-config-lambda",
+        "lambdas:invoke-step-function-lambda",
         "lambdas:libraries:s3-event-handling",
         "lambdas:libraries:s3-test-util",
         "lambdas:libraries:emr-job-runner",

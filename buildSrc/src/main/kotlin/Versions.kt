@@ -4,6 +4,7 @@ object Versions {
     const val scala = "$scalaCompat.7"
 
     // Dependencies
+    const val googleJib = "1.5.1"
     const val scopt = "4.0.0-RC2"
     const val spark = "2.4.3"
     const val geotrellis = "2.3.1"
@@ -20,7 +21,12 @@ object Versions {
     const val springBoot = "2.1.6.RELEASE"
     const val commonsMath3 = "3.6.1"
     const val commonsCompress = "1.19"
+    const val commonsIO = "1.3.2"
+    const val commonsLang = "3.6"
+    const val cyclops = "10.3.3"
     const val athenaJdbcLib = "AthenaJDBC42_2.0.7.jar"
+    const val awsJavaSdkCore = "1.11.610"
+    const val awsSdk = "2.7.26"
 
     // Test dependencies
     const val junit = "4.12"
