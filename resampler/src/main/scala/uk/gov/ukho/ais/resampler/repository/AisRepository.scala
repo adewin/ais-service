@@ -14,18 +14,23 @@ class AisRepository(val dataSource: DataSource)(implicit config: Config) {
   val DEFAULT_NUMBER_OF_BUCKETS: Int = 31
 
   def getDistinctYearAndMonthPairsForFiles(
-      inputFiles: Seq[String]): Seq[(Int, Int)] = {
+                                            inputFiles: Seq[String]): Seq[(Int, Int)] = {
     val connection: Connection = dataSource.getConnection()
 
-    val sqlStatement: PreparedStatement = connection.prepareStatement(s"""
+    val sql =
+      s"""
          |SELECT DISTINCT year, month FROM "${config.database}"."${config.table}"
          |WHERE input_ais_data_file = '${inputFiles.head}'
-         """.stripMargin + inputFiles.tail.foreach { file => s"OR input_ais_data_file = '$file'\n" })
+         """.stripMargin + inputFiles.tail.foreach { file => s"OR input_ais_data_file = '$file'\n" }
+
+    println("== SQL ==\n" + sql)
+    val sqlStatement: PreparedStatement = connection.prepareStatement(sql)
 
     val results: ResultSet = sqlStatement.executeQuery()
 
     new Iterator[(Int, Int)] {
       override def hasNext: Boolean = results.next()
+
       override def next(): (Int, Int) =
         (results.getInt("year"), results.getInt("month"))
     }.toSeq // TODO: !!!
@@ -43,16 +48,17 @@ class AisRepository(val dataSource: DataSource)(implicit config: Config) {
 
         mutable.Queue(
           (0 until DEFAULT_NUMBER_OF_BUCKETS)
-            .map(bucket => s"""
-                              |SELECT *
-                              |FROM "${config.database}"."${config.table}"
-                              |WHERE (
-                              |(year = $year AND month = $month)
-                              |OR (year = $nextYear AND month = $nextMonth AND day=1)
-                              |OR (year = $prevYear AND month = $prevMonth AND day=$prevDay)
-                              |)
-                              |AND mod(cast(mmsi as integer), $DEFAULT_NUMBER_OF_BUCKETS) = $bucket
-                              |ORDER BY mmsi, acquisition_time
+            .map(bucket =>
+              s"""
+                 |SELECT *
+                 |FROM "${config.database}"."${config.table}"
+                 |WHERE (
+                 |(year = $year AND month = $month)
+                 |OR (year = $nextYear AND month = $nextMonth AND day=1)
+                 |OR (year = $prevYear AND month = $prevMonth AND day=$prevDay)
+                 |)
+                 |AND mod(cast(mmsi as integer), $DEFAULT_NUMBER_OF_BUCKETS) = $bucket
+                 |ORDER BY mmsi, acquisition_time
               """.stripMargin)
             .map(sqlStatement => connection.prepareStatement(sqlStatement)): _*)
       }
