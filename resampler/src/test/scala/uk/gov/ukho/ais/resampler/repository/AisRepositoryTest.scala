@@ -123,7 +123,7 @@ class AisRepositoryTest {
       when(resultSetMock.next()).thenReturn(false)
 
       val iterator =
-        aisRepository.getDistinctYearAndMonthPairsForFile("i-dont-exist")
+        aisRepository.getDistinctYearAndMonthPairsForFiles("i-dont-exist")
 
       softly.assertThat(iterator.hasNext).isFalse()
     }
@@ -139,7 +139,7 @@ class AisRepositoryTest {
       when(resultSetMock.getInt("month"))
         .thenReturn(months.head, months.tail: _*)
 
-      val results = aisRepository.getDistinctYearAndMonthPairsForFile("")
+      val results = aisRepository.getDistinctYearAndMonthPairsForFiles("")
 
       softly
         .assertThat(results.asJava)

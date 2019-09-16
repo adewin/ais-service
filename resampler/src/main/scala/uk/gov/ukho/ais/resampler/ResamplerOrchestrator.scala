@@ -13,11 +13,8 @@ object ResamplerOrchestrator {
                                                 amazonS3: AmazonS3): Unit = {
     val aisRepository = new AisRepository(source)
 
-    val modifiedMonths = config.inputFiles
-      .flatMap { path =>
-        println(s"querying for months contained in input AIS data file: $path...")
-        aisRepository.getDistinctYearAndMonthPairsForFile(path)
-      }
+    println(s"querying for months contained in input AIS data files...")
+    val modifiedMonths = aisRepository.getDistinctYearAndMonthPairsForFiles(config.inputFiles)
 
     println(s"will resample ${modifiedMonths.size} month(s)")
 

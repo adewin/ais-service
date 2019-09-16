@@ -13,14 +13,14 @@ class AisRepository(val dataSource: DataSource)(implicit config: Config) {
   val FETCH_BUFFER_SIZE_ONE_MILLION: Int = 1000000
   val DEFAULT_NUMBER_OF_BUCKETS: Int = 31
 
-  def getDistinctYearAndMonthPairsForFile(
-      inputFile: String): Iterator[(Int, Int)] = {
+  def getDistinctYearAndMonthPairsForFiles(
+      inputFiles: Seq[String]): Seq[(Int, Int)] = {
     val connection: Connection = dataSource.getConnection()
 
     val sqlStatement: PreparedStatement = connection.prepareStatement(s"""
          |SELECT DISTINCT year, month FROM "${config.database}"."${config.table}"
-         |WHERE input_ais_data_file = '$inputFile'
-         """.stripMargin)
+         |WHERE input_ais_data_file = '$inputFiles.head'
+         """.stripMargin + inputFiles.tail.foreach { file => s"OR input_ais_data_file = '$file'" })
 
     val results: ResultSet = sqlStatement.executeQuery()
 
@@ -28,7 +28,7 @@ class AisRepository(val dataSource: DataSource)(implicit config: Config) {
       override def hasNext: Boolean = results.next()
       override def next(): (Int, Int) =
         (results.getInt("year"), results.getInt("month"))
-    }
+    }.toSeq // TODO: !!!
   }
 
   def getFilteredPingsByDate(year: Int, month: Int): Iterator[Ping] =
