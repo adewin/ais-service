@@ -12,42 +12,50 @@ import uk.gov.ukho.ais.resampler.service.CsvS3KeyService
 object CsvRepository {
 
   def writePingsForMonth(year: Int, month: Int, pings: Iterator[Ping])(
-      implicit config: Config,
-      s3Client: AmazonS3): Unit = {
-    val fileName = generateFilename(year, month, 0)
+    implicit config: Config,
+    s3Client: AmazonS3): Unit = {
+
     val directory =
       if (config.isLocal) config.outputDirectory
       else s"/tmp"
 
-    val filePath = s"$directory/$fileName.csv.bz2"
-    val file = new File(filePath)
-
-    val pbzip2 = new ProcessBuilder("/bin/bash", "-c", s"pbzip2 -c > ${file.getAbsolutePath}")
-      .start()
-
-    // val outputStream = new BufferedOutputStream(new FileOutputStream(file), 256 * 1024 * 1024)
-    val outputStream = pbzip2.getOutputStream
-
-    pings.zipWithIndex
+    pings
+      .grouped(1E8.toInt)
+      .zipWithIndex
       .foreach {
-        case (ping, i: Int) =>
-          IOUtils.write(ping.toString, outputStream)
+        case (pings, part: Int) =>
+          val fileName = generateFilename(year, month, part)
 
-          if (i % 1E6 == 0)
-            println(f"wrote ${i / 1E6}m pings for year $year, month $month to $filePath")
+          val filePath = s"$directory/$fileName.csv.bz2"
+          val file = new File(filePath)
+
+          val pbzip2 = new ProcessBuilder("/bin/bash", "-c", s"pbzip2 -c > ${file.getAbsolutePath}")
+            .start()
+
+          val outputStream = pbzip2.getOutputStream
+
+          pings
+            .zipWithIndex
+            .foreach {
+              case (ping, i: Int) =>
+                IOUtils.write(ping.toString, outputStream)
+
+                if (i % 1E6 == 0)
+                  println(f"wrote ${i / 1E6}m pings for year $year, month $month to $filePath")
+            }
+
+          outputStream.close()
+          pbzip2.waitFor()
+
+          if (!config.isLocal) uploadFileToS3AndDelete(year, month, file)
       }
-    outputStream.close()
-
-    pbzip2.waitFor()
-
-    if (!config.isLocal) uploadFileToS3AndDelete(year, month, file)
   }
 
   private def uploadFileToS3AndDelete(year: Int,
                                       month: Int,
                                       localFileToUpload: File)(
-      implicit config: Config,
-      s3Client: AmazonS3): Unit = {
+                                       implicit config: Config,
+                                       s3Client: AmazonS3): Unit = {
     println(
       s"uploading file '${localFileToUpload.getAbsolutePath}' " +
         s"for year $year, month $month to ${config.outputDirectory}...")
