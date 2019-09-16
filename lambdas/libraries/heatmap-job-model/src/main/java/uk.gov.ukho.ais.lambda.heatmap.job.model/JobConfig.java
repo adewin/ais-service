@@ -1,4 +1,4 @@
-package uk.gov.ukho.ais.validatenewjobconfiglambda.model;
+package uk.gov.ukho.ais.lambda.heatmap.job.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;

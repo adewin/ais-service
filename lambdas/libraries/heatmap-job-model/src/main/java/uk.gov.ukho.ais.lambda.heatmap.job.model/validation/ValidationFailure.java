@@ -1,4 +1,4 @@
-package uk.gov.ukho.ais.validatenewjobconfiglambda.model;
+package uk.gov.ukho.ais.lambda.heatmap.job.model.validation;
 
 public enum ValidationFailure {
   JOB_CONFIG_DOES_NOT_EXIST,

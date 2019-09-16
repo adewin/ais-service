@@ -14,10 +14,10 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import uk.gov.ukho.ais.validatenewjobconfiglambda.model.JobConfig;
-import uk.gov.ukho.ais.validatenewjobconfiglambda.model.ValidationFailure;
-import uk.gov.ukho.ais.validatenewjobconfiglambda.model.ValidationRequest;
-import uk.gov.ukho.ais.validatenewjobconfiglambda.model.ValidationResult;
+import uk.gov.ukho.ais.lambda.heatmap.job.model.JobConfig;
+import uk.gov.ukho.ais.lambda.heatmap.job.model.StepFunctionInput;
+import uk.gov.ukho.ais.lambda.heatmap.job.model.validation.ValidationFailure;
+import uk.gov.ukho.ais.lambda.heatmap.job.model.validation.ValidationResult;
 import uk.gov.ukho.ais.validatenewjobconfiglambda.repository.JobConfigRepository;
 import uk.gov.ukho.ais.validatenewjobconfiglambda.validation.JobConfigValidationService;
 import uk.gov.ukho.ais.validatenewjobconfiglambda.validation.ValidationResultFactory;
@@ -51,7 +51,7 @@ public class ValidationFunctionTest {
           when(mockValidationResultFactory.valid(jobConfig)).thenReturn(validationResult);
 
           final ValidationResult result =
-              validationFunction.apply(new ValidationRequest(jobConfigFile));
+              validationFunction.apply(new StepFunctionInput(jobConfigFile));
 
           softly.assertThat(result).isEqualToComparingFieldByFieldRecursively(validationResult);
         });
@@ -68,7 +68,7 @@ public class ValidationFunctionTest {
     when(mockJobConfigValidationService.performValidation(jobConfigInRepo))
         .thenReturn(Validated.valid(jobConfig));
 
-    validationFunction.apply(new ValidationRequest(jobConfigFile));
+    validationFunction.apply(new StepFunctionInput(jobConfigFile));
 
     verify(mockJobConfigRepository, times(1)).getJobConfig(jobConfigFile);
   }
@@ -83,7 +83,7 @@ public class ValidationFunctionTest {
     when(mockJobConfigValidationService.performValidation(jobConfigInRepo))
         .thenReturn(Validated.valid(jobConfig));
 
-    validationFunction.apply(new ValidationRequest(jobConfigFile));
+    validationFunction.apply(new StepFunctionInput(jobConfigFile));
 
     verify(mockJobConfigValidationService, times(1)).performValidation(jobConfigInRepo);
   }

@@ -8,8 +8,8 @@ import java.util.Objects;
 import java.util.function.Function;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
-import uk.gov.ukho.ais.validatenewjobconfiglambda.model.JobConfig;
-import uk.gov.ukho.ais.validatenewjobconfiglambda.model.ValidationFailure;
+import uk.gov.ukho.ais.lambda.heatmap.job.model.JobConfig;
+import uk.gov.ukho.ais.lambda.heatmap.job.model.validation.ValidationFailure;
 
 public interface Validator {
 

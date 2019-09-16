@@ -34,7 +34,7 @@ resource aws_sfn_state_machine batch_heatmap_step_fn {
       "Catch": [{
         "ErrorEquals": ["States.ALL"],
         "ResultPath": "$.validationFailure",
-        "Next": "Failure"
+        "Next": "Complete"
       }]
     },
     "Is Valid Request": {
@@ -42,7 +42,7 @@ resource aws_sfn_state_machine batch_heatmap_step_fn {
       "Choices": [{
           "BooleanEquals": false,
           "Variable": "$.jobConfig.success",
-          "Next": "Failure"
+          "Next": "Complete"
       }],
       "Default": "Generate Heatmaps"
     },
@@ -52,7 +52,7 @@ resource aws_sfn_state_machine batch_heatmap_step_fn {
       "Catch": [{
         "ErrorEquals": ["States.ALL"],
         "ResultPath": "$.heatmapGenerationFailure",
-        "Next": "Failure"
+        "Next": "Complete"
       }],
       "Branches": [
         {
@@ -64,7 +64,7 @@ resource aws_sfn_state_machine batch_heatmap_step_fn {
               "End": true,
               "Resource": "arn:aws:states:::batch:submitJob.sync",
               "InputPath": "$.jobConfig.data",
-              "ResultPath": "$.6hr30kmHeatmap",
+              "ResultPath": "$.create6hr30kmHeatmap",
               "Parameters": {
                 "JobName": "Create6hr30kmHeatmap",
                 "JobQueue": "${var.batch_job_queue_id}",
@@ -91,7 +91,7 @@ resource aws_sfn_state_machine batch_heatmap_step_fn {
               "End": true,
               "Resource": "arn:aws:states:::batch:submitJob.sync",
               "InputPath": "$.jobConfig.data",
-              "ResultPath": "$.18hr100kmHeatmap",
+              "ResultPath": "$.create18hr100kmHeatmap",
               "Parameters": {
                 "JobName": "Create18hr100kmHeatmap",
                 "JobQueue":  "${var.batch_job_queue_id}",
@@ -117,11 +117,11 @@ resource aws_sfn_state_machine batch_heatmap_step_fn {
       "Resource": "arn:aws:states:::batch:submitJob.sync",
       "InputPath": "$.jobConfig.data",
       "ResultPath": "$.heatmapAggregation",
-      "Next": "Success",
+      "Next": "Complete",
       "Catch": [{
         "ErrorEquals": ["States.ALL"],
         "ResultPath": "$.heatmapAggregationFailure",
-        "Next": "Failure"
+        "Next": "Complete"
       }],
       "Parameters": {
         "JobName": "AggregateHeatmaps",
@@ -131,6 +131,21 @@ resource aws_sfn_state_machine batch_heatmap_step_fn {
           "heatmaps_store.$": "$.output"
         }
       }
+    },
+    "Complete": {
+      "Type": "Task",
+      "Resource": "${var.handle_step_function_outcome_function_id}",
+      "ResultPath": "$",
+      "Next": "Determine Success"
+    },
+    "Determine Success": {
+      "Type": "Choice",
+      "Choices": [{
+          "StringEquals": "FAILED",
+          "Variable": "$.stepFunctionOutcome",
+          "Next": "Failure"
+      }],
+      "Default": "Success"
     },
     "Failure": {
       "Type": "Fail"

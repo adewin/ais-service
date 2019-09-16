@@ -4,8 +4,8 @@ import cyclops.control.Either;
 import cyclops.control.Validated;
 import java.util.List;
 import org.springframework.stereotype.Component;
-import uk.gov.ukho.ais.validatenewjobconfiglambda.model.JobConfig;
-import uk.gov.ukho.ais.validatenewjobconfiglambda.model.ValidationFailure;
+import uk.gov.ukho.ais.lambda.heatmap.job.model.JobConfig;
+import uk.gov.ukho.ais.lambda.heatmap.job.model.validation.ValidationFailure;
 
 @Component
 public class JobConfigValidationService {

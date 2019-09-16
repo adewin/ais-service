@@ -69,16 +69,18 @@ module functions {
   heatmap_sql_archive_prefix           = "archive"
   heatmap_sql_store_name               = data.external.secrets.result["heatmap_sql_archive_store"]
   validate_job_config_jar              = var.VALIDATE_JOB_CONFIG_LAMBDA_JAR_PATH
+  handle_heatmap_outcome_function_jar  = var.HANDLE_HEATMAP_OUTCOME_LAMBDA_JAR_PATH
 }
 
 module batch {
-  source                          = "./modules/batch"
-  docker_registry_url             = var.DOCKER_REGISTRY_URL
-  project_version                 = var.PROJECT_VERSION
-  batch_job_queue_id              = data.aws_cloudformation_export.batch_queue_url.value
-  validate_job_config_function_id = module.functions.validate_job_config_function_id
-  invoke_step_function_jar        = var.INVOKE_STEP_FUNCTION_LAMBDA_JAR_PATH
-  heatmap_job_submission_bucket   = data.external.secrets.result["heatmap_job_submission_store"]
+  source                                   = "./modules/batch"
+  docker_registry_url                      = var.DOCKER_REGISTRY_URL
+  project_version                          = var.PROJECT_VERSION
+  batch_job_queue_id                       = data.aws_cloudformation_export.batch_queue_url.value
+  validate_job_config_function_id          = module.functions.validate_job_config_function_id
+  invoke_step_function_jar                 = var.INVOKE_STEP_FUNCTION_LAMBDA_JAR_PATH
+  heatmap_job_submission_bucket            = data.external.secrets.result["heatmap_job_submission_store"]
+  handle_step_function_outcome_function_id = module.functions.handle_step_function_outcome_function_id
 }
 
 module notifications {

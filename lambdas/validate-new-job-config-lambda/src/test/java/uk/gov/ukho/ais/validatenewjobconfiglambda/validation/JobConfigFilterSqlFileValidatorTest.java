@@ -13,8 +13,8 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import uk.gov.ukho.ais.validatenewjobconfiglambda.model.JobConfig;
-import uk.gov.ukho.ais.validatenewjobconfiglambda.model.ValidationFailure;
+import uk.gov.ukho.ais.lambda.heatmap.job.model.JobConfig;
+import uk.gov.ukho.ais.lambda.heatmap.job.model.validation.ValidationFailure;
 import uk.gov.ukho.ais.validatenewjobconfiglambda.repository.FilterSqlFileRepository;
 
 @RunWith(MockitoJUnitRunner.class)

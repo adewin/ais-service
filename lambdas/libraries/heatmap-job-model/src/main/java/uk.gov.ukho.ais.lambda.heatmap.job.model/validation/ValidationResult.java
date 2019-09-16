@@ -1,9 +1,10 @@
-package uk.gov.ukho.ais.validatenewjobconfiglambda.model;
+package uk.gov.ukho.ais.lambda.heatmap.job.model.validation;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import cyclops.control.Option;
 import java.util.List;
+import uk.gov.ukho.ais.lambda.heatmap.job.model.JobConfig;
 
 public class ValidationResult {
 

@@ -1,0 +1,10 @@
+failure:
+  reason:
+    validationFailed: Invalid heatmap request
+    validationError: Error performing validation
+    generationError: Error generating monthly heatmaps
+    aggregationError: Error aggregating monthly heatmaps
+
+logging:
+  level:
+    root: info
