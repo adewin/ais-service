@@ -17,8 +17,8 @@ tasks.withType<ShadowJar> {
     append("META-INF/spring.schemas")
     append("META-INF/spring.tooling")
     manifest {
-        attributes["Main-Class"] = "uk.gov.ukho.ais.invokestepfunction.InvokeStepFunctionLambdaApplication"
-        attributes["Start-Class"] = "uk.gov.ukho.ais.invokestepfunction.InvokeStepFunctionLambdaApplication"
+        attributes["Main-Class"] = "uk.gov.ukho.ais.ingestsqlfile.IngestSqlFileLambdaApplication"
+        attributes["Start-Class"] = "uk.gov.ukho.ais.ingestsqlfile.IngestSqlFileLambdaApplication"
     }
     transform(PropertiesFileTransformer::class.java) {
         paths = listOf("META-INF/spring.factories")
@@ -36,4 +36,7 @@ dependencies {
     implementation("com.amazonaws:aws-java-sdk-stepfunctions")
     implementation("com.oath.cyclops:cyclops:${Versions.cyclops}")
     implementation("com.oath.cyclops:cyclops-jackson-integration:${Versions.cyclops}")
+    testImplementation("junit:junit:${Versions.junit}")
+    testImplementation("org.assertj:assertj-core:${Versions.assertJ}")
+    testImplementation("org.mockito:mockito-core:${Versions.mockito}")
 }
