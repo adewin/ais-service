@@ -122,10 +122,10 @@ class AisRepositoryTest {
     SoftAssertions.assertSoftly { softly =>
       when(resultSetMock.next()).thenReturn(false)
 
-      val iterator =
-        aisRepository.getDistinctYearAndMonthPairsForFiles("i-dont-exist")
+      val months =
+        aisRepository.getDistinctYearAndMonthPairsForFiles(Seq("i-dont-exist"))
 
-      softly.assertThat(iterator.hasNext).isFalse()
+      softly.assertThat(months.size).isEqualTo(0)
     }
 
   @Test
@@ -139,10 +139,10 @@ class AisRepositoryTest {
       when(resultSetMock.getInt("month"))
         .thenReturn(months.head, months.tail: _*)
 
-      val results = aisRepository.getDistinctYearAndMonthPairsForFiles("")
+      val results = aisRepository.getDistinctYearAndMonthPairsForFiles(Seq(""))
 
       softly
-        .assertThat(results.asJava)
+        .assertThat(results.iterator.asJava)
         .containsExactlyElementsOf(expectedPairs.asJava)
     }
 }
