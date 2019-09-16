@@ -20,7 +20,7 @@ object CsvRepository {
       else s"/tmp"
 
     pings
-      .grouped(1E8.toInt)
+      .grouped(25 * 1E6.toInt)
       .zipWithIndex
       .foreach {
         case (pings, part: Int) =>
