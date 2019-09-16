@@ -21,9 +21,8 @@ class AisRepository(val dataSource: DataSource)(implicit config: Config) {
       s"""
          |SELECT DISTINCT year, month FROM "${config.database}"."${config.table}"
          |WHERE input_ais_data_file = '${inputFiles.head}'
-         """.stripMargin + inputFiles.tail.foreach { file => s"OR input_ais_data_file = '$file'\n" }
+         """.stripMargin + inputFiles.tail.map { file => s"OR input_ais_data_file = '$file'" }.mkString("\n")
 
-    println("== SQL ==\n" + sql)
     val sqlStatement: PreparedStatement = connection.prepareStatement(sql)
 
     val results: ResultSet = sqlStatement.executeQuery()
