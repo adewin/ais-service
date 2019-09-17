@@ -47,6 +47,21 @@ class AisRepositoryTest {
       .thenReturn(preparedStatementMock)
     when(preparedStatementMock.executeQuery()).thenReturn(resultSetMock)
 
+    when(resultSetMock.getString("arkposid")).thenReturn("arkposid")
+    when(resultSetMock.getString("vessel_class")).thenReturn("vessel_class")
+    when(resultSetMock.getString("navigational_status"))
+      .thenReturn("navigational_status")
+    when(resultSetMock.getString("rot")).thenReturn("rot")
+    when(resultSetMock.getString("sog")).thenReturn("sog")
+    when(resultSetMock.getString("cog")).thenReturn("cog")
+    when(resultSetMock.getString("true_heading")).thenReturn("true_heading")
+    when(resultSetMock.getString("altitude")).thenReturn("altitude")
+    when(resultSetMock.getString("special_manoeuvre"))
+      .thenReturn("special_manoeuvre")
+    when(resultSetMock.getString("radio_status")).thenReturn("radio_status")
+    when(resultSetMock.getString("flags")).thenReturn("flags")
+    when(resultSetMock.getString("input_ais_data_file"))
+      .thenReturn("input_ais_data_file")
   }
 
   @Test
@@ -106,8 +121,7 @@ class AisRepositoryTest {
     softly
       .assertThat(preparedStatementArgCaptor.getAllValues.iterator())
       .allMatch { sqlStatement =>
-        sqlStatement.startsWith(
-          """
+        sqlStatement.startsWith("""
             |SELECT *
             |FROM "database"."table"
             |WHERE (

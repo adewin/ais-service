@@ -9,17 +9,17 @@ case class Ping(arkposid: String,
                 latitude: Double,
                 vesselClass: String,
                 messageTypeId: Int,
-                navigational_status: String,
+                navigationalStatus: String,
                 rot: String,
                 sog: String,
                 cog: String,
-                true_heading: String,
+                trueHeading: String,
                 altitude: String,
-                special_manoeuvre: String,
-                radio_status: String,
+                specialManoeuvre: String,
+                radioStatus: String,
                 flags: String,
-                input_ais_data_file: String) {
+                inputAisDataFile: String) {
   override def toString: String =
-    "$arkposid\t$mmsi\t$acquisitionTime\t$longitude\t$latitude\t$vesselClass\t$messageTypeId\t$navigational_status\t" +
-      "$rot\t$sog\t$cog\t$true_heading\t$altitude\t$special_manoeuvre\t$radio_status\t$flags\t$input_ais_data_file\n"
+    s"$arkposid\t$mmsi\t$acquisitionTime\t$longitude\t$latitude\t$vesselClass\t$messageTypeId\t$navigationalStatus\t" +
+      s"$rot\t$sog\t$cog\t$trueHeading\t$altitude\t$specialManoeuvre\t$radioStatus\t$flags\t$inputAisDataFile\n"
 }

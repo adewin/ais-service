@@ -14,7 +14,8 @@ object ResamplerOrchestrator {
     val aisRepository = new AisRepository(source)
 
     println(s"querying for months contained in input AIS data files...")
-    val modifiedMonths = aisRepository.getDistinctYearAndMonthPairsForFiles(config.inputFiles)
+    val modifiedMonths =
+      aisRepository.getDistinctYearAndMonthPairsForFiles(config.inputFiles)
 
     println(s"will resample ${modifiedMonths.size} month(s)")
 

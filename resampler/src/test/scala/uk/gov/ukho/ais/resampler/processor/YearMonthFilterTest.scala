@@ -46,8 +46,17 @@ class YearMonthFilterTest {
 
     }
 
-  private def pingWithYearMonthAndDay(mmsi: String, year: Int, month: Int, day: Int, lat: Double, lon: Double) =
-    ping(mmsi, makeTimestampFromLocalDateTime(LocalDate.of(year, month, day).atStartOfDay()), lat, lon)
+  private def pingWithYearMonthAndDay(mmsi: String,
+                                      year: Int,
+                                      month: Int,
+                                      day: Int,
+                                      lat: Double,
+                                      lon: Double) =
+    ping(mmsi,
+         makeTimestampFromLocalDateTime(
+           LocalDate.of(year, month, day).atStartOfDay()),
+         lat,
+         lon)
 
   private val doubleComparator: Comparator[Double] =
     (a: Double, b: Double) => {

@@ -119,22 +119,24 @@ object Resampler {
     val newLat: Double = timeProportion * latGap + prevPing.latitude
     val newLon: Double = timeProportion * lonGap + prevPing.longitude
 
-    Ping(currPing.arkposid,
+    Ping(
+      currPing.arkposid,
       currPing.mmsi,
       new Timestamp(nextTime),
       newLon,
       newLat,
       currPing.vesselClass,
       currPing.messageTypeId,
-      currPing.navigational_status,
+      currPing.navigationalStatus,
       currPing.rot,
       currPing.sog,
       currPing.cog,
-      currPing.true_heading,
+      currPing.trueHeading,
       currPing.altitude,
-      currPing.special_manoeuvre,
-      currPing.radio_status,
+      currPing.specialManoeuvre,
+      currPing.radioStatus,
       currPing.flags,
-      currPing.input_ais_data_file)
+      currPing.inputAisDataFile
+    )
   }
 }

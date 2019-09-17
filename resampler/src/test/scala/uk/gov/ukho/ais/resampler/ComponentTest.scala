@@ -42,7 +42,6 @@ class ComponentTest {
 
   private val BZ2_EXTENSION: String = "bz2"
 
-  private final val TOTAL_CELL_COUNT_WHOLE_WORLD_AT_1K = 65884
   private final val DEFAULT_INTERPOLATION_METERS = 30000
   private final val DEFAULT_INTERPOLATION_TIME = 6 * 60 * 60 * 1000
 
@@ -77,7 +76,7 @@ class ComponentTest {
   }
 
   @Test
-  def whenGivenAnEmptySetOfPingsThenEmptyCsvIsGenerated(): Unit =
+  def whenGivenAnEmptySetOfPingsThenNoCsvIsGenerated(): Unit =
     SoftAssertions.assertSoftly { softly =>
       implicit val config: Config = testConfig
 
@@ -90,14 +89,6 @@ class ComponentTest {
         .map(filename =>
           Paths.get(tempDir.getRoot.getAbsolutePath, filename).toString)
 
-      filePath match {
-        case Some(filePath) =>
-          val csv = openCsvFile(filePath)
-
-          softly.assertThat(csv.size).isEqualTo(0)
-
-        case None => softly.fail("csv file not found")
-      }
     }
 
   @Test
@@ -107,29 +98,29 @@ class ComponentTest {
 
       val expectedPings = Seq(
         ("123",
-          baseDateTime.plusSeconds(10).toEpochSecond(ZoneOffset.UTC),
-          179.9,
-          -89.9),
+         baseDateTime.plusSeconds(10).toEpochSecond(ZoneOffset.UTC),
+         179.9,
+         -89.9),
         ("456",
-          baseDateTime.plusSeconds(20).toEpochSecond(ZoneOffset.UTC),
-          -179.9,
-          89.9),
+         baseDateTime.plusSeconds(20).toEpochSecond(ZoneOffset.UTC),
+         -179.9,
+         89.9),
         ("789",
-          baseDateTime.plusSeconds(30).toEpochSecond(ZoneOffset.UTC),
-          0d,
-          0d),
+         baseDateTime.plusSeconds(30).toEpochSecond(ZoneOffset.UTC),
+         0d,
+         0d),
         ("234",
-          baseDateTime.plusSeconds(40).toEpochSecond(ZoneOffset.UTC),
-          179.9,
-          89.9),
+         baseDateTime.plusSeconds(40).toEpochSecond(ZoneOffset.UTC),
+         179.9,
+         89.9),
         ("567",
-          baseDateTime.plusSeconds(50).toEpochSecond(ZoneOffset.UTC),
-          -179.9,
-          -89.9),
+         baseDateTime.plusSeconds(50).toEpochSecond(ZoneOffset.UTC),
+         -179.9,
+         -89.9),
         ("890",
-          baseDateTime.plusSeconds(60).toEpochSecond(ZoneOffset.UTC),
-          179.9,
-          -89.9)
+         baseDateTime.plusSeconds(60).toEpochSecond(ZoneOffset.UTC),
+         179.9,
+         -89.9)
       )
 
       setDataReturnedFromDataSource(expectedPings)
@@ -165,25 +156,25 @@ class ComponentTest {
 
       val expectedPings = Seq(
         ("123456793",
-          baseDateTime.toEpochSecond(ZoneOffset.UTC),
-          -1.216151956,
-          50.77512703),
+         baseDateTime.toEpochSecond(ZoneOffset.UTC),
+         -1.216151956,
+         50.77512703),
         ("123456793",
-          baseDateTime.plusMinutes(6).toEpochSecond(ZoneOffset.UTC),
-          -1.198185651,
-          50.78648692),
+         baseDateTime.plusMinutes(6).toEpochSecond(ZoneOffset.UTC),
+         -1.198185651,
+         50.78648692),
         ("123456793",
-          baseDateTime.plusMinutes(12).toEpochSecond(ZoneOffset.UTC),
-          -1.180219345,
-          50.77512703),
+         baseDateTime.plusMinutes(12).toEpochSecond(ZoneOffset.UTC),
+         -1.180219345,
+         50.77512703),
         ("123456793",
-          baseDateTime.plusMinutes(13).toEpochSecond(ZoneOffset.UTC),
-          -1.180202123,
-          50.77235519),
+         baseDateTime.plusMinutes(13).toEpochSecond(ZoneOffset.UTC),
+         -1.180202123,
+         50.77235519),
         ("123456793",
-          baseDateTime.plusMinutes(15).toEpochSecond(ZoneOffset.UTC),
-          -1.180219345,
-          50.76944604)
+         baseDateTime.plusMinutes(15).toEpochSecond(ZoneOffset.UTC),
+         -1.180219345,
+         50.76944604)
       )
 
       setDataReturnedFromDataSource(expectedPings)
@@ -216,17 +207,17 @@ class ComponentTest {
       setDataReturnedFromDataSource(
         Seq(
           ("123456793",
-            baseDateTime.minusMinutes(24).toEpochSecond(ZoneOffset.UTC),
-            -1.216151956,
-            50.77512703),
+           baseDateTime.minusMinutes(24).toEpochSecond(ZoneOffset.UTC),
+           -1.216151956,
+           50.77512703),
           ("123456793",
-            baseDateTime.plusMinutes(6).toEpochSecond(ZoneOffset.UTC),
-            -1.198185651,
-            50.78648692),
+           baseDateTime.plusMinutes(6).toEpochSecond(ZoneOffset.UTC),
+           -1.198185651,
+           50.78648692),
           ("123456793",
-            baseDateTime.plusMinutes(12).toEpochSecond(ZoneOffset.UTC),
-            -1.180219345,
-            50.77512703)
+           baseDateTime.plusMinutes(12).toEpochSecond(ZoneOffset.UTC),
+           -1.180219345,
+           50.77512703)
         ))
 
       ResamplerOrchestrator.orchestrateResampling(datasourceMock)
@@ -276,8 +267,7 @@ class ComponentTest {
 
       softly
         .assertThat(preparedStatementIterator.next())
-        .startsWith(
-          s"""
+        .startsWith(s"""
              |SELECT DISTINCT year, month FROM "database"."table"
              |WHERE input_ais_data_file = '${config.inputFiles.head}'
              |""".stripMargin)
@@ -285,8 +275,7 @@ class ComponentTest {
       softly
         .assertThat(preparedStatementIterator)
         .allMatch { sqlStatement =>
-          sqlStatement.startsWith(
-            s"""
+          sqlStatement.startsWith(s"""
                |SELECT *
                |FROM "database"."table"
                |WHERE (
@@ -296,7 +285,7 @@ class ComponentTest {
     }
 
   private def openCsvFile(
-                           filename: String): Seq[(String, Long, Double, Double)] = {
+      filename: String): Seq[(String, Long, Double, Double)] = {
     val lines: java.util.List[_] = IOUtils.readLines(
       new BZip2CompressorInputStream(new FileInputStream(new File(filename))))
 
@@ -307,17 +296,17 @@ class ComponentTest {
           println(timestamp)
 
           (mmsi,
-            Timestamp
-              .valueOf(timestamp)
-              .toLocalDateTime
-              .toEpochSecond(ZoneOffset.UTC),
-            lat.toDouble,
-            lon.toDouble)
+           Timestamp
+             .valueOf(timestamp)
+             .toLocalDateTime
+             .toEpochSecond(ZoneOffset.UTC),
+           lon.toDouble,
+           lat.toDouble)
       })
   }
 
   private def setYearAndMonthPairsReturnedFromDataSource(
-                                                          pairs: (Int, Int)*): Unit = {
+      pairs: (Int, Int)*): Unit = {
     val (years, months) = pairs.unzip
     val nexts = months.map { _ =>
       true
@@ -331,18 +320,18 @@ class ComponentTest {
   }
 
   private def setDataReturnedFromDataSource(
-                                             data: Seq[(String, Long, Double, Double)]): Unit = {
+      data: Seq[(String, Long, Double, Double)]): Unit = {
     data.map {
       case (mmsi: String, timeSeconds: Long, lon: Double, lat: Double) =>
         List(mmsi, makeTimestamp(timeSeconds), lon, lat, true)
     }.transpose match {
       case List(
-      mmsi: List[String],
-      timestamps: List[Timestamp],
-      lon: List[Double],
-      lat: List[Double],
-      hasNext: List[Boolean]
-      ) =>
+          mmsi: List[String],
+          timestamps: List[Timestamp],
+          lon: List[Double],
+          lat: List[Double],
+          hasNext: List[Boolean]
+          ) =>
         when(resultSetMock.getString("mmsi"))
           .thenReturn(mmsi.head, mmsi.tail: _*)
         when(resultSetMock.getTimestamp("acquisition_time"))
@@ -360,8 +349,8 @@ class ComponentTest {
   private def createFilterSqlFile = {
     val tmpSqlFile = Files.createTempFile("unfiltered", ".sql").toFile
     FileUtils.writeStringToFile(tmpSqlFile,
-      filterQuery,
-      StandardCharsets.UTF_8.toString)
+                                filterQuery,
+                                StandardCharsets.UTF_8.toString)
     tmpSqlFile
   }
 }

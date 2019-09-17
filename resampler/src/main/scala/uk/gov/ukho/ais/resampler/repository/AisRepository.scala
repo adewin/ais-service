@@ -5,7 +5,10 @@ import java.sql.{Connection, PreparedStatement, ResultSet}
 import javax.sql.DataSource
 import uk.gov.ukho.ais.resampler.Config
 import uk.gov.ukho.ais.resampler.model.Ping
-import uk.gov.ukho.ais.resampler.utility.TimeUtilities.{getLastDayOfPreviousMonth, getNextMonth}
+import uk.gov.ukho.ais.resampler.utility.TimeUtilities.{
+  getLastDayOfPreviousMonth,
+  getNextMonth
+}
 
 import scala.collection.mutable
 
@@ -14,14 +17,18 @@ class AisRepository(val dataSource: DataSource)(implicit config: Config) {
   val DEFAULT_NUMBER_OF_BUCKETS: Int = 31
 
   def getDistinctYearAndMonthPairsForFiles(
-                                            inputFiles: Seq[String]): Seq[(Int, Int)] = {
+      inputFiles: Seq[String]): Seq[(Int, Int)] = {
     val connection: Connection = dataSource.getConnection()
 
     val sql =
       s"""
          |SELECT DISTINCT year, month FROM "${config.database}"."${config.table}"
          |WHERE input_ais_data_file = '${inputFiles.head}'
-         """.stripMargin + inputFiles.tail.map { file => s"OR input_ais_data_file = '$file'" }.mkString("\n")
+         """.stripMargin + inputFiles.tail
+        .map { file =>
+          s"OR input_ais_data_file = '$file'"
+        }
+        .mkString("\n")
 
     val sqlStatement: PreparedStatement = connection.prepareStatement(sql)
 
@@ -47,8 +54,7 @@ class AisRepository(val dataSource: DataSource)(implicit config: Config) {
 
         mutable.Queue(
           (0 until DEFAULT_NUMBER_OF_BUCKETS)
-            .map(bucket =>
-              s"""
+            .map(bucket => s"""
                  |SELECT *
                  |FROM "${config.database}"."${config.table}"
                  |WHERE (
