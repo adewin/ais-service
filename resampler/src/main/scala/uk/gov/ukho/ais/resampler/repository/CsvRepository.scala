@@ -30,34 +30,34 @@ object CsvRepository {
       }
     }
 
-//    implicit class Spliterator[T](xs: Iterator[T]) {
-//      def lazyGroup(n: Int): Iterator[Iterator[(T, Int)]] = new Iterator[Iterator[(T, Int)]] {
-//        private val indexedXs: Iterator[(T, Int)] = xs.zipWithIndex
-//
-//        private var previousIndex = -1;
-//
-//        override def hasNext: Boolean = indexedXs.hasNext
-//
-//        override def next(): Iterator[(T, Int)] = new Iterator[(T, Int)] {
-//          override def hasNext: Boolean =
-//            indexedXs.hasNext && !(previousIndex > 0 && (previousIndex + 1) % n == 0)
-//
-//          override def next(): (T, Int) = if (hasNext) {
-//            previousIndex += 1
-//            val (value, _) = indexedXs.next()
-//            (value, previousIndex / n)
-//          } else {
-//            throw new Exception("BAD")
-//          }
-//        }
-//      }
-//    }
+    //    implicit class Spliterator[T](xs: Iterator[T]) {
+    //      def lazyGroup(n: Int): Iterator[Iterator[(T, Int)]] = new Iterator[Iterator[(T, Int)]] {
+    //        private val indexedXs: Iterator[(T, Int)] = xs.zipWithIndex
+    //
+    //        private var previousIndex = -1;
+    //
+    //        override def hasNext: Boolean = indexedXs.hasNext
+    //
+    //        override def next(): Iterator[(T, Int)] = new Iterator[(T, Int)] {
+    //          override def hasNext: Boolean =
+    //            indexedXs.hasNext && !(previousIndex > 0 && (previousIndex + 1) % n == 0)
+    //
+    //          override def next(): (T, Int) = if (hasNext) {
+    //            previousIndex += 1
+    //            val (value, _) = indexedXs.next()
+    //            (value, previousIndex / n)
+    //          } else {
+    //            throw new Exception("BAD")
+    //          }
+    //        }
+    //      }
+    //    }
 
     pings
       .lazyGroup(25E6.toInt)
       .zipWithIndex
       .foreach { case (pings, part) =>
-          writePingGroupForYearAndMonth(year, month, directory, pings, part)
+        writePingGroupForYearAndMonth(year, month, directory, pings, part)
       }
   }
 
@@ -86,11 +86,12 @@ object CsvRepository {
     outputStream.close()
     pbzip2.waitFor()
 
-    if (!config.isLocal) uploadFileToS3AndDelete(year, month, file)
+    if (!config.isLocal) uploadFileToS3AndDelete(year, month, part, file)
   }
 
   private def uploadFileToS3AndDelete(year: Int,
                                       month: Int,
+                                      part: Int,
                                       localFileToUpload: File)(
                                        implicit config: Config,
                                        s3Client: AmazonS3): Unit = {
@@ -101,7 +102,7 @@ object CsvRepository {
     s3Client.putObject(
       new PutObjectRequest(
         config.outputDirectory,
-        CsvS3KeyService.generateS3Key(year, month, 0),
+        CsvS3KeyService.generateS3Key(year, month, part),
         localFileToUpload
       )
     )
