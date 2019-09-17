@@ -39,3 +39,7 @@ variable heatmap_sql_store_name {}
 variable heatmap_sql_archive_prefix {}
 
 variable heatmap_job_submission_store_name {}
+
+variable handle_heatmap_outcome_function_jar {}
+
+variable ais_sql_ingest_function_jar {}

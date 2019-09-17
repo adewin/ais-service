@@ -27,6 +27,7 @@ tasks.withType<ShadowJar> {
 }
 
 dependencies {
+    implementation(project(":lambdas:libraries:heatmap-job-model"))
     compile("org.springframework.cloud:spring-cloud-function-context")
     compileOnly("com.amazonaws:aws-lambda-java-core:${Versions.lambdaJavaCore}")
     implementation("org.springframework.cloud:spring-cloud-function-adapter-aws:${Versions.springCloudFunction}")
@@ -34,10 +35,8 @@ dependencies {
     implementation(platform("com.amazonaws:aws-java-sdk-bom:${Versions.mavenAwsBom}"))
     implementation("com.amazonaws:aws-lambda-java-events:${Versions.lambdaJavaCore}")
     implementation("com.amazonaws:aws-java-sdk-s3")
-    implementation("com.amazonaws:aws-java-sdk-emr")
     implementation("com.oath.cyclops:cyclops:${Versions.cyclops}")
     implementation("com.oath.cyclops:cyclops-jackson-integration:${Versions.cyclops}")
-    implementation(project(":lambdas:libraries:emr-job-runner"))
     implementation("org.apache.commons:commons-lang3:${Versions.commonsLang}")
 
     testImplementation("junit:junit:${Versions.junit}")

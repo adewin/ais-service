@@ -6,6 +6,9 @@ variable function_code {}
 
 variable function_environment_variables {
   type = map(string)
+  default = {
+    "NO_ENVIRONMENT_VARIABLES" = "true"
+  }
 }
 
 variable runtime { default = "java8" }
