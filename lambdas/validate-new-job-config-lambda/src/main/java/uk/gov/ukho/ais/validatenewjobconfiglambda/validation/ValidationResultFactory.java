@@ -5,9 +5,9 @@ import cyclops.data.NonEmptyList;
 import java.util.ArrayList;
 import java.util.Collections;
 import org.springframework.stereotype.Component;
-import uk.gov.ukho.ais.validatenewjobconfiglambda.model.JobConfig;
-import uk.gov.ukho.ais.validatenewjobconfiglambda.model.ValidationFailure;
-import uk.gov.ukho.ais.validatenewjobconfiglambda.model.ValidationResult;
+import uk.gov.ukho.ais.lambda.heatmap.job.model.JobConfig;
+import uk.gov.ukho.ais.lambda.heatmap.job.model.validation.ValidationFailure;
+import uk.gov.ukho.ais.lambda.heatmap.job.model.validation.ValidationResult;
 import uk.gov.ukho.ais.validatenewjobconfiglambda.repository.FilterSqlFileRepository;
 
 @Component

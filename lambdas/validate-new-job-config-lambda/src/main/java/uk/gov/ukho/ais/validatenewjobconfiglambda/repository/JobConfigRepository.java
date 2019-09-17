@@ -8,8 +8,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import cyclops.control.Either;
 import java.io.IOException;
 import org.springframework.stereotype.Component;
-import uk.gov.ukho.ais.validatenewjobconfiglambda.model.JobConfig;
-import uk.gov.ukho.ais.validatenewjobconfiglambda.model.ValidationFailure;
+import uk.gov.ukho.ais.lambda.heatmap.job.model.JobConfig;
+import uk.gov.ukho.ais.lambda.heatmap.job.model.validation.ValidationFailure;
 
 @Component
 public class JobConfigRepository {

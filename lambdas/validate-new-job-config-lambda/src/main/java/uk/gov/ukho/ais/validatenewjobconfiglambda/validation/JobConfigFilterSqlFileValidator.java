@@ -5,8 +5,8 @@ import cyclops.control.Option;
 import cyclops.control.Validated;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
-import uk.gov.ukho.ais.validatenewjobconfiglambda.model.JobConfig;
-import uk.gov.ukho.ais.validatenewjobconfiglambda.model.ValidationFailure;
+import uk.gov.ukho.ais.lambda.heatmap.job.model.JobConfig;
+import uk.gov.ukho.ais.lambda.heatmap.job.model.validation.ValidationFailure;
 import uk.gov.ukho.ais.validatenewjobconfiglambda.repository.FilterSqlFileRepository;
 
 @Component

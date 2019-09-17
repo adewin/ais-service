@@ -5,8 +5,8 @@ import cyclops.control.Validated;
 import cyclops.data.NonEmptyList;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.Test;
-import uk.gov.ukho.ais.validatenewjobconfiglambda.model.JobConfig;
-import uk.gov.ukho.ais.validatenewjobconfiglambda.model.ValidationFailure;
+import uk.gov.ukho.ais.lambda.heatmap.job.model.JobConfig;
+import uk.gov.ukho.ais.lambda.heatmap.job.model.validation.ValidationFailure;
 
 public class JobConfigYearValidatorTest {
 

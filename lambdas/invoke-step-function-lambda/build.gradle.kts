@@ -27,6 +27,7 @@ tasks.withType<ShadowJar> {
 }
 
 dependencies {
+    implementation(project(":lambdas:libraries:heatmap-job-model"))
     compile("org.springframework.cloud:spring-cloud-function-context")
     compileOnly("com.amazonaws:aws-lambda-java-core:${Versions.lambdaJavaCore}")
     implementation("org.springframework.cloud:spring-cloud-function-adapter-aws:${Versions.springCloudFunction}")
