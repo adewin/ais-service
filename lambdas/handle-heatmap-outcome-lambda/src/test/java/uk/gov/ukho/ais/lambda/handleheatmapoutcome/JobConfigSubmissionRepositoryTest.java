@@ -36,6 +36,7 @@ public class JobConfigSubmissionRepositoryTest {
   private final String jobSubmissionBucket = "test-bucket";
   private final StepFunctionOutput stepFunctionOutput =
       new StepFunctionOutput(
+          "2345",
           StepFunctionOutcome.SUCCESS,
           "s3://bucket/test.json",
           Option.of(JobConfig.empty()),

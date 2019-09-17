@@ -8,6 +8,7 @@ import uk.gov.ukho.ais.lambda.heatmap.job.model.validation.ValidationResult;
 public class HeatmapRequestOutcome {
 
   private final String jobConfigFile;
+  private final String executionId;
   private final Option<ValidationResult> jobConfig;
   private final Option<Object> validationFailure;
   private final Option<Object> heatmapGenerationFailure;
@@ -18,6 +19,7 @@ public class HeatmapRequestOutcome {
 
   @JsonCreator
   public HeatmapRequestOutcome(
+      @JsonProperty("executionId") final String executionId,
       @JsonProperty("jobConfigFile") final String jobConfigFile,
       @JsonProperty("jobConfig") final ValidationResult jobConfig,
       @JsonProperty("create6hr30kmHeatmap") final Object create6hr30kmHeatmap,
@@ -27,6 +29,7 @@ public class HeatmapRequestOutcome {
       @JsonProperty("heatmapGenerationFailure") final Object heatmapGenerationFailure,
       @JsonProperty("heatmapAggregationFailure") final Object heatmapAggregationFailure) {
     this.jobConfigFile = jobConfigFile;
+    this.executionId = executionId;
     this.jobConfig = Option.ofNullable(jobConfig);
     this.validationFailure = Option.ofNullable(validationFailure);
     this.heatmapGenerationFailure = Option.ofNullable(heatmapGenerationFailure);
@@ -66,5 +69,9 @@ public class HeatmapRequestOutcome {
 
   public Option<Object> getHeatmapAggregation() {
     return heatmapAggregation;
+  }
+
+  public String getExecutionId() {
+    return executionId;
   }
 }

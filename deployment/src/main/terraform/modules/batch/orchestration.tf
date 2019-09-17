@@ -35,7 +35,11 @@ resource aws_sfn_state_machine batch_heatmap_step_fn {
         "ErrorEquals": ["States.ALL"],
         "ResultPath": "$.validationFailure",
         "Next": "Complete"
-      }]
+      }],
+      "Parameters": {
+        "jobConfigFile.$": "$.jobConfigFile",
+        "executionId.$": "$$.Execution.Id"
+      }
     },
     "Is Valid Request": {
       "Type": "Choice",

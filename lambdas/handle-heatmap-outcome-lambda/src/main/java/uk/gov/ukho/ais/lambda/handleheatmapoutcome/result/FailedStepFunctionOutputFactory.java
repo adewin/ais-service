@@ -50,6 +50,7 @@ public class FailedStepFunctionOutputFactory {
             : Either.right(determineErrorForNonValidationFailure(heatmapRequestOutcome));
 
     return new StepFunctionOutput(
+        heatmapRequestOutcome.getExecutionId(),
         StepFunctionOutcome.FAILED,
         heatmapRequestOutcome.getJobConfigFile(),
         heatmapRequestOutcome.getJobConfig().map(ValidationResult::getData).orElse(Option.none()),

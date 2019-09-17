@@ -25,6 +25,7 @@ public class StepFunctionS3ObjectKeyServiceTest {
           final String inputFileBaseName = "test-conf";
           final StepFunctionOutput stepFunctionOutput =
               new StepFunctionOutput(
+                  "2dda",
                   StepFunctionOutcome.SUCCESS,
                   "s3://test-bucket/submit/" + inputFileBaseName + ".json",
                   Option.of(JobConfig.empty()),

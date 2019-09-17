@@ -33,6 +33,7 @@ public class OutcomeHandlingFunctionTest {
 
   private final HeatmapRequestOutcome heatmapRequestOutcome =
       new HeatmapRequestOutcome(
+          "55336",
           "s3://bucket/file",
           new ValidationResult(Option.of(JobConfig.empty()), Collections.emptyList()),
           new Object(),
@@ -44,6 +45,7 @@ public class OutcomeHandlingFunctionTest {
 
   private final StepFunctionOutput stepFunctionOutput =
       new StepFunctionOutput(
+          "1234",
           StepFunctionOutcome.SUCCESS,
           "s3://bucket/file",
           Option.of(JobConfig.empty()),

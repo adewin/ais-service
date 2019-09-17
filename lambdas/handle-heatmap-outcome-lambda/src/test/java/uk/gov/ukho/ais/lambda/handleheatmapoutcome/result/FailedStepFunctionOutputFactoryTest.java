@@ -25,6 +25,7 @@ public class FailedStepFunctionOutputFactoryTest {
 
   private final HeatmapRequestOutcome successfulOutcome =
       new HeatmapRequestOutcome(
+          "56365",
           "s3://test/submit/jobconf.json",
           new ValidationResult(Option.of(JobConfig.empty()), Collections.emptyList()),
           new Object(),
@@ -36,6 +37,7 @@ public class FailedStepFunctionOutputFactoryTest {
 
   private final HeatmapRequestOutcome failedValidation =
       new HeatmapRequestOutcome(
+          "3563465",
           "s3://bucket/file",
           new ValidationResult(Option.none(), Collections.singletonList(jobConfigDoesNotExist)),
           null,
@@ -47,9 +49,10 @@ public class FailedStepFunctionOutputFactoryTest {
 
   private final HeatmapRequestOutcome couldNotPerformValidation =
       new HeatmapRequestOutcome(
-          "s3://bucket/file", null, null, null, null, "Could not run validation", null, null);
+          "", "s3://bucket/file", null, null, null, null, "Could not run validation", null, null);
   private final HeatmapRequestOutcome failedGeneratingHeatmap =
       new HeatmapRequestOutcome(
+          "",
           "s3://bucket/file",
           new ValidationResult(Option.of(JobConfig.empty()), Collections.emptyList()),
           null,
@@ -61,6 +64,7 @@ public class FailedStepFunctionOutputFactoryTest {
 
   private final HeatmapRequestOutcome failedAggregatingHeatmaps =
       new HeatmapRequestOutcome(
+          "",
           "s3://bucket/file",
           new ValidationResult(Option.of(JobConfig.empty()), Collections.emptyList()),
           null,

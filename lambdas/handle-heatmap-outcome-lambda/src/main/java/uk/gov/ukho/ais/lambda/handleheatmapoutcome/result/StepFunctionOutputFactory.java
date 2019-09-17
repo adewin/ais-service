@@ -31,6 +31,7 @@ public class StepFunctionOutputFactory {
 
   private StepFunctionOutput createSucceededResult(final HeatmapRequestOutcome succeeded) {
     return new StepFunctionOutput(
+        succeeded.getExecutionId(),
         StepFunctionOutcome.SUCCESS,
         succeeded.getJobConfigFile(),
         succeeded.getJobConfig().map(ValidationResult::getData).orElse(Option.none()),

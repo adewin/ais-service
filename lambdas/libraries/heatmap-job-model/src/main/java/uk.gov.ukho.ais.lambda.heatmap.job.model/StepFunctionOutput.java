@@ -11,20 +11,23 @@ public class StepFunctionOutput {
 
   private final Option<JobConfig> processedJobConfig;
   private final String inputS3Uri;
+  private final String executionId;
   private final StepFunctionOutcome stepFunctionOutcome;
   private final Option<String> failureReason;
   private final Option<Either<List<ValidationFailure>, Object>> error;
 
   @JsonCreator
   public StepFunctionOutput(
-      @JsonProperty("stepFunctionOutcome") StepFunctionOutcome stepFunctionOutcome,
-      @JsonProperty("inputS3Uri") String inputS3Uri,
-      @JsonProperty("processedJobConfig") Option<JobConfig> processedJobConfig,
-      @JsonProperty("failureReason") Option<String> failureReason,
-      @JsonProperty("error") Option<Either<List<ValidationFailure>, Object>> error) {
+      @JsonProperty("executionId") final String executionId,
+      @JsonProperty("stepFunctionOutcome") final StepFunctionOutcome stepFunctionOutcome,
+      @JsonProperty("inputS3Uri") final String inputS3Uri,
+      @JsonProperty("processedJobConfig") final Option<JobConfig> processedJobConfig,
+      @JsonProperty("failureReason") final Option<String> failureReason,
+      @JsonProperty("error") final Option<Either<List<ValidationFailure>, Object>> error) {
     this.processedJobConfig = processedJobConfig;
     this.inputS3Uri = inputS3Uri;
     this.stepFunctionOutcome = stepFunctionOutcome;
+    this.executionId = executionId;
     this.failureReason = failureReason;
     this.error = error;
   }
@@ -47,5 +50,9 @@ public class StepFunctionOutput {
 
   public Option<Either<List<ValidationFailure>, Object>> getError() {
     return error;
+  }
+
+  public String getExecutionId() {
+    return executionId;
   }
 }

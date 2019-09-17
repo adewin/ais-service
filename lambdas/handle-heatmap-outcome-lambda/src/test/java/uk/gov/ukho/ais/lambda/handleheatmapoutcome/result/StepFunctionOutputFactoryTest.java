@@ -24,6 +24,7 @@ import uk.gov.ukho.ais.lambda.heatmap.job.model.validation.ValidationResult;
 public class StepFunctionOutputFactoryTest {
   private final HeatmapRequestOutcome successfulRequest =
       new HeatmapRequestOutcome(
+          "",
           "s3://test/submit/jobconf.json",
           new ValidationResult(Option.of(JobConfig.empty()), Collections.emptyList()),
           new Object(),
@@ -34,6 +35,7 @@ public class StepFunctionOutputFactoryTest {
           null);
   private final HeatmapRequestOutcome failedValidationRequest =
       new HeatmapRequestOutcome(
+          "",
           "s3://test/submit/jobconf.json",
           new ValidationResult(
               Option.none(),
@@ -122,6 +124,7 @@ public class StepFunctionOutputFactoryTest {
         softly -> {
           final StepFunctionOutput failedOutput =
               new StepFunctionOutput(
+                  "abc",
                   StepFunctionOutcome.FAILED,
                   "s3://buck/1.json",
                   Option.none(),
