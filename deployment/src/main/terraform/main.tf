@@ -70,6 +70,7 @@ module functions {
   heatmap_sql_store_name               = data.external.secrets.result["heatmap_sql_archive_store"]
   validate_job_config_jar              = var.VALIDATE_JOB_CONFIG_LAMBDA_JAR_PATH
   handle_heatmap_outcome_function_jar  = var.HANDLE_HEATMAP_OUTCOME_LAMBDA_JAR_PATH
+  ais_sql_ingest_function_jar          = var.INGEST_SQL_FILE_LAMBDA_JAR_PATH
 }
 
 module batch {

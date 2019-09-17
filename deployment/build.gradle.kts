@@ -24,6 +24,7 @@ configure<TerraformExtension> {
     val processStaticDataDistZipTask = tasks.getByPath(":lambdas:process_new_static_file:pythonDistZip")
     val validateJobConfigLambdaShadowJarTask = tasks.getByPath(":lambdas:validate-new-job-config-lambda:shadowJar")
     val invokeStepFunctionLambdaShadowJarTask = tasks.getByPath(":lambdas:invoke-step-function-lambda:shadowJar")
+    val ingestSqlFileLambdaShadowJarTask = tasks.getByPath(":lambdas:ingest-sql-file:shadowJar")
     val handleHeatmapOutcomeLambdaShadowJarTask = tasks.getByPath(":lambdas:handle-heatmap-outcome-lambda:shadowJar")
 
     dependsOn(ingestUploadFileLambdaShadowJarTask,
@@ -32,7 +33,8 @@ configure<TerraformExtension> {
             aisRawParititioningSparkJobShadowJarTask,
             invokeStepFunctionLambdaShadowJarTask,
             validateJobConfigLambdaShadowJarTask,
-            handleHeatmapOutcomeLambdaShadowJarTask)
+            handleHeatmapOutcomeLambdaShadowJarTask,
+            ingestSqlFileLambdaShadowJarTask)
 
     environmentVariables(
             "TF_VAR_DATA_FILE_FUNCTION_LAMBDA_JAR_PATH" to ingestUploadFileLambdaShadowJarTask.outputs.files.singleFile.absolutePath,
@@ -44,7 +46,8 @@ configure<TerraformExtension> {
             "TF_VAR_INVOKE_STEP_FUNCTION_LAMBDA_JAR_PATH" to invokeStepFunctionLambdaShadowJarTask.outputs.files.singleFile.absolutePath,
             "TF_VAR_HANDLE_HEATMAP_OUTCOME_LAMBDA_JAR_PATH" to handleHeatmapOutcomeLambdaShadowJarTask.outputs.files.singleFile.absolutePath,
             "TF_VAR_DOCKER_REGISTRY_URL" to System.getenv("DOCKER_REGISTRY_URL"),
-            "TF_VAR_PROJECT_VERSION" to project.version.toString()
+            "TF_VAR_PROJECT_VERSION" to project.version.toString(),
+            "TF_VAR_INGEST_SQL_FILE_LAMBDA_JAR_PATH" to ingestSqlFileLambdaShadowJarTask.outputs.files.singleFile.absolutePath
     )
 }
 
