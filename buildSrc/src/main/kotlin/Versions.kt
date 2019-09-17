@@ -21,7 +21,6 @@ object Versions {
     const val springBoot = "2.1.6.RELEASE"
     const val commonsMath3 = "3.6.1"
     const val commonsCompress = "1.19"
-    const val commonsIO = "1.3.2"
     const val commonsLang = "3.6"
     const val cyclops = "10.3.3"
     const val athenaJdbcLib = "AthenaJDBC42_2.0.7.jar"

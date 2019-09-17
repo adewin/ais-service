@@ -20,7 +20,7 @@ class AisRepository(val dataSource: DataSource)(implicit config: Config) {
       inputFiles: Seq[String]): Seq[(Int, Int)] = {
     val connection: Connection = dataSource.getConnection()
 
-    val sql =
+    val sqlStatement: PreparedStatement = connection.prepareStatement(
       s"""
          |SELECT DISTINCT year, month FROM "${config.database}"."${config.table}"
          |WHERE input_ais_data_file = '${inputFiles.head}'
@@ -28,9 +28,7 @@ class AisRepository(val dataSource: DataSource)(implicit config: Config) {
         .map { file =>
           s"OR input_ais_data_file = '$file'"
         }
-        .mkString("\n")
-
-    val sqlStatement: PreparedStatement = connection.prepareStatement(sql)
+        .mkString("\n"))
 
     val results: ResultSet = sqlStatement.executeQuery()
 

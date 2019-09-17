@@ -14,7 +14,7 @@ dependencies {
     implementation("org.locationtech.geotrellis:geotrellis-spark_${Versions.scalaCompat}:${Versions.geotrellis}")
     implementation("org.locationtech.geotrellis:geotrellis-s3_${Versions.scalaCompat}:${Versions.geotrellis}")
     implementation("software.amazon.awssdk:s3:${Versions.awsSdk}")
-    implementation("org.apache.commons:commons-io:${Versions.commonsIO}")
+    implementation("org.apache.commons:commons-io:${Versions.commonsIo}")
     testImplementation("junit:junit:${Versions.junit}")
     testImplementation("org.assertj:assertj-core:${Versions.assertJ}")
     testImplementation("org.apache.commons:commons-math3:${Versions.commonsMath3}")

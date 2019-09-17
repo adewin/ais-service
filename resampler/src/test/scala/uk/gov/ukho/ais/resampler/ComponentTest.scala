@@ -89,6 +89,10 @@ class ComponentTest {
         .map(filename =>
           Paths.get(tempDir.getRoot.getAbsolutePath, filename).toString)
 
+      filePath match {
+        case Some(filePath) => softly.fail(s"csv should not exist: $filePath")
+        case None           =>
+      }
     }
 
   @Test
