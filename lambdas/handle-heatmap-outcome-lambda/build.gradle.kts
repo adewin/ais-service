@@ -38,7 +38,7 @@ dependencies {
     implementation("com.oath.cyclops:cyclops:${Versions.cyclops}")
     implementation("com.oath.cyclops:cyclops-jackson-integration:${Versions.cyclops}")
     implementation("org.apache.commons:commons-lang3:${Versions.commonsLang}")
-    implementation("org.apache.commons:commons-io:${Versions.commonsIO}")
+    implementation("org.apache.commons:commons-io:${Versions.commonsIo}")
 
     testImplementation("junit:junit:${Versions.junit}")
     testImplementation("org.assertj:assertj-core:${Versions.assertJ}")

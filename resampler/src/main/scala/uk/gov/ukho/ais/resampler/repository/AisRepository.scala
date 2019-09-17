@@ -17,23 +17,25 @@ class AisRepository(val dataSource: DataSource)(implicit config: Config) {
   val DEFAULT_NUMBER_OF_BUCKETS: Int = 31
 
   def getDistinctYearAndMonthPairsForFiles(
-                                            inputFiles: Seq[String]): Seq[(Int, Int)] = {
+      inputFiles: Seq[String]): Seq[(Int, Int)] = {
     val connection: Connection = dataSource.getConnection()
 
-    val sqlStatement: PreparedStatement = connection.prepareStatement(
-      """
+    val sqlStatement: PreparedStatement =
+      connection.prepareStatement("""
         |SELECT DISTINCT year, month FROM ?
         |WHERE input_ais_data_file in (?)
       """.stripMargin)
 
     sqlStatement.setString(1, s"${config.database}.${config.table}")
-    sqlStatement.setArray(2, connection.createArrayOf("VARCHAR", inputFiles.toArray))
+    sqlStatement.setArray(
+      2,
+      connection.createArrayOf("VARCHAR", inputFiles.toArray))
 
     val results: ResultSet = sqlStatement.executeQuery()
 
     Iterator
       .continually((results.getInt("year"), results.getInt("month")))
-      .takeWhile( _ => results.next())
+      .takeWhile(_ => results.next())
       .toSeq
   }
 
@@ -49,8 +51,7 @@ class AisRepository(val dataSource: DataSource)(implicit config: Config) {
 
         mutable.Queue(
           (0 until DEFAULT_NUMBER_OF_BUCKETS)
-            .map(bucket =>
-              s"""
+            .map(bucket => s"""
                  |SELECT *
                  |FROM "${config.database}"."${config.table}"
                  |WHERE (
