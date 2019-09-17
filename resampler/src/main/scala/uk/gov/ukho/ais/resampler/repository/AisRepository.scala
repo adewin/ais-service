@@ -17,27 +17,24 @@ class AisRepository(val dataSource: DataSource)(implicit config: Config) {
   val DEFAULT_NUMBER_OF_BUCKETS: Int = 31
 
   def getDistinctYearAndMonthPairsForFiles(
-      inputFiles: Seq[String]): Seq[(Int, Int)] = {
+                                            inputFiles: Seq[String]): Seq[(Int, Int)] = {
     val connection: Connection = dataSource.getConnection()
 
     val sqlStatement: PreparedStatement = connection.prepareStatement(
-      s"""
-         |SELECT DISTINCT year, month FROM "${config.database}"."${config.table}"
-         |WHERE input_ais_data_file = '${inputFiles.head}'
-         """.stripMargin + inputFiles.tail
-        .map { file =>
-          s"OR input_ais_data_file = '$file'"
-        }
-        .mkString("\n"))
+      """
+        |SELECT DISTINCT year, month FROM ?
+        |WHERE input_ais_data_file in (?)
+      """.stripMargin)
+
+    sqlStatement.setString(1, s"${config.database}.${config.table}")
+    sqlStatement.setArray(2, connection.createArrayOf("VARCHAR", inputFiles.toArray))
 
     val results: ResultSet = sqlStatement.executeQuery()
 
-    new Iterator[(Int, Int)] {
-      override def hasNext: Boolean = results.next()
-
-      override def next(): (Int, Int) =
-        (results.getInt("year"), results.getInt("month"))
-    }.toSeq // TODO: !!!
+    Iterator
+      .continually((results.getInt("year"), results.getInt("month")))
+      .takeWhile( _ => results.next())
+      .toSeq
   }
 
   def getFilteredPingsByDate(year: Int, month: Int): Iterator[Ping] =
@@ -52,7 +49,8 @@ class AisRepository(val dataSource: DataSource)(implicit config: Config) {
 
         mutable.Queue(
           (0 until DEFAULT_NUMBER_OF_BUCKETS)
-            .map(bucket => s"""
+            .map(bucket =>
+              s"""
                  |SELECT *
                  |FROM "${config.database}"."${config.table}"
                  |WHERE (

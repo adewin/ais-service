@@ -272,8 +272,8 @@ class ComponentTest {
       softly
         .assertThat(preparedStatementIterator.next())
         .startsWith(s"""
-             |SELECT DISTINCT year, month FROM "database"."table"
-             |WHERE input_ais_data_file = '${config.inputFiles.head}'
+             |SELECT DISTINCT year, month FROM ?
+             |WHERE input_ais_data_file in (?)
              |""".stripMargin)
 
       softly
