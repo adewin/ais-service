@@ -1,1 +1,0 @@
-WHERE Oll is King
