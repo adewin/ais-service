@@ -176,13 +176,12 @@ public class HeatmapUserJourneyTest {
       keys.addAll(
           listObjectsV2Result.getObjectSummaries().stream()
               .map(S3ObjectSummary::getKey)
+              .filter(key -> key.contains("/input-file-name=" + jobConfigFileName + "/"))
               .collect(Collectors.toList()));
 
     } while (listObjectsV2Result.isTruncated());
 
-    return keys.stream()
-        .filter(key -> key.contains("/input-file-name=" + jobConfigFileName + "/"))
-        .collect(Collectors.toList());
+    return keys;
   }
 
   private boolean hasOutcomeFileFor(final String jobConfigFileName) {
