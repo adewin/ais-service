@@ -9,7 +9,7 @@ class JobConfigOutputCreator {
 
   static JobConfig createOutputJobConfig(final HeatmapRequestOutcome heatmapRequestOutcome) {
     return heatmapRequestOutcome
-        .getJobConfig()
+        .getValidationResult()
         .map(ValidationResult::getJobConfig)
         .map(jobConfig -> jobConfig.withFilterSqlFile(sqlFileName(jobConfig.getFilterSqlFile())))
         .orElse(null);
