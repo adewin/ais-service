@@ -5,12 +5,11 @@ import java.time.format.DateTimeFormatter
 import java.time.{Instant, ZoneId}
 import java.util.Locale
 
+import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.s3.model.PutObjectRequest
-import com.amazonaws.services.s3.{AmazonS3, AmazonS3ClientBuilder}
 import geotrellis.proj4.CRS
 import geotrellis.raster.io.geotiff.GeoTiff
 import geotrellis.raster.io.geotiff.writer.GeoTiffWriter
-import geotrellis.raster.render.{ColorMap, ColorRamps}
 import geotrellis.raster.{IntArrayTile, RasterExtent}
 import uk.gov.ukho.ais.heatmaps.generator.Config
 import uk.gov.ukho.ais.heatmaps.generator.service.GeoTiffS3KeyService
@@ -27,9 +26,6 @@ object GeoTiffRepository {
       implicit config: Config,
       s3Client: AmazonS3): Unit = {
     val (rasterExtent, rasterMatrix) = raster
-
-    val cm =
-      ColorMap.fromQuantileBreaks(rasterMatrix.histogram, ColorRamps.BlueToRed)
 
     val filename = generateFilename(config.outputFilePrefix)
     val directory =

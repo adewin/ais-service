@@ -59,7 +59,7 @@ object Resampler {
     }
 
   private def shouldInterpolateBetweenPings(prevPing: Ping, currPing: Ping)(
-      implicit config: Config) = {
+      implicit config: Config): Boolean = {
     isTimeBetweenPingsWithinThreshold(
       prevPing,
       currPing,
@@ -68,7 +68,13 @@ object Resampler {
       prevPing,
       currPing,
       config.interpolationDistanceThresholdMeters) &&
+    isTimeBetweenPingsGreaterThanTimeStep(prevPing, currPing) &&
     prevPing.mmsi == currPing.mmsi
+  }
+
+  private def isTimeBetweenPingsGreaterThanTimeStep(prevPing: Ping,
+                                                    currPing: Ping): Boolean = {
+    currPing.acquisitionTime.getTime - prevPing.acquisitionTime.getTime > TIME_STEP
   }
 
   private def isDistanceBetweenPingsWithinThreshold(

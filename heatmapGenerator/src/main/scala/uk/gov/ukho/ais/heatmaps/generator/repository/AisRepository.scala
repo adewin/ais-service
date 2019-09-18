@@ -22,7 +22,7 @@ class AisRepository(val dataSource: DataSource) {
       val connection: Connection = dataSource.getConnection()
       var bucket: Int = 1
 
-      private val sqlStatements: mutable.Queue[PreparedStatement] = {
+      val sqlStatements: mutable.Queue[PreparedStatement] = {
         val (nextYear, nextMonth) = getNextMonth(year, month)
         val (prevYear, prevMonth, prevDay) =
           getLastDayOfPreviousMonth(year, month)
@@ -48,7 +48,7 @@ class AisRepository(val dataSource: DataSource) {
 
       var results: ResultSet = sqlStatements.dequeue().executeQuery()
 
-      private var _hasNext: Boolean = results.next()
+      var _hasNext: Boolean = results.next()
 
       override def hasNext: Boolean = {
         if (!_hasNext) {

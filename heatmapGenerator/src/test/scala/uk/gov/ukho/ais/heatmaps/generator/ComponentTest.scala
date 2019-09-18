@@ -82,11 +82,11 @@ class ComponentTest {
 
       setDataReturnedFromDataSource(
         ("123", 10, 179.9, -89.9),
-        ("456", 20, -179.9, 89.9),
-        ("789", 30, 0, 0),
-        ("234", 40, 179.9, 89.9),
-        ("567", 50, -179.9, -89.9),
-        ("890", 60, 179.9, -89.9)
+        ("123", 20, -179.9, 89.9),
+        ("123", 30, 0, 0),
+        ("123", 40, 179.9, 89.9),
+        ("123", 50, -179.9, -89.9),
+        ("123", 60, 179.9, -89.9)
       )
 
       HeatmapOrchestrator.orchestrateHeatmapGeneration(datasourceMock)
@@ -131,7 +131,8 @@ class ComponentTest {
     }
 
   @Test
-  def whenGivenASetOfPingsThenPingsCorrectlyInterpolated(): Unit =
+  def whenGivenASetOfPingsWithLastPingsWithin3MinTimeStepThenPingsCorrectlyInterpolated()
+    : Unit =
     SoftAssertions.assertSoftly { softly =>
       implicit val config: Config = testConfig.copy(
         interpolationTimeThresholdMilliseconds = DEFAULT_INTERPOLATION_TIME,
@@ -141,8 +142,9 @@ class ComponentTest {
         ("123456793", 0, -1.216151956, 50.77512703),
         ("123456793", 60 * 6, -1.198185651, 50.78648692),
         ("123456793", 60 * 12, -1.180219345, 50.77512703),
-        ("123456793", 60 * 13, -1.180202123, 50.77235519),
-        ("123456793", 60 * 15, -1.180219345, 50.76944604)
+        ("123456795", 60 * 10, -1.180219345, 50.76944604),
+        ("123456795", 60 * 20, -1.180219345, 50.76944604),
+        ("123456795", 60 * 21, -1.180218345, 50.76944604)
       )
 
       HeatmapOrchestrator.orchestrateHeatmapGeneration(datasourceMock)
