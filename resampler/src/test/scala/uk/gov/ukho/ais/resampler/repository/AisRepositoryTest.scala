@@ -8,18 +8,20 @@ import org.apache.commons.math3.util.Precision
 import org.assertj.core.api.SoftAssertions
 import org.junit.runner.RunWith
 import org.junit.{Before, Test}
-import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers._
+import org.mockito.IdiomaticMockito
 import org.mockito.Mockito._
+import org.mockito.captor.ArgCaptor
 import org.mockito.junit.MockitoJUnitRunner
 import uk.gov.ukho.ais.resampler.Config
+import uk.gov.ukho.ais.resampler.repository.AisRepository._
 import uk.gov.ukho.ais.resampler.utility.TestPingCreator.ping
 import uk.gov.ukho.ais.resampler.utility.TimeUtilities.makeTimestamp
 
 import scala.collection.JavaConverters._
 
 @RunWith(classOf[MockitoJUnitRunner])
-class AisRepositoryTest {
+class AisRepositoryTest extends IdiomaticMockito {
   val DOUBLE_COMPARISON_PRECISION: Double = 0.00000001
 
   private val doubleComparator: Comparator[Double] =
@@ -31,45 +33,39 @@ class AisRepositoryTest {
     table = "table"
   )
 
-  val datasourceMock: DataSource = mock(classOf[DataSource])
-  val connectionMock: Connection = mock(classOf[Connection])
-  val preparedStatementMock: PreparedStatement = mock(
-    classOf[PreparedStatement])
-  val resultSetMock: ResultSet = mock(classOf[ResultSet])
-  var aisRepository: AisRepository = _
+  val dataSourceMock: DataSource = mock[DataSource]
+  val connectionMock: Connection = mock[Connection]
+  val preparedStatementMock: PreparedStatement = mock[PreparedStatement]
+  val resultSetMock: ResultSet = mock[ResultSet]
 
   @Before
   def setup(): Unit = {
-    aisRepository = new AisRepository(datasourceMock)
+    dataSourceMock.getConnection() returns connectionMock
+    connectionMock.prepareStatement(any[String]) returns preparedStatementMock
+    preparedStatementMock.executeQuery() returns resultSetMock
 
-    when(datasourceMock.getConnection()).thenReturn(connectionMock)
-    when(connectionMock.prepareStatement(anyString()))
-      .thenReturn(preparedStatementMock)
-    when(preparedStatementMock.executeQuery()).thenReturn(resultSetMock)
-
-    when(resultSetMock.getString("arkposid")).thenReturn("arkposid")
-    when(resultSetMock.getString("vessel_class")).thenReturn("vessel_class")
+    resultSetMock.getString("arkposid") returns "arkposid"
+    resultSetMock.getString("vessel_class") returns "vessel_class"
     when(resultSetMock.getString("navigational_status"))
       .thenReturn("navigational_status")
-    when(resultSetMock.getString("rot")).thenReturn("rot")
-    when(resultSetMock.getString("sog")).thenReturn("sog")
-    when(resultSetMock.getString("cog")).thenReturn("cog")
-    when(resultSetMock.getString("true_heading")).thenReturn("true_heading")
-    when(resultSetMock.getString("altitude")).thenReturn("altitude")
+    resultSetMock.getString("rot") returns "rot"
+    resultSetMock.getString("sog") returns "sog"
+    resultSetMock.getString("cog") returns "cog"
+    resultSetMock.getString("true_heading") returns "true_heading"
+    resultSetMock.getString("altitude") returns "altitude"
     when(resultSetMock.getString("special_manoeuvre"))
       .thenReturn("special_manoeuvre")
-    when(resultSetMock.getString("radio_status")).thenReturn("radio_status")
-    when(resultSetMock.getString("flags")).thenReturn("flags")
-    when(resultSetMock.getString("input_ais_data_file"))
-      .thenReturn("input_ais_data_file")
+    resultSetMock.getString("radio_status") returns "radio_status"
+    resultSetMock.getString("flags") returns "flags"
+    resultSetMock.getString("input_ais_data_file") returns "input_ais_data_file"
   }
 
   @Test
   def whenGetPingsWithDateOutOfRangeThenEmptySeqReturned(): Unit =
     SoftAssertions.assertSoftly { softly =>
-      when(resultSetMock.next()).thenReturn(false)
+      resultSetMock.next() returns false
 
-      val results = aisRepository.getFilteredPingsByDate(2018, 1)
+      val results = dataSourceMock.getFilteredPingsByDate(2018, 1)
 
       softly.assertThat(results.asJava).isEmpty()
     }
@@ -94,7 +90,7 @@ class AisRepositoryTest {
       when(resultSetMock.getDouble("lon")).thenReturn(1.1, 3.3, 5.5)
       when(resultSetMock.getDouble("lat")).thenReturn(2.2, 4.4, 6.6)
 
-      val results = aisRepository.getFilteredPingsByDate(2019, 1)
+      val results = dataSourceMock.getFilteredPingsByDate(2019, 1)
 
       softly
         .assertThat(results.asJava)
@@ -106,20 +102,17 @@ class AisRepositoryTest {
   @Test
   def whenFilterStatementAppliedThenTheFilterStatementIsIncludedAsSubQuery()
     : Unit = SoftAssertions.assertSoftly { softly =>
-    when(resultSetMock.next()).thenReturn(false)
+    resultSetMock.next() returns false
 
-    val results = aisRepository.getFilteredPingsByDate(2018, 1)
+    val results = dataSourceMock.getFilteredPingsByDate(2018, 1)
 
     softly.assertThat(results.asJava).isEmpty()
 
-    val preparedStatementArgCaptor: ArgumentCaptor[String] =
-      ArgumentCaptor.forClass(classOf[String])
-
-    verify(connectionMock, times(31))
-      .prepareStatement(preparedStatementArgCaptor.capture())
+    val captor = ArgCaptor[String]
+    connectionMock.prepareStatement(captor) wasCalled 31.times
 
     softly
-      .assertThat(preparedStatementArgCaptor.getAllValues.iterator())
+      .assertThat(captor.values.iterator.asJava)
       .allMatch { sqlStatement =>
         sqlStatement.startsWith("""
             |SELECT *
@@ -137,7 +130,7 @@ class AisRepositoryTest {
       when(resultSetMock.next()).thenReturn(false)
 
       val months =
-        aisRepository.getDistinctYearAndMonthPairsForFiles(Seq("i-dont-exist"))
+        dataSourceMock.getDistinctYearAndMonthPairsForFiles(Seq("i-dont-exist"))
 
       softly.assertThat(months.size).isEqualTo(0)
     }
@@ -153,7 +146,7 @@ class AisRepositoryTest {
       when(resultSetMock.getInt("month"))
         .thenReturn(months.head, months.tail: _*)
 
-      val results = aisRepository.getDistinctYearAndMonthPairsForFiles(Seq(""))
+      val results = dataSourceMock.getDistinctYearAndMonthPairsForFiles(Seq(""))
 
       softly
         .assertThat(results.iterator.asJava)

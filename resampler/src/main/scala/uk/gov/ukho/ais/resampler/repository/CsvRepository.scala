@@ -55,7 +55,7 @@ object CsvRepository {
     val filePath = s"$directory/$fileName.csv.bz2"
     val file = new File(filePath)
 
-    val pbzip2 = new ProcessBuilder("/bin/bash",
+    val pbzip2 = new ProcessBuilder("/bin/sh",
                                     "-c",
                                     s"pbzip2 -c > ${file.getAbsolutePath}")
       .start()

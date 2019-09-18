@@ -12,108 +12,111 @@ import uk.gov.ukho.ais.resampler.utility.TimeUtilities.{
 
 import scala.collection.mutable
 
-class AisRepository(val dataSource: DataSource)(implicit config: Config) {
+object AisRepository {
+
   val FETCH_BUFFER_SIZE_ONE_MILLION: Int = 1000000
   val DEFAULT_NUMBER_OF_BUCKETS: Int = 31
 
-  def getDistinctYearAndMonthPairsForFiles(
-      inputFiles: Seq[String]): Seq[(Int, Int)] = {
-    val connection: Connection = dataSource.getConnection()
+  implicit class AisDataSource(val dataSource: DataSource)(
+      implicit config: Config) {
+    def getDistinctYearAndMonthPairsForFiles(
+        inputFiles: Seq[String]): Seq[(Int, Int)] = {
+      val connection: Connection = dataSource.getConnection()
 
-    val sqlStatement: PreparedStatement =
-      connection.prepareStatement("""
-        |SELECT DISTINCT year, month FROM ?
-        |WHERE input_ais_data_file in (?)
+      val sqlStatement: PreparedStatement =
+        connection.prepareStatement("""
+                                      |SELECT DISTINCT year, month FROM ?
+                                      |WHERE input_ais_data_file in (?)
       """.stripMargin)
 
-    sqlStatement.setString(1, s"${config.database}.${config.table}")
-    sqlStatement.setArray(
-      2,
-      connection.createArrayOf("VARCHAR", inputFiles.toArray))
+      sqlStatement.setString(1, s"${config.database}.${config.table}")
+      sqlStatement.setArray(
+        2,
+        connection.createArrayOf("VARCHAR", inputFiles.toArray))
 
-    val results: ResultSet = sqlStatement.executeQuery()
+      val results: ResultSet = sqlStatement.executeQuery()
 
-    Iterator
-      .continually((results.getInt("year"), results.getInt("month")))
-      .takeWhile(_ => results.next())
-      .toSeq
-  }
+      Iterator
+        .continually((results.getInt("year"), results.getInt("month")))
+        .takeWhile(_ => results.next())
+        .toSeq
+    }
 
-  def getFilteredPingsByDate(year: Int, month: Int): Iterator[Ping] =
-    new Iterator[Ping] {
-      val connection: Connection = dataSource.getConnection()
-      var bucket: Int = 1
+    def getFilteredPingsByDate(year: Int, month: Int): Iterator[Ping] =
+      new Iterator[Ping] {
+        val connection: Connection = dataSource.getConnection()
+        var bucket: Int = 1
 
-      private val sqlStatements: mutable.Queue[PreparedStatement] = {
-        val (nextYear, nextMonth) = getNextMonth(year, month)
-        val (prevYear, prevMonth, prevDay) =
-          getLastDayOfPreviousMonth(year, month)
+        private val sqlStatements: mutable.Queue[PreparedStatement] = {
+          val (nextYear, nextMonth) = getNextMonth(year, month)
+          val (prevYear, prevMonth, prevDay) =
+            getLastDayOfPreviousMonth(year, month)
 
-        mutable.Queue(
-          (0 until DEFAULT_NUMBER_OF_BUCKETS)
+          mutable.Queue((0 until DEFAULT_NUMBER_OF_BUCKETS)
             .map(bucket => s"""
-                 |SELECT *
-                 |FROM "${config.database}"."${config.table}"
-                 |WHERE (
-                 |(year = $year AND month = $month)
-                 |OR (year = $nextYear AND month = $nextMonth AND day=1)
-                 |OR (year = $prevYear AND month = $prevMonth AND day=$prevDay)
-                 |)
-                 |AND mod(cast(mmsi as integer), $DEFAULT_NUMBER_OF_BUCKETS) = $bucket
-                 |ORDER BY mmsi, acquisition_time
+                                |SELECT *
+                                |FROM "${config.database}"."${config.table}"
+                                |WHERE (
+                                |(year = $year AND month = $month)
+                                |OR (year = $nextYear AND month = $nextMonth AND day=1)
+                                |OR (year = $prevYear AND month = $prevMonth AND day=$prevDay)
+                                |)
+                                |AND mod(cast(mmsi as integer), $DEFAULT_NUMBER_OF_BUCKETS) = $bucket
+                                |ORDER BY mmsi, acquisition_time
               """.stripMargin)
             .map(sqlStatement => connection.prepareStatement(sqlStatement)): _*)
-      }
-
-      println(
-        s"prepared SQL statement for year $year, month $month " +
-          s"(bucket $bucket of $DEFAULT_NUMBER_OF_BUCKETS)")
-
-      var results: ResultSet = sqlStatements.dequeue().executeQuery()
-
-      private var _hasNext: Boolean = results.next()
-
-      override def hasNext: Boolean = {
-        if (!_hasNext) {
-          connection.close()
         }
 
-        _hasNext
-      }
+        println(
+          s"prepared SQL statement for year $year, month $month " +
+            s"(bucket $bucket of $DEFAULT_NUMBER_OF_BUCKETS)")
 
-      override def next(): Ping = {
-        val ping = Ping(
-          results.getString("arkposid"),
-          results.getString("mmsi"),
-          results.getTimestamp("acquisition_time"),
-          results.getDouble("lon"),
-          results.getDouble("lat"),
-          results.getString("vessel_class"),
-          results.getInt("message_type_id"),
-          results.getString("navigational_status"),
-          results.getString("rot"),
-          results.getString("sog"),
-          results.getString("cog"),
-          results.getString("true_heading"),
-          results.getString("altitude"),
-          results.getString("special_manoeuvre"),
-          results.getString("radio_status"),
-          results.getString("flags"),
-          results.getString("input_ais_data_file")
-        )
+        var results: ResultSet = sqlStatements.dequeue().executeQuery()
 
-        _hasNext = results.next()
+        private var _hasNext: Boolean = results.next()
 
-        if (!_hasNext && sqlStatements.nonEmpty) {
-          println(
-            s"executing SQL query for year $year, month $month " +
-              s"(bucket $bucket of $DEFAULT_NUMBER_OF_BUCKETS)...")
-          bucket += 1
-          results = sqlStatements.dequeue().executeQuery()
+        override def hasNext: Boolean = {
+          if (!_hasNext) {
+            connection.close()
+          }
+
+          _hasNext
+        }
+
+        override def next(): Ping = {
+          val ping = Ping(
+            results.getString("arkposid"),
+            results.getString("mmsi"),
+            results.getTimestamp("acquisition_time"),
+            results.getDouble("lon"),
+            results.getDouble("lat"),
+            results.getString("vessel_class"),
+            results.getInt("message_type_id"),
+            results.getString("navigational_status"),
+            results.getString("rot"),
+            results.getString("sog"),
+            results.getString("cog"),
+            results.getString("true_heading"),
+            results.getString("altitude"),
+            results.getString("special_manoeuvre"),
+            results.getString("radio_status"),
+            results.getString("flags"),
+            results.getString("input_ais_data_file")
+          )
+
           _hasNext = results.next()
-        }
 
-        ping
+          if (!_hasNext && sqlStatements.nonEmpty) {
+            println(
+              s"executing SQL query for year $year, month $month " +
+                s"(bucket $bucket of $DEFAULT_NUMBER_OF_BUCKETS)...")
+            bucket += 1
+            results = sqlStatements.dequeue().executeQuery()
+            _hasNext = results.next()
+          }
+
+          ping
+        }
       }
-    }
+  }
 }

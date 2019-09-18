@@ -14,7 +14,7 @@ dependencies {
     implementation("com.github.scopt:scopt_${Versions.scalaCompat}:${Versions.scopt}")
     implementation("org.locationtech.geotrellis:geotrellis-spark_${Versions.scalaCompat}:${Versions.geotrellis}")
     implementation("org.locationtech.geotrellis:geotrellis-s3_${Versions.scalaCompat}:${Versions.geotrellis}")
-    implementation("software.amazon.awssdk:s3:${Versions.awsSdk}")
+    implementation("software.amazon.awssdk:s3:${Versions.awsS3Sdk}")
     implementation("org.apache.commons:commons-io:${Versions.commonsIo}")
     implementation("org.apache.commons:commons-compress:${Versions.commonsCompress}")
     testImplementation("junit:junit:${Versions.junit}")
@@ -37,8 +37,15 @@ application {
 }
 
 jib {
+    from {
+        image = "${System.getenv("DOCKER_REGISTRY_URL")}/ais-resampler-base"
+        auth {
+            username = System.getenv("DOCKER_REGISTRY_USERNAME")
+            password = System.getenv("DOCKER_REGISTRY_PASSWORD")
+        }
+    }
     to {
-        image = "${System.getenv("DOCKER_REGISTRY_URL")}/ais-generate-heatmaps"
+        image = "${System.getenv("DOCKER_REGISTRY_URL")}/ais-resampler"
         tags = setOf("latest", project.version.toString())
         auth {
             username = System.getenv("DOCKER_REGISTRY_USERNAME")

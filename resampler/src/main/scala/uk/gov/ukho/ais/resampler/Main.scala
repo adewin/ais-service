@@ -1,6 +1,7 @@
 package uk.gov.ukho.ais.resampler
 
 import com.amazonaws.services.s3.{AmazonS3, AmazonS3ClientBuilder}
+import javax.sql.DataSource
 import uk.gov.ukho.ais.resampler.service.AthenaDataSourceProvider
 
 object Main {
@@ -9,8 +10,8 @@ object Main {
     implicit val amazonS3: AmazonS3 = AmazonS3ClientBuilder.defaultClient()
     implicit val config: Config = ConfigParser.parse(args)
 
-    val source = AthenaDataSourceProvider.dataSource
+    implicit val dataSource: DataSource = AthenaDataSourceProvider.dataSource
 
-    ResamplerOrchestrator.orchestrateResampling(source)
+    ResamplerOrchestrator.orchestrateResampling()
   }
 }

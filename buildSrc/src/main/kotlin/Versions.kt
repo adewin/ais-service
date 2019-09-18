@@ -26,7 +26,7 @@ object Versions {
     const val cyclops = "10.3.3"
     const val athenaJdbcLib = "AthenaJDBC42_2.0.7.jar"
     const val awsJavaSdkCore = "1.11.610"
-    const val awsSdk = "2.7.26"
+    const val awsS3Sdk = "2.7.26"
 
     // Test dependencies
     const val junit = "4.12"

@@ -12,31 +12,28 @@ import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream
 import org.apache.commons.io.{FileUtils, FilenameUtils, IOUtils}
 import org.assertj.core.api.SoftAssertions
 import org.junit.rules.TemporaryFolder
-import org.junit.runner.RunWith
 import org.junit.{Before, Rule, Test}
-import org.mockito.ArgumentCaptor
-import org.mockito.ArgumentMatchers.anyString
+import org.mockito.ArgumentMatchers._
+import org.mockito.IdiomaticMockito
 import org.mockito.Mockito._
-import org.mockito.junit.MockitoJUnitRunner
+import org.mockito.captor.ArgCaptor
 import uk.gov.ukho.ais.resampler.FileUtilities.findGeneratedFiles
 import uk.gov.ukho.ais.resampler.utility.TimeUtilities.makeTimestamp
 
 import scala.collection.JavaConverters._
 
-@RunWith(classOf[MockitoJUnitRunner])
-class ComponentTest {
+class ComponentTest extends IdiomaticMockito {
 
   val _tempDir = new TemporaryFolder()
 
   @Rule
   def tempDir: TemporaryFolder = _tempDir
 
-  val datasourceMock: DataSource = mock(classOf[DataSource])
-  val connectionMock: Connection = mock(classOf[Connection])
-  val preparedStatementMock: PreparedStatement = mock(
-    classOf[PreparedStatement])
-  val resultSetMock: ResultSet = mock(classOf[ResultSet])
-  val pairResultSetMock: ResultSet = mock(classOf[ResultSet])
+  implicit val dataSourceMock: DataSource = mock[DataSource]
+  val connectionMock: Connection = mock[Connection]
+  val preparedStatementMock: PreparedStatement = mock[PreparedStatement]
+  val resultSetMock: ResultSet = mock[ResultSet]
+  val pairResultSetMock: ResultSet = mock[ResultSet]
 
   val filterQuery = "SELECT * FROM table"
 
@@ -46,7 +43,7 @@ class ComponentTest {
   private final val DEFAULT_INTERPOLATION_TIME = 6 * 60 * 60 * 1000
 
   private var testConfig: Config = _
-  private implicit val mockAmazonS3: AmazonS3 = mock(classOf[AmazonS3])
+  private implicit val mockAmazonS3: AmazonS3 = mock[AmazonS3]
 
   val baseYear = 2019
   val baseMonth = 1
@@ -55,11 +52,10 @@ class ComponentTest {
 
   @Before
   def setup(): Unit = {
-    when(datasourceMock.getConnection()).thenReturn(connectionMock)
-    when(connectionMock.prepareStatement(anyString()))
-      .thenReturn(preparedStatementMock)
-    when(preparedStatementMock.executeQuery())
-      .thenReturn(pairResultSetMock, resultSetMock)
+    dataSourceMock.getConnection() returns connectionMock
+    connectionMock.prepareStatement(any[String]) returns preparedStatementMock
+    preparedStatementMock
+      .executeQuery() returns pairResultSetMock andThen resultSetMock
 
     setYearAndMonthPairsReturnedFromDataSource(
       (baseYear, baseMonth)
@@ -82,7 +78,7 @@ class ComponentTest {
 
       setDataReturnedFromDataSource(Seq.empty)
 
-      ResamplerOrchestrator.orchestrateResampling(datasourceMock)
+      ResamplerOrchestrator.orchestrateResampling()
 
       val filePath = findGeneratedFiles(tempDir.getRoot.getAbsolutePath)
         .find(file => FilenameUtils.getExtension(file) == BZ2_EXTENSION)
@@ -129,7 +125,7 @@ class ComponentTest {
 
       setDataReturnedFromDataSource(expectedPings)
 
-      ResamplerOrchestrator.orchestrateResampling(datasourceMock)
+      ResamplerOrchestrator.orchestrateResampling()
 
       val filePath = findGeneratedFiles(tempDir.getRoot.getAbsolutePath)
         .find(file => FilenameUtils.getExtension(file) == BZ2_EXTENSION)
@@ -183,14 +179,16 @@ class ComponentTest {
 
       setDataReturnedFromDataSource(expectedPings)
 
-      ResamplerOrchestrator.orchestrateResampling(datasourceMock)
+      ResamplerOrchestrator.orchestrateResampling()
 
-      val filePath = findGeneratedFiles(tempDir.getRoot.getAbsolutePath)
-        .find(file => FilenameUtils.getExtension(file) == BZ2_EXTENSION)
+      val filePaths = findGeneratedFiles(tempDir.getRoot.getAbsolutePath)
+        .filter(file => FilenameUtils.getExtension(file) == BZ2_EXTENSION)
         .map(filename =>
           Paths.get(tempDir.getRoot.getAbsolutePath, filename).toString)
 
-      filePath match {
+      softly.assertThat(filePaths).hasSize(1)
+
+      filePaths.headOption match {
         case Some(filePath) =>
           val csv = openCsvFile(filePath)
 
@@ -224,7 +222,7 @@ class ComponentTest {
            50.77512703)
         ))
 
-      ResamplerOrchestrator.orchestrateResampling(datasourceMock)
+      ResamplerOrchestrator.orchestrateResampling()
 
       val filePath = findGeneratedFiles(tempDir.getRoot.getAbsolutePath)
         .find(file => FilenameUtils.getExtension(file) == BZ2_EXTENSION)
@@ -258,34 +256,27 @@ class ComponentTest {
           ("890", 60, 179.9, -89.9)
         ))
 
-      ResamplerOrchestrator.orchestrateResampling(datasourceMock)
+      ResamplerOrchestrator.orchestrateResampling()
 
-      val preparedStatementArgCaptor: ArgumentCaptor[String] =
-        ArgumentCaptor.forClass(classOf[String])
-
-      verify(connectionMock, times(32))
-        .prepareStatement(preparedStatementArgCaptor.capture())
-
-      val preparedStatementIterator =
-        preparedStatementArgCaptor.getAllValues.iterator()
+      val captor = ArgCaptor[String]
+      connectionMock.prepareStatement(captor) wasCalled 32.times
 
       softly
-        .assertThat(preparedStatementIterator.next())
+        .assertThat(captor.values.head)
         .startsWith(s"""
              |SELECT DISTINCT year, month FROM ?
              |WHERE input_ais_data_file in (?)
              |""".stripMargin)
 
       softly
-        .assertThat(preparedStatementIterator)
-        .allMatch { sqlStatement =>
-          sqlStatement.startsWith(s"""
+        .assertThat(captor.values.tail.iterator.asJava)
+        .allMatch(
+          _.startsWith(s"""
                |SELECT *
                |FROM "database"."table"
                |WHERE (
                |""".stripMargin)
-        }
-
+        )
     }
 
   private def openCsvFile(
@@ -297,8 +288,6 @@ class ComponentTest {
       .map(_.toString)
       .map(_.split("\t") match {
         case Array(_, mmsi, timestamp, lon, lat, _*) =>
-          println(timestamp)
-
           (mmsi,
            Timestamp
              .valueOf(timestamp)
@@ -346,7 +335,7 @@ class ComponentTest {
           .thenReturn(hasNext.head, hasNext.tail: _*)
           .thenReturn(false)
 
-      case _ => when(resultSetMock.next()).thenReturn(false)
+      case _ => resultSetMock.next() returns false
     }
   }
 

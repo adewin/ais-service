@@ -14,7 +14,7 @@ dependencies {
     implementation("com.github.scopt:scopt_${Versions.scalaCompat}:${Versions.scopt}")
     implementation("org.locationtech.geotrellis:geotrellis-spark_${Versions.scalaCompat}:${Versions.geotrellis}")
     implementation("org.locationtech.geotrellis:geotrellis-s3_${Versions.scalaCompat}:${Versions.geotrellis}")
-    implementation("software.amazon.awssdk:s3:${Versions.awsSdk}")
+    implementation("software.amazon.awssdk:s3:${Versions.awsS3Sdk}")
     implementation("org.apache.commons:commons-io:${Versions.commonsIo}")
     implementation("org.apache.commons:commons-compress:${Versions.commonsCompress}")
     testImplementation("junit:junit:${Versions.junit}")
