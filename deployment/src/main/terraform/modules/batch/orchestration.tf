@@ -153,7 +153,7 @@ module resampler_statemachine {
   name = "resampler-step-function"
   definition = <<EOF
 {
-  "Comment": "A state machine that orchestrates heatmap creation",
+  "Comment": "A state machine that orchestrates resampling",
   "StartAt": "Resample",
   "TimeoutSeconds": ${var.step_function_timeout_seconds},
   "States": {
