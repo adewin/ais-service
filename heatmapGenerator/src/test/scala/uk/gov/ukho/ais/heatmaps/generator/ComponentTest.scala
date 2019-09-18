@@ -160,9 +160,7 @@ class ComponentTest {
 
           val (sum, count) = geoTiff.calculateSumAndCount()
 
-          val expectedNumberOfPings = 6
-
-          softly.assertThat(sum).isEqualTo(expectedNumberOfPings)
+          softly.assertThat(sum).isEqualTo(10)
           softly.assertThat(count).isEqualTo(TOTAL_CELL_COUNT_WHOLE_WORLD_AT_1K)
       }
     }
