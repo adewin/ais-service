@@ -6,15 +6,15 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class JobConfig {
 
   private final String output;
-  private final Integer year;
-  private final Integer month;
+  private final String year;
+  private final String month;
   private final String filterSqlFile;
 
   @JsonCreator
   public JobConfig(
       @JsonProperty("output") final String output,
-      @JsonProperty("year") final Integer year,
-      @JsonProperty("month") final Integer month,
+      @JsonProperty("year") final String year,
+      @JsonProperty("month") final String month,
       @JsonProperty("filterSqlFile") final String filterSqlFile) {
     this.output = output;
     this.year = year;
@@ -26,11 +26,11 @@ public class JobConfig {
     return output;
   }
 
-  public Integer getYear() {
+  public String getYear() {
     return year;
   }
 
-  public Integer getMonth() {
+  public String getMonth() {
     return month;
   }
 
@@ -43,6 +43,6 @@ public class JobConfig {
   }
 
   public static JobConfig empty() {
-    return new JobConfig("", 0, 0, "");
+    return new JobConfig("", "", "", "");
   }
 }

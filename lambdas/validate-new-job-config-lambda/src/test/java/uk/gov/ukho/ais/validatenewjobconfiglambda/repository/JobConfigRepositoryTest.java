@@ -63,7 +63,7 @@ public class JobConfigRepositoryTest {
           final JobConfigRepository jobConfigRepository =
               new JobConfigRepository(mockS3Client, objectMapper);
           final String s3Uri = "s3://test/example.json";
-          final JobConfig jobConfig = new JobConfig("output", 2019, 9, "filterSqlFile");
+          final JobConfig jobConfig = new JobConfig("output", "2019", "9", "filterSqlFile");
           final String testConfig = jobConfigToJson(jobConfig);
           final InputStream inputStream =
               new ByteArrayInputStream(testConfig.getBytes(Charset.defaultCharset()));

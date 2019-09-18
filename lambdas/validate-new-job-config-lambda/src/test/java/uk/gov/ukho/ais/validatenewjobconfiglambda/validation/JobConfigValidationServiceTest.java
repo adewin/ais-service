@@ -39,7 +39,7 @@ public class JobConfigValidationServiceTest {
     SoftAssertions.assertSoftly(
         softly -> {
           final String filterSqlFile = "filterSqlFile.sql";
-          final JobConfig validJobConfig = new JobConfig("output", 2019, 9, filterSqlFile);
+          final JobConfig validJobConfig = new JobConfig("output", "2019", "9", filterSqlFile);
 
           final Either<ValidationFailure, JobConfig> jobConfigOrFailure =
               Either.right(validJobConfig);
@@ -61,7 +61,7 @@ public class JobConfigValidationServiceTest {
   public void whenJobConfigIsValidThenAllValidatorsHaveValidatedTheJobConfig() {
 
     final String filterSqlFile = "filterSqlFile.sql";
-    final JobConfig validJobConfig = new JobConfig("output", 2019, 9, filterSqlFile);
+    final JobConfig validJobConfig = new JobConfig("output", "2019", "9", filterSqlFile);
 
     final Either<ValidationFailure, JobConfig> jobConfigOrFailure = Either.right(validJobConfig);
 
@@ -99,7 +99,7 @@ public class JobConfigValidationServiceTest {
     SoftAssertions.assertSoftly(
         softly -> {
           final String filterSqlFile = "filterSqlFile.sql";
-          final JobConfig validJobConfig = new JobConfig("output", 2019, 9, filterSqlFile);
+          final JobConfig validJobConfig = new JobConfig("output", "2019", "9", filterSqlFile);
 
           final Either<ValidationFailure, JobConfig> jobConfigOrFailure =
               Either.right(validJobConfig);
@@ -124,7 +124,7 @@ public class JobConfigValidationServiceTest {
     SoftAssertions.assertSoftly(
         softly -> {
           final String filterSqlFile = "filterSqlFile.sql";
-          final JobConfig validJobConfig = new JobConfig("output", 2019, 9, filterSqlFile);
+          final JobConfig validJobConfig = new JobConfig("output", "2019", "9", filterSqlFile);
 
           final Either<ValidationFailure, JobConfig> jobConfigOrFailure =
               Either.right(validJobConfig);

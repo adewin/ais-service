@@ -3,6 +3,7 @@ module ais_sql_ingest_function {
   function_name    = "ingest-sql-file-handler"
   function_handler = "uk.gov.ukho.ais.ingestsqlfile.IngestSqlFileLambdaHandler"
   function_code    = var.ais_sql_ingest_function_jar
+  memory           = "512"
 }
 
 module ais_sql_ingest_function_get_uploaded_file_permission {

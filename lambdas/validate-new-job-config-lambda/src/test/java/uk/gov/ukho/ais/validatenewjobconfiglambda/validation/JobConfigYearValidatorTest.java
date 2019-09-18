@@ -17,7 +17,7 @@ public class JobConfigYearValidatorTest {
 
     SoftAssertions.assertSoftly(
         softly -> {
-          final JobConfig jobConfig = new JobConfig("output", 2019, 1, "filterSqlFile.sql");
+          final JobConfig jobConfig = new JobConfig("output", "2019", "1", "filterSqlFile.sql");
           final Either<ValidationFailure, JobConfig> jobConfigOrFailure = Either.right(jobConfig);
 
           final Validated<ValidationFailure, JobConfig> validated =
@@ -32,7 +32,7 @@ public class JobConfigYearValidatorTest {
   public void whenConfigDoesNotSpecifyYearThenReturnsUnvalidatedResult() {
     SoftAssertions.assertSoftly(
         softly -> {
-          final JobConfig jobConfig = new JobConfig("output", null, 1, "filterSqlFile.sql");
+          final JobConfig jobConfig = new JobConfig("output", null, "1", "filterSqlFile.sql");
           final Either<ValidationFailure, JobConfig> jobConfigOrFailure = Either.right(jobConfig);
 
           final Validated<ValidationFailure, JobConfig> unvalidatedResult =
@@ -50,7 +50,25 @@ public class JobConfigYearValidatorTest {
   public void whenConfigSpecifiesInvalidYearThenReturnsUnvalidatedResult() {
     SoftAssertions.assertSoftly(
         softly -> {
-          final JobConfig jobConfig = new JobConfig("output", -2019, 1, "filterSqlFile.sql");
+          final JobConfig jobConfig = new JobConfig("output", "-2019", "1", "filterSqlFile.sql");
+          final Either<ValidationFailure, JobConfig> jobConfigOrFailure = Either.right(jobConfig);
+
+          final Validated<ValidationFailure, JobConfig> unvalidatedResult =
+              jobConfigYearValidator.validate(jobConfigOrFailure);
+
+          softly.assertThat(unvalidatedResult.isInvalid()).isTrue();
+          softly
+              .assertThat(unvalidatedResult.toEither().leftOrElse(null))
+              .containsExactlyInAnyOrderElementsOf(
+                  NonEmptyList.of(ValidationFailure.JOB_CONFIG_CONTAINS_INVALID_YEAR));
+        });
+  }
+
+  @Test
+  public void whenConfigSpecifiesNonNumericYearThenReturnsUnvalidatedResult() {
+    SoftAssertions.assertSoftly(
+        softly -> {
+          final JobConfig jobConfig = new JobConfig("output", "INVALID", "1", "filterSqlFile.sql");
           final Either<ValidationFailure, JobConfig> jobConfigOrFailure = Either.right(jobConfig);
 
           final Validated<ValidationFailure, JobConfig> unvalidatedResult =

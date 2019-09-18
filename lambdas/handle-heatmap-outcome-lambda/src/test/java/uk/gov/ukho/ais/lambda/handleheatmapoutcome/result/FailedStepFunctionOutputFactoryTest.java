@@ -28,8 +28,7 @@ public class FailedStepFunctionOutputFactoryTest {
           "56365",
           "s3://test/submit/jobconf.json",
           new ValidationResult(Option.of(JobConfig.empty()), Collections.emptyList()),
-          new Object(),
-          new Object(),
+          true,
           new Object(),
           null,
           null,
@@ -44,19 +43,17 @@ public class FailedStepFunctionOutputFactoryTest {
           null,
           null,
           null,
-          null,
           null);
 
   private final HeatmapRequestOutcome couldNotPerformValidation =
       new HeatmapRequestOutcome(
-          "", "s3://bucket/file", null, null, null, null, "Could not run validation", null, null);
+          "", "s3://bucket/file", null, true, null, "Could not run validation", null, null);
   private final HeatmapRequestOutcome failedGeneratingHeatmap =
       new HeatmapRequestOutcome(
           "",
           "s3://bucket/file",
           new ValidationResult(Option.of(JobConfig.empty()), Collections.emptyList()),
-          null,
-          null,
+          true,
           null,
           null,
           "Failed generating heatmaps",
@@ -67,8 +64,7 @@ public class FailedStepFunctionOutputFactoryTest {
           "",
           "s3://bucket/file",
           new ValidationResult(Option.of(JobConfig.empty()), Collections.emptyList()),
-          null,
-          null,
+          true,
           null,
           null,
           null,

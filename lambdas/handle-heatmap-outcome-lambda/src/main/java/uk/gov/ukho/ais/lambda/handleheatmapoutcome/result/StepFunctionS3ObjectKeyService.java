@@ -21,7 +21,7 @@ public class StepFunctionS3ObjectKeyService {
     final String inputFileExtension =
         FilenameUtils.getExtension(stepFunctionOutput.getInputS3Uri());
     final String completionTime =
-        LocalDateTime.now(clock).format(DateTimeFormatter.ofPattern("YYYY-MM-DD'T'HH_mm_ss"));
+        LocalDateTime.now(clock).format(DateTimeFormatter.ofPattern("YYYY-MM-dd'T'HH_mm_ss"));
     final String outputFileName = inputFileName + "-" + completionTime + ".json";
     return "completed/result="
         + stepFunctionOutput.getStepFunctionOutcome().name()

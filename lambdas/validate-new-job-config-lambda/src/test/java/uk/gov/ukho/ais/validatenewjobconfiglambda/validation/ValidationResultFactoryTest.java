@@ -32,7 +32,7 @@ public class ValidationResultFactoryTest {
   public void whenCreatingValidResultThenJobConfigIsPresent() {
     SoftAssertions.assertSoftly(
         softly -> {
-          final JobConfig jobConfig = new JobConfig("output", 2019, 9, filterSqlFileName);
+          final JobConfig jobConfig = new JobConfig("output", "2019", "9", filterSqlFileName);
 
           when(mockFilterSqlFileRepository.getS3Uri(filterSqlFileName)).thenReturn(filterSqlS3Uri);
 
@@ -42,7 +42,7 @@ public class ValidationResultFactoryTest {
           softly
               .assertThat(result.getData().orElse(null))
               .extracting("output", "year", "month")
-              .isEqualTo(Arrays.asList("output", 2019, 9));
+              .isEqualTo(Arrays.asList("output", "2019", "9"));
         });
   }
 
@@ -50,7 +50,7 @@ public class ValidationResultFactoryTest {
   public void whenCreatingValidResultThenFilterSqlFileIsFullS3Uri() {
     SoftAssertions.assertSoftly(
         softly -> {
-          final JobConfig jobConfig = new JobConfig("output", 2019, 9, filterSqlFileName);
+          final JobConfig jobConfig = new JobConfig("output", "2019", "9", filterSqlFileName);
 
           when(mockFilterSqlFileRepository.getS3Uri(filterSqlFileName)).thenReturn(filterSqlS3Uri);
 
@@ -67,7 +67,7 @@ public class ValidationResultFactoryTest {
   public void whenCreatingValidThenErrorIsEmpty() {
     SoftAssertions.assertSoftly(
         softly -> {
-          final JobConfig jobConfig = new JobConfig("output", 2019, 9, filterSqlFileName);
+          final JobConfig jobConfig = new JobConfig("output", "2019", "9", filterSqlFileName);
 
           when(mockFilterSqlFileRepository.getS3Uri(filterSqlFileName)).thenReturn(filterSqlS3Uri);
 

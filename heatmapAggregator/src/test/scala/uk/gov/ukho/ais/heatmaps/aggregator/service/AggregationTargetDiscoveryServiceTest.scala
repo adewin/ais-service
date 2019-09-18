@@ -100,7 +100,7 @@ class AggregationTargetDiscoveryServiceTest {
             "/type=seasonal" +
             "/year=2019" +
             "/season=spring" +
-            "/myfile-1km-res-6hr-30km-spring-2019.tif")
+            "/myfile.sql-1km-res-6hr-30km-spring-2019.tif")
     }
 
   @Test
@@ -161,14 +161,14 @@ class AggregationTargetDiscoveryServiceTest {
             "/type=seasonal" +
             "/year=2018" +
             "/season=winter" +
-            "/myfile-1km-res-6hr-30km-winter-2018.tif",
+            "/myfile.sql-1km-res-6hr-30km-winter-2018.tif",
           "sqlFilename=" +
             "myfile2.sql" +
             "/resample=6hr-30km" +
             "/type=seasonal" +
             "/year=2018" +
             "/season=winter" +
-            "/myfile2-1km-res-6hr-30km-winter-2018.tif"
+            "/myfile2.sql-1km-res-6hr-30km-winter-2018.tif"
         )
     }
 
@@ -230,14 +230,14 @@ class AggregationTargetDiscoveryServiceTest {
             "/type=seasonal" +
             "/year=2018" +
             "/season=winter" +
-            "/myfile-1km-res-6hr-30km-winter-2018.tif",
+            "/myfile.sql-1km-res-6hr-30km-winter-2018.tif",
           "sqlFilename=" +
             "myfile.sql" +
             "/resample=18hr-100km" +
             "/type=seasonal" +
             "/year=2018" +
             "/season=winter" +
-            "/myfile-1km-res-18hr-100km-winter-2018.tif"
+            "/myfile.sql-1km-res-18hr-100km-winter-2018.tif"
         )
     }
 
@@ -276,7 +276,7 @@ class AggregationTargetDiscoveryServiceTest {
               "/type=seasonal" +
               "/year=2019" +
               "/season=spring" +
-              "/myfile-1km-res-6hr-30km-spring-2019.tif"))
+              "/myfile.sql-1km-res-6hr-30km-spring-2019.tif"))
 
       val targetPaths: Iterable[String] = AggregationTargetDiscoveryService
         .discoverAggregationTargets(monthlyFiles, filesInBucket)

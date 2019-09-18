@@ -7,6 +7,7 @@ import cyclops.function.Semigroup;
 import java.util.Objects;
 import java.util.function.Function;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import uk.gov.ukho.ais.lambda.heatmap.job.model.JobConfig;
 import uk.gov.ukho.ais.lambda.heatmap.job.model.validation.ValidationFailure;
@@ -20,16 +21,21 @@ public interface Validator {
 
   static Function<ValidationFailure, Validated<ValidationFailure, JobConfig>> intWithinBounds(
       final Either<ValidationFailure, JobConfig> jobConfigOrFailure,
-      final Function<JobConfig, Integer> extractorFunction,
+      final Function<JobConfig, String> extractorFunction,
       final Pair<Integer, Integer> minMaxBounds) {
     return validationFailure ->
         jobConfigOrFailure
             .fold(l -> Option.<JobConfig>none(), Option::of)
             .map(extractorFunction)
             .filter(Objects::nonNull)
-            .filter(v -> v < minMaxBounds.getLeft() || v > minMaxBounds.getRight())
+            .filter(v -> !NumberUtils.isNumber(v) || withinBounds(v, minMaxBounds))
             .map(m -> invalid(validationFailure))
             .orElse(valid(jobConfigOrFailure));
+  }
+
+  static boolean withinBounds(final String number, final Pair<Integer, Integer> minMaxBounds) {
+    final Integer numberAsInt = Integer.valueOf(number);
+    return numberAsInt < minMaxBounds.getLeft() || numberAsInt > minMaxBounds.getRight();
   }
 
   static Function<ValidationFailure, Validated<ValidationFailure, JobConfig>> isNotEmpty(

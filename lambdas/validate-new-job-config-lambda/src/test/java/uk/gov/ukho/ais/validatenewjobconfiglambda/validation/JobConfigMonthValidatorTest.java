@@ -16,7 +16,7 @@ public class JobConfigMonthValidatorTest {
   public void whenConfigSpecifiesValidMonthThenReturnsValidatedResult() {
     SoftAssertions.assertSoftly(
         softly -> {
-          final JobConfig jobConfig = new JobConfig("output", 2019, 9, "filterSqlFile.sql");
+          final JobConfig jobConfig = new JobConfig("output", "2019", "9", "filterSqlFile.sql");
           final Either<ValidationFailure, JobConfig> jobConfigOrFailure = Either.right(jobConfig);
 
           final Validated<ValidationFailure, JobConfig> validated =
@@ -32,7 +32,7 @@ public class JobConfigMonthValidatorTest {
     SoftAssertions.assertSoftly(
         softly -> {
           final String filterSqlFile = "filterSqlFile.sql";
-          final JobConfig jobConfig = new JobConfig("output", 2019, null, filterSqlFile);
+          final JobConfig jobConfig = new JobConfig("output", "2019", null, filterSqlFile);
           final Either<ValidationFailure, JobConfig> jobConfigOrFailure = Either.right(jobConfig);
 
           final Validated<ValidationFailure, JobConfig> unvalidatedResult =
@@ -51,7 +51,26 @@ public class JobConfigMonthValidatorTest {
     SoftAssertions.assertSoftly(
         softly -> {
           final String filterSqlFile = "filterSqlFile.sql";
-          final JobConfig jobConfig = new JobConfig("output", 2019, 19, filterSqlFile);
+          final JobConfig jobConfig = new JobConfig("output", "2019", "19", filterSqlFile);
+          final Either<ValidationFailure, JobConfig> jobConfigOrFailure = Either.right(jobConfig);
+
+          final Validated<ValidationFailure, JobConfig> unvalidatedResult =
+              jobConfigMonthValidator.validate(jobConfigOrFailure);
+
+          softly.assertThat(unvalidatedResult.isInvalid()).isTrue();
+          softly
+              .assertThat(unvalidatedResult.toEither().leftOrElse(null))
+              .containsExactlyInAnyOrderElementsOf(
+                  NonEmptyList.of(ValidationFailure.JOB_CONFIG_CONTAINS_INVALID_MONTH));
+        });
+  }
+
+  @Test
+  public void whenConfigSpecifiesNonNumericMonthThenReturnsUnvalidatedResult() {
+    SoftAssertions.assertSoftly(
+        softly -> {
+          final JobConfig jobConfig =
+              new JobConfig("output", "2019", "INVALID", "filterSqlFile.sql");
           final Either<ValidationFailure, JobConfig> jobConfigOrFailure = Either.right(jobConfig);
 
           final Validated<ValidationFailure, JobConfig> unvalidatedResult =
