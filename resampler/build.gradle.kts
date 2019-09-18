@@ -38,7 +38,7 @@ application {
 
 jib {
     from {
-        image = "${System.getenv("DOCKER_REGISTRY_URL")}/ais-resampler-base"
+        image = "${System.getenv("DOCKER_REGISTRY_URL")}/jdk8-python36"
         auth {
             username = System.getenv("DOCKER_REGISTRY_USERNAME")
             password = System.getenv("DOCKER_REGISTRY_PASSWORD")
