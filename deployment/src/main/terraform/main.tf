@@ -82,6 +82,10 @@ module batch {
   invoke_step_function_jar                 = var.INVOKE_STEP_FUNCTION_LAMBDA_JAR_PATH
   heatmap_job_submission_bucket            = data.external.secrets.result["heatmap_job_submission_store"]
   handle_step_function_outcome_function_id = module.functions.handle_step_function_outcome_function_id
+  ais_athena_database                      = local.ais_database_name
+  ais_resampled_store_name                 = data.external.secrets.result["resampled_partitioned_ais_store"]
+  ais_18hr_100km_athena_resampled_table    = "derived_resampled_100km_18hr_ais_data"
+  ais_6hr_30km_athena_resampled_table      = "derived_resampled_30km_6hr_ais_data"
 }
 
 module notifications {
