@@ -29,7 +29,7 @@ public class JobConfigFilterSqlFileValidatorTest {
   public void whenSqlFileSuppliedAndExistsThenReturnsValidatedResult() {
     SoftAssertions.assertSoftly(
         softly -> {
-          final JobConfig jobConfig = new JobConfig("output", 2019, 9, filterSqlFileName);
+          final JobConfig jobConfig = new JobConfig("output", "2019", "9", filterSqlFileName);
           final Either<ValidationFailure, JobConfig> jobConfigOrFailure = Either.right(jobConfig);
 
           when(mockFilterSqlFileRepository.exists(filterSqlFileName)).thenReturn(true);
@@ -44,7 +44,7 @@ public class JobConfigFilterSqlFileValidatorTest {
 
   @Test
   public void whenSqlFileSuppliedThenRepositoryCheckedToSeeIfFilterFileExists() {
-    final JobConfig jobConfig = new JobConfig("output", 2019, 9, filterSqlFileName);
+    final JobConfig jobConfig = new JobConfig("output", "2019", "9", filterSqlFileName);
     final Either<ValidationFailure, JobConfig> jobConfigOrFailure = Either.right(jobConfig);
 
     when(mockFilterSqlFileRepository.exists(filterSqlFileName)).thenReturn(true);
@@ -58,7 +58,7 @@ public class JobConfigFilterSqlFileValidatorTest {
   public void whenNoSqlFileSuppliedAndExistsThenReturnsUnvalidatedResult() {
     SoftAssertions.assertSoftly(
         softly -> {
-          final JobConfig jobConfig = new JobConfig("output", 2019, 9, null);
+          final JobConfig jobConfig = new JobConfig("output", "2019", "9", null);
           final Either<ValidationFailure, JobConfig> jobConfigOrFailure = Either.right(jobConfig);
 
           final Validated<ValidationFailure, JobConfig> unvalidatedResult =
@@ -76,7 +76,7 @@ public class JobConfigFilterSqlFileValidatorTest {
   public void whenBlankSqlFileSuppliedAndExistsThenReturnsUnvalidatedResult() {
     SoftAssertions.assertSoftly(
         softly -> {
-          final JobConfig jobConfig = new JobConfig("output", 2019, 9, "");
+          final JobConfig jobConfig = new JobConfig("output", "2019", "9", "");
           final Either<ValidationFailure, JobConfig> jobConfigOrFailure = Either.right(jobConfig);
 
           final Validated<ValidationFailure, JobConfig> unvalidatedResult =
@@ -94,7 +94,7 @@ public class JobConfigFilterSqlFileValidatorTest {
   public void whenSqlFileSuppliedWhichDoesNotExistThenReturnsUnvalidatedResult() {
     SoftAssertions.assertSoftly(
         softly -> {
-          final JobConfig jobConfig = new JobConfig("output", 2019, 9, filterSqlFileName);
+          final JobConfig jobConfig = new JobConfig("output", "2019", "9", filterSqlFileName);
           final Either<ValidationFailure, JobConfig> jobConfigOrFailure = Either.right(jobConfig);
 
           when(mockFilterSqlFileRepository.exists(filterSqlFileName)).thenReturn(false);

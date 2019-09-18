@@ -12,7 +12,7 @@ import java.util.UUID;
 import java.util.function.Function;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import uk.gov.ukho.ais.lambda.heatmap.job.model.StepFunctionInput;
+import uk.gov.ukho.ais.lambda.heatmap.job.model.StepFunctionTrigger;
 
 @Component
 public class TriggerStepFunction implements Function<S3Event, InvokeStepFunctionResult> {
@@ -65,6 +65,6 @@ public class TriggerStepFunction implements Function<S3Event, InvokeStepFunction
 
   private Try<String, JsonProcessingException> getStepFunctionInput(final String jobConfigUri) {
     return Try.withCatch(
-        () -> objectMapper.writeValueAsString(new StepFunctionInput(jobConfigUri)));
+        () -> objectMapper.writeValueAsString(new StepFunctionTrigger(jobConfigUri)));
   }
 }

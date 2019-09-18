@@ -10,6 +10,7 @@ object Versions {
     const val geotrellis = "2.3.1"
     const val mavenAwsBom = "1.11.571"
     const val lambdaJavaCore = "1.2.0"
+    const val lambdaJavaEvents = "2.2.7"
     const val dependencyCheckGradle = "5.2.1"
     const val jacksonDatabind = "2.9.9.3"
     const val findsecbugs = "1.9.0"
