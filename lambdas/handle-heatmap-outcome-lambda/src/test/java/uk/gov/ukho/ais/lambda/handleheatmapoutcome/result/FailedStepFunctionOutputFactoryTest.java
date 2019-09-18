@@ -1,7 +1,6 @@
 package uk.gov.ukho.ais.lambda.handleheatmapoutcome.result;
 
 import cyclops.control.Either;
-import cyclops.control.Option;
 import java.util.Collections;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.Test;
@@ -12,6 +11,8 @@ import uk.gov.ukho.ais.lambda.heatmap.job.model.validation.ValidationFailure;
 import uk.gov.ukho.ais.lambda.heatmap.job.model.validation.ValidationResult;
 
 public class FailedStepFunctionOutputFactoryTest {
+  private final String filterSqlFileName = "test-filter.sql.1";
+  private final String fullyQualifiedSqlFileName = "s3://test-bucket/archive/" + filterSqlFileName;
 
   private final FailedStepFunctionOutputFactory failedStepFunctionOutputFactory =
       new FailedStepFunctionOutputFactory(
@@ -27,7 +28,9 @@ public class FailedStepFunctionOutputFactoryTest {
       new HeatmapRequestOutcome(
           "56365",
           "s3://test/submit/jobconf.json",
-          new ValidationResult(Option.of(JobConfig.empty()), Collections.emptyList()),
+          new ValidationResult(
+              JobConfig.empty().withFilterSqlFile(fullyQualifiedSqlFileName),
+              Collections.emptyList()),
           true,
           new Object(),
           null,
@@ -38,7 +41,9 @@ public class FailedStepFunctionOutputFactoryTest {
       new HeatmapRequestOutcome(
           "3563465",
           "s3://bucket/file",
-          new ValidationResult(Option.none(), Collections.singletonList(jobConfigDoesNotExist)),
+          new ValidationResult(
+              JobConfig.empty().withFilterSqlFile(fullyQualifiedSqlFileName),
+              Collections.singletonList(jobConfigDoesNotExist)),
           null,
           null,
           null,
@@ -52,7 +57,9 @@ public class FailedStepFunctionOutputFactoryTest {
       new HeatmapRequestOutcome(
           "",
           "s3://bucket/file",
-          new ValidationResult(Option.of(JobConfig.empty()), Collections.emptyList()),
+          new ValidationResult(
+              JobConfig.empty().withFilterSqlFile(fullyQualifiedSqlFileName),
+              Collections.emptyList()),
           true,
           null,
           null,
@@ -63,7 +70,9 @@ public class FailedStepFunctionOutputFactoryTest {
       new HeatmapRequestOutcome(
           "",
           "s3://bucket/file",
-          new ValidationResult(Option.of(JobConfig.empty()), Collections.emptyList()),
+          new ValidationResult(
+              JobConfig.empty().withFilterSqlFile(fullyQualifiedSqlFileName),
+              Collections.emptyList()),
           true,
           null,
           null,
@@ -119,6 +128,20 @@ public class FailedStepFunctionOutputFactoryTest {
               failedStepFunctionOutputFactory.hasFailed(failedAggregatingHeatmaps);
 
           softly.assertThat(result).isTrue();
+        });
+  }
+
+  @Test
+  public void whenCreatingFailedResultThenFailureHasFormattedJobConfig() {
+    SoftAssertions.assertSoftly(
+        softly -> {
+          final StepFunctionOutput result =
+              failedStepFunctionOutputFactory.createStepFunctionOutput(successfulOutcome);
+
+          softly
+              .assertThat(result.getJobConfig())
+              .isEqualToComparingFieldByField(
+                  JobConfig.empty().withFilterSqlFile(filterSqlFileName));
         });
   }
 

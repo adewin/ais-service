@@ -38,9 +38,8 @@ public class ValidationResultFactoryTest {
 
           final ValidationResult result = validationResultFactory.valid(jobConfig);
 
-          softly.assertThat(result.getData().isPresent()).isTrue();
           softly
-              .assertThat(result.getData().orElse(null))
+              .assertThat(result.getJobConfig())
               .extracting("output", "year", "month")
               .isEqualTo(Arrays.asList("output", "2019", "9"));
         });
@@ -57,7 +56,7 @@ public class ValidationResultFactoryTest {
           final ValidationResult result = validationResultFactory.valid(jobConfig);
 
           softly
-              .assertThat(result.getData().orElse(null))
+              .assertThat(result.getJobConfig())
               .extracting("filterSqlFile")
               .isEqualTo(Collections.singletonList(filterSqlS3Uri));
         });
@@ -78,20 +77,12 @@ public class ValidationResultFactoryTest {
   }
 
   @Test
-  public void whenCreatingInvalidThenHasNoData() {
-    SoftAssertions.assertSoftly(
-        softly -> {
-          final ValidationResult result = validationResultFactory.invalid(validationFailures);
-
-          softly.assertThat(result.getData().isPresent()).isFalse();
-        });
-  }
-
-  @Test
   public void whenCreatingInvalidThenResultHasSuppliedValidationFailure() {
     SoftAssertions.assertSoftly(
         softly -> {
-          final ValidationResult result = validationResultFactory.invalid(validationFailures);
+          final JobConfig jobConfig = new JobConfig("output", "2019", "9", filterSqlFileName);
+          final ValidationResult result =
+              validationResultFactory.buildInvalidResult(jobConfig).apply(validationFailures);
 
           softly
               .assertThat(result.getError())

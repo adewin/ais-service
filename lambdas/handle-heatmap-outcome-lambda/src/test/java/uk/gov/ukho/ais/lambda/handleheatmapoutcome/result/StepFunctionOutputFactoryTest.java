@@ -22,11 +22,16 @@ import uk.gov.ukho.ais.lambda.heatmap.job.model.validation.ValidationResult;
 
 @RunWith(MockitoJUnitRunner.class)
 public class StepFunctionOutputFactoryTest {
+  private final String filterSqlFileName = "test-filter.sql.1";
+  private final String fullyQualifiedSqlFileName = "s3://test-bucket/archive/" + filterSqlFileName;
+
   private final HeatmapRequestOutcome successfulRequest =
       new HeatmapRequestOutcome(
           "",
           "s3://test/submit/jobconf.json",
-          new ValidationResult(Option.of(JobConfig.empty()), Collections.emptyList()),
+          new ValidationResult(
+              JobConfig.empty().withFilterSqlFile(fullyQualifiedSqlFileName),
+              Collections.emptyList()),
           true,
           new Object(),
           new Object(),
@@ -37,7 +42,7 @@ public class StepFunctionOutputFactoryTest {
           "",
           "s3://test/submit/jobconf.json",
           new ValidationResult(
-              Option.none(),
+              JobConfig.empty().withFilterSqlFile(fullyQualifiedSqlFileName),
               Collections.singletonList(ValidationFailure.JOB_CONFIG_DOES_NOT_EXIST)),
           true,
           new Object(),
@@ -86,10 +91,10 @@ public class StepFunctionOutputFactoryTest {
           final StepFunctionOutput stepFunctionOutput =
               stepFunctionOutputFactory.createStepFunctionOutput(successfulRequest);
 
-          softly.assertThat(stepFunctionOutput.getProcessedJobConfig().isPresent()).isTrue();
           softly
-              .assertThat(stepFunctionOutput.getProcessedJobConfig().orElse(null))
-              .isEqualToComparingFieldByField(JobConfig.empty());
+              .assertThat(stepFunctionOutput.getJobConfig())
+              .isEqualToComparingFieldByField(
+                  JobConfig.empty().withFilterSqlFile(filterSqlFileName));
         });
   }
 
@@ -125,7 +130,7 @@ public class StepFunctionOutputFactoryTest {
                   "abc",
                   StepFunctionOutcome.FAILED,
                   "s3://buck/1.json",
-                  Option.none(),
+                  JobConfig.empty(),
                   Option.of("Validation Failed"),
                   Option.none());
           when(failedStepFunctionOutputFactory.hasFailed(failedValidationRequest)).thenReturn(true);

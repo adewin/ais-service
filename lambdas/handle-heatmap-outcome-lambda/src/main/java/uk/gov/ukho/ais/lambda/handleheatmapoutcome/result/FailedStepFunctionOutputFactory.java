@@ -44,7 +44,7 @@ public class FailedStepFunctionOutputFactory {
         hasFailedValidation(heatmapRequestOutcome)
             ? Either.left(
                 heatmapRequestOutcome
-                    .getJobConfig()
+                    .getValidationResult()
                     .map(ValidationResult::getError)
                     .orElse(Collections.emptyList()))
             : Either.right(determineErrorForNonValidationFailure(heatmapRequestOutcome));
@@ -53,7 +53,7 @@ public class FailedStepFunctionOutputFactory {
         heatmapRequestOutcome.getExecutionId(),
         StepFunctionOutcome.FAILED,
         heatmapRequestOutcome.getJobConfigFile(),
-        heatmapRequestOutcome.getJobConfig().map(ValidationResult::getData).orElse(Option.none()),
+        JobConfigOutputCreator.createOutputJobConfig(heatmapRequestOutcome),
         Option.of(failureReason),
         Option.of(error));
   }
@@ -91,6 +91,6 @@ public class FailedStepFunctionOutputFactory {
   }
 
   private boolean hasFailedValidation(final HeatmapRequestOutcome heatmapRequestOutcome) {
-    return !heatmapRequestOutcome.getJobConfig().map(ValidationResult::isSuccess).orElse(true);
+    return !heatmapRequestOutcome.getValidationResult().map(ValidationResult::isSuccess).orElse(true);
   }
 }

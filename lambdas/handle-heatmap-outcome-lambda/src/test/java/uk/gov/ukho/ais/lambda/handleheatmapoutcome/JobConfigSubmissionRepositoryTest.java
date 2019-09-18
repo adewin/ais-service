@@ -39,7 +39,7 @@ public class JobConfigSubmissionRepositoryTest {
           "2345",
           StepFunctionOutcome.SUCCESS,
           "s3://bucket/test.json",
-          Option.of(JobConfig.empty()),
+          JobConfig.empty(),
           Option.none(),
           Option.none());
   private final String stepFunctionOutputJson = "{\"stepFunctionOutcome\": \"SUCCESS\"}";

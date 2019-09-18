@@ -1,9 +1,9 @@
 package uk.gov.ukho.ais.validatenewjobconfiglambda.validation;
 
-import cyclops.control.Option;
 import cyclops.data.NonEmptyList;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.function.Function;
 import org.springframework.stereotype.Component;
 import uk.gov.ukho.ais.lambda.heatmap.job.model.JobConfig;
 import uk.gov.ukho.ais.lambda.heatmap.job.model.validation.ValidationFailure;
@@ -21,11 +21,13 @@ public class ValidationResultFactory {
 
   public ValidationResult valid(final JobConfig jobConfig) {
     return new ValidationResult(
-        Option.of(addFilterSqlFileS3UriToJobConfig(jobConfig)), Collections.emptyList());
+        addFilterSqlFileS3UriToJobConfig(jobConfig), Collections.emptyList());
   }
 
-  public ValidationResult invalid(final NonEmptyList<ValidationFailure> validationFailures) {
-    return new ValidationResult(Option.none(), new ArrayList<>(validationFailures.toList()));
+  public Function<NonEmptyList<ValidationFailure>, ValidationResult> buildInvalidResult(
+      final JobConfig jobConfig) {
+    return validationFailures ->
+        new ValidationResult(jobConfig, new ArrayList<>(validationFailures.toList()));
   }
 
   private JobConfig addFilterSqlFileS3UriToJobConfig(JobConfig jobConfig) {

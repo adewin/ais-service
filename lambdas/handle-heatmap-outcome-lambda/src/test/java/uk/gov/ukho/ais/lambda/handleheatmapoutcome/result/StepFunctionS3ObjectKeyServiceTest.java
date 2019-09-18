@@ -28,7 +28,7 @@ public class StepFunctionS3ObjectKeyServiceTest {
                   "2dda",
                   StepFunctionOutcome.SUCCESS,
                   "s3://test-bucket/submit/" + inputFileBaseName + ".json",
-                  Option.of(JobConfig.empty()),
+                  JobConfig.empty(),
                   Option.none(),
                   Option.none());
 

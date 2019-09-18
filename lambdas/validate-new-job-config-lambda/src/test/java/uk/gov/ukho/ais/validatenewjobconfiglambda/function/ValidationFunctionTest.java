@@ -5,7 +5,6 @@ import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
 
 import cyclops.control.Either;
-import cyclops.control.Option;
 import cyclops.control.Validated;
 import java.util.Collections;
 import org.assertj.core.api.SoftAssertions;
@@ -42,7 +41,7 @@ public class ValidationFunctionTest {
           final JobConfig jobConfig = new JobConfig("output", "2019", "1", "filter.sql");
           final ValidationResult validationResult =
               new ValidationResult(
-                  Option.of(jobConfig.withFilterSqlFile("s3://test-bucket/filter.sql")),
+                  jobConfig.withFilterSqlFile("s3://test-bucket/filter.sql"),
                   Collections.emptyList());
           final Either<ValidationFailure, JobConfig> jobConfigInRepo = Either.right(jobConfig);
 
@@ -55,7 +54,7 @@ public class ValidationFunctionTest {
               validationFunction.apply(new StepFunctionInput(jobConfigFile, "exec-id"));
 
           softly
-              .assertThat(result.getJobConfig().orElse(null))
+              .assertThat(result.getValidationResult().orElse(null))
               .isEqualToComparingFieldByFieldRecursively(validationResult);
         });
   }
@@ -68,7 +67,7 @@ public class ValidationFunctionTest {
           final JobConfig jobConfig = new JobConfig("output", "2019", "1", "filter.sql");
           final ValidationResult validationResult =
               new ValidationResult(
-                  Option.of(jobConfig.withFilterSqlFile("s3://test-bucket/filter.sql")),
+                  jobConfig.withFilterSqlFile("s3://test-bucket/filter.sql"),
                   Collections.emptyList());
           final Either<ValidationFailure, JobConfig> jobConfigInRepo = Either.right(jobConfig);
 
@@ -90,8 +89,7 @@ public class ValidationFunctionTest {
     final JobConfig jobConfig = new JobConfig("output", "2019", "1", "filter.sql");
     final ValidationResult validationResult =
         new ValidationResult(
-            Option.of(jobConfig.withFilterSqlFile("s3://test-bucket/filter.sql")),
-            Collections.emptyList());
+            jobConfig.withFilterSqlFile("s3://test-bucket/filter.sql"), Collections.emptyList());
 
     final Either<ValidationFailure, JobConfig> jobConfigInRepo = Either.right(jobConfig);
 
@@ -112,8 +110,7 @@ public class ValidationFunctionTest {
     final Either<ValidationFailure, JobConfig> jobConfigInRepo = Either.right(jobConfig);
     final ValidationResult validationResult =
         new ValidationResult(
-            Option.of(jobConfig.withFilterSqlFile("s3://test-bucket/filter.sql")),
-            Collections.emptyList());
+            jobConfig.withFilterSqlFile("s3://test-bucket/filter.sql"), Collections.emptyList());
 
     when(mockJobConfigRepository.getJobConfig(jobConfigFile)).thenReturn(jobConfigInRepo);
     when(mockJobConfigValidationService.performValidation(jobConfigInRepo))

@@ -44,7 +44,7 @@ resource aws_sfn_state_machine batch_heatmap_step_fn {
       "Type": "Choice",
       "Choices": [{
           "BooleanEquals": false,
-          "Variable": "$.jobConfig.success",
+          "Variable": "$.validationResult.success",
           "Next": "Complete"
       }],
       "Default": "Generate Heatmaps"
@@ -67,7 +67,7 @@ resource aws_sfn_state_machine batch_heatmap_step_fn {
               "TimeoutSeconds": ${var.step_execution_timeout_seconds},
               "End": true,
               "Resource": "arn:aws:states:::batch:submitJob.sync",
-              "InputPath": "$.jobConfig.data",
+              "InputPath": "$.validationResult.jobConfig",
               "ResultPath": "$.create6hr30kmHeatmap",
               "Parameters": {
                 "JobName": "Create6hr30kmHeatmap",
@@ -94,7 +94,7 @@ resource aws_sfn_state_machine batch_heatmap_step_fn {
               "TimeoutSeconds": ${var.step_execution_timeout_seconds},
               "End": true,
               "Resource": "arn:aws:states:::batch:submitJob.sync",
-              "InputPath": "$.jobConfig.data",
+              "InputPath": "$.validationResult.jobConfig",
               "ResultPath": "$.create18hr100kmHeatmap",
               "Parameters": {
                 "JobName": "Create18hr100kmHeatmap",
@@ -119,7 +119,7 @@ resource aws_sfn_state_machine batch_heatmap_step_fn {
       "Type": "Task",
       "TimeoutSeconds": ${var.step_execution_timeout_seconds},
       "Resource": "arn:aws:states:::batch:submitJob.sync",
-      "InputPath": "$.jobConfig.data",
+      "InputPath": "$.validationResult.jobConfig",
       "ResultPath": "$.heatmapAggregation",
       "Next": "Complete",
       "Catch": [{

@@ -9,7 +9,7 @@ import uk.gov.ukho.ais.lambda.heatmap.job.model.validation.ValidationFailure;
 
 public class StepFunctionOutput {
 
-  private final Option<JobConfig> processedJobConfig;
+  private final JobConfig jobConfig;
   private final String inputS3Uri;
   private final String executionId;
   private final StepFunctionOutcome stepFunctionOutcome;
@@ -21,10 +21,10 @@ public class StepFunctionOutput {
       @JsonProperty("executionId") final String executionId,
       @JsonProperty("stepFunctionOutcome") final StepFunctionOutcome stepFunctionOutcome,
       @JsonProperty("inputS3Uri") final String inputS3Uri,
-      @JsonProperty("processedJobConfig") final Option<JobConfig> processedJobConfig,
+      @JsonProperty("jobConfig") final JobConfig jobConfig,
       @JsonProperty("failureReason") final Option<String> failureReason,
       @JsonProperty("error") final Option<Either<List<ValidationFailure>, Object>> error) {
-    this.processedJobConfig = processedJobConfig;
+    this.jobConfig = jobConfig;
     this.inputS3Uri = inputS3Uri;
     this.stepFunctionOutcome = stepFunctionOutcome;
     this.executionId = executionId;
@@ -32,8 +32,8 @@ public class StepFunctionOutput {
     this.error = error;
   }
 
-  public Option<JobConfig> getProcessedJobConfig() {
-    return processedJobConfig;
+  public JobConfig getJobConfig() {
+    return jobConfig;
   }
 
   public String getInputS3Uri() {

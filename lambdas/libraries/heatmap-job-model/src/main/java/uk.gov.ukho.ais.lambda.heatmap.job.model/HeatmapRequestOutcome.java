@@ -10,7 +10,7 @@ public class HeatmapRequestOutcome {
   private final String jobConfigFile;
   private final String executionId;
   private final Object generateHeatmaps;
-  private final Option<ValidationResult> jobConfig;
+  private final Option<ValidationResult> validationResult;
   private final Option<Object> validationFailure;
   private final Option<Object> heatmapGenerationFailure;
   private final Option<Object> heatmapAggregationFailure;
@@ -20,7 +20,7 @@ public class HeatmapRequestOutcome {
   public HeatmapRequestOutcome(
       @JsonProperty("executionId") final String executionId,
       @JsonProperty("jobConfigFile") final String jobConfigFile,
-      @JsonProperty("jobConfig") final ValidationResult jobConfig,
+      @JsonProperty("validationResult") final ValidationResult validationResult,
       @JsonProperty("generateHeatmaps") final Object generateHeatmaps,
       @JsonProperty("heatmapAggregation") final Object heatmapAggregation,
       @JsonProperty("validationFailure") final Object validationFailure,
@@ -29,7 +29,7 @@ public class HeatmapRequestOutcome {
     this.jobConfigFile = jobConfigFile;
     this.executionId = executionId;
     this.generateHeatmaps = generateHeatmaps;
-    this.jobConfig = Option.ofNullable(jobConfig);
+    this.validationResult = Option.ofNullable(validationResult);
     this.validationFailure = Option.ofNullable(validationFailure);
     this.heatmapGenerationFailure = Option.ofNullable(heatmapGenerationFailure);
     this.heatmapAggregationFailure = Option.ofNullable(heatmapAggregationFailure);
@@ -40,8 +40,8 @@ public class HeatmapRequestOutcome {
     return jobConfigFile;
   }
 
-  public Option<ValidationResult> getJobConfig() {
-    return jobConfig;
+  public Option<ValidationResult> getValidationResult() {
+    return validationResult;
   }
 
   public Option<Object> getValidationFailure() {

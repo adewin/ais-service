@@ -37,7 +37,9 @@ public class ValidationFunction implements Function<StepFunctionInput, HeatmapRe
     final ValidationResult validationResult =
         jobConfigValidationService
             .performValidation(jobConfig)
-            .fold(validationResultFactory::invalid, validationResultFactory::valid);
+            .fold(
+                validationResultFactory.buildInvalidResult(jobConfig.orElse(null)),
+                validationResultFactory::valid);
     return new HeatmapRequestOutcome(
         stepFunctionInput.getExecutionId(),
         stepFunctionInput.getJobConfigFile(),

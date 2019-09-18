@@ -5,7 +5,6 @@ import org.springframework.stereotype.Component;
 import uk.gov.ukho.ais.lambda.heatmap.job.model.HeatmapRequestOutcome;
 import uk.gov.ukho.ais.lambda.heatmap.job.model.StepFunctionOutcome;
 import uk.gov.ukho.ais.lambda.heatmap.job.model.StepFunctionOutput;
-import uk.gov.ukho.ais.lambda.heatmap.job.model.validation.ValidationResult;
 
 @Component
 public class StepFunctionOutputFactory {
@@ -34,13 +33,13 @@ public class StepFunctionOutputFactory {
         succeeded.getExecutionId(),
         StepFunctionOutcome.SUCCESS,
         succeeded.getJobConfigFile(),
-        succeeded.getJobConfig().map(ValidationResult::getData).orElse(Option.none()),
+        JobConfigOutputCreator.createOutputJobConfig(succeeded),
         Option.none(),
         Option.none());
   }
 
   private boolean isSuccess(final HeatmapRequestOutcome heatmapRequestOutcome) {
-    return heatmapRequestOutcome.getJobConfig().isPresent()
+    return heatmapRequestOutcome.getValidationResult().isPresent()
         && !failedStepFunctionOutputFactory.hasFailed(heatmapRequestOutcome);
   }
 }
