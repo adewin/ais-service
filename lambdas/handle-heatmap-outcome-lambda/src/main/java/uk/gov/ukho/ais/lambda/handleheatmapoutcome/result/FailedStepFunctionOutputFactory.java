@@ -91,6 +91,9 @@ public class FailedStepFunctionOutputFactory {
   }
 
   private boolean hasFailedValidation(final HeatmapRequestOutcome heatmapRequestOutcome) {
-    return !heatmapRequestOutcome.getValidationResult().map(ValidationResult::isSuccess).orElse(true);
+    return !heatmapRequestOutcome
+        .getValidationResult()
+        .map(ValidationResult::isSuccess)
+        .orElse(true);
   }
 }
