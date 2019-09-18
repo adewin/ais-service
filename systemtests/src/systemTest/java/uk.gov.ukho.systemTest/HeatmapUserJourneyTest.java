@@ -69,6 +69,8 @@ public class HeatmapUserJourneyTest {
   public void whenMonthlySqlFilesAreIngestedThenSeasonalHeatmapProduced() throws Exception {
     uploadFiles();
 
+    waitUntilSeasonalHeatmapsHaveBeenGenerated();
+
     final File downloadedSeasonalHeatmap = download6Hr30KmSeasonalHeatmap();
 
     SoftAssertions.assertSoftly(
@@ -77,7 +79,7 @@ public class HeatmapUserJourneyTest {
 
           assertThatSeasonalGeoTiffProducedCorrectly(downloadedSeasonalHeatmap, softly);
 
-          assertThatMonthlyHeatmapsProduced(softly);
+          assertThatRequestedMonthlyHeatmapsProduced(softly);
 
           assertThatAllJobsHaveAnOutputFile(softly);
         });
@@ -95,6 +97,14 @@ public class HeatmapUserJourneyTest {
     uploadFile(inputJobSubmissionBucketName, "submit/", testJanJobConfigFileName);
   }
 
+  private void waitUntilSeasonalHeatmapsHaveBeenGenerated() {
+    waitWhile(
+        () ->
+            !objectExists(outputBucketName, expectedSeasonal6Hr30KmHeatmapKey)
+                && !objectExists(outputBucketName, expectedSeasonal18Hr100KmHeatmapKey),
+        Duration.ofHours(12));
+  }
+
   private void assertThatSeasonalHeatmapsAtBothResampleParametersProduced(SoftAssertions softly) {
     softly.assertThat(objectExists(outputBucketName, expectedSeasonal6Hr30KmHeatmapKey)).isTrue();
     softly.assertThat(objectExists(outputBucketName, expectedSeasonal18Hr100KmHeatmapKey)).isTrue();
@@ -106,7 +116,7 @@ public class HeatmapUserJourneyTest {
     softly.assertThat(hasOutcomeFileFor(testNovJobConfigFileName)).isTrue();
   }
 
-  private void assertThatMonthlyHeatmapsProduced(final SoftAssertions softly) {
+  private void assertThatRequestedMonthlyHeatmapsProduced(final SoftAssertions softly) {
     softly.assertThat(objectExists(outputBucketName, expectedNov6Hr30KmHeatmapKey)).isTrue();
     softly.assertThat(objectExists(outputBucketName, expectedDec6Hr30KmHeatmapKey)).isTrue();
     softly.assertThat(objectExists(outputBucketName, expectedJan6Hr30KmHeatmapKey)).isTrue();
@@ -130,10 +140,9 @@ public class HeatmapUserJourneyTest {
 
   @After
   public void teardown() {
-
     tryToDeleteObject(inputSqlFileBucketName, sqlFileName);
-
     tryToDeleteObject(inputSqlFileBucketName, "archive/" + sqlFileName + ".1");
+
     tryToDeleteObject(inputJobSubmissionBucketName, "submit/" + testJanJobConfigFileName);
     tryToDeleteObject(inputJobSubmissionBucketName, "submit/" + testDecJobConfigFileName);
     tryToDeleteObject(inputJobSubmissionBucketName, "submit/" + testNovJobConfigFileName);
@@ -205,12 +214,6 @@ public class HeatmapUserJourneyTest {
   private File download6Hr30KmSeasonalHeatmap() throws IOException {
     Path tempDir = Files.createTempDirectory("ukho-heatmap-data");
     File localFile = new File(tempDir.toFile(), "seasonal-6hr-30km.tif");
-
-    waitWhile(
-        () ->
-            !objectExists(outputBucketName, expectedSeasonal6Hr30KmHeatmapKey)
-                && !objectExists(outputBucketName, expectedSeasonal18Hr100KmHeatmapKey),
-        Duration.ofHours(12));
 
     s3Client.getObject(
         new GetObjectRequest(outputBucketName, expectedSeasonal6Hr30KmHeatmapKey), localFile);
