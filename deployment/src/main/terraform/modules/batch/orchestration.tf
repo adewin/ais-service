@@ -1,6 +1,5 @@
 module batch_heatmap_statemachine {
   source     = "./statemachine"
-  depends_on = [aws_batch_job_definition.monthly_heatmap_job_definition]
   name       = "heatmap-step-function"
   definition = <<EOF
 {
@@ -149,8 +148,7 @@ module batch_heatmap_statemachine {
 EOF
 }
 
-module "resampler_statemachine" {
-  depends_on = [aws_batch_job_definition.resampler_job_definition]
+module resampler_statemachine {
   source = "./statemachine"
   name = "resampler-step-function"
   definition = <<EOF
