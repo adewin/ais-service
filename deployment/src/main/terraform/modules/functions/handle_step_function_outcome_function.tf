@@ -6,6 +6,7 @@ module handle_step_function_outcome_function {
   }
   function_handler = "uk.gov.ukho.ais.lambda.handleheatmapoutcome.HandleHeatmapOutcomeLambdaHandler"
   function_name    = "HandleHeatmapOutcomeFunction"
+  memory           = "512"
 }
 
 module handle_step_function_outcome_function_put_object_perms {

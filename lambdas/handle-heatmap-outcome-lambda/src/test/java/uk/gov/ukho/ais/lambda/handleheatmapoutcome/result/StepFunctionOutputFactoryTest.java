@@ -27,11 +27,10 @@ public class StepFunctionOutputFactoryTest {
           "",
           "s3://test/submit/jobconf.json",
           new ValidationResult(Option.of(JobConfig.empty()), Collections.emptyList()),
+          true,
           new Object(),
           new Object(),
           new Object(),
-          null,
-          null,
           null);
   private final HeatmapRequestOutcome failedValidationRequest =
       new HeatmapRequestOutcome(
@@ -40,11 +39,10 @@ public class StepFunctionOutputFactoryTest {
           new ValidationResult(
               Option.none(),
               Collections.singletonList(ValidationFailure.JOB_CONFIG_DOES_NOT_EXIST)),
+          true,
           new Object(),
           new Object(),
           new Object(),
-          null,
-          null,
           null);
 
   @Mock private FailedStepFunctionOutputFactory failedStepFunctionOutputFactory;

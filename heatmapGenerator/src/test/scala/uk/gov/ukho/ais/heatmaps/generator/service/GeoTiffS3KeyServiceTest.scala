@@ -12,7 +12,7 @@ class GeoTiffS3KeyServiceTest {
     val interpolationDistanceThresholdMeters = 3000
 
     implicit val config: Config = Config.default.copy(
-      filterSqlFile = "s3://test/unfiltered.sql",
+      filterSqlFile = "s3://test/unfiltered.sql.1",
       interpolationDistanceThresholdMeters =
         interpolationDistanceThresholdMeters,
       interpolationTimeThresholdMilliseconds =
@@ -24,6 +24,6 @@ class GeoTiffS3KeyServiceTest {
     val generatedPath = GeoTiffS3KeyService.generateS3Key()
 
     assertThat(generatedPath).isEqualTo(
-      "sqlFilename=unfiltered.sql/resample=3hr-3km/type=monthly/year=2019/month=1/unfiltered-1km-res-3hr-3km-monthly-Jan-2019.tif")
+      "sqlFilename=unfiltered.sql.1/resample=3hr-3km/type=monthly/year=2019/month=1/unfiltered.sql.1-1km-res-3hr-3km-monthly-Jan-2019.tif")
   }
 }

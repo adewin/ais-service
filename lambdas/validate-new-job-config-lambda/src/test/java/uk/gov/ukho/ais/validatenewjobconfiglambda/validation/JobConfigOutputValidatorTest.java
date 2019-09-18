@@ -30,7 +30,8 @@ public class JobConfigOutputValidatorTest {
     SoftAssertions.assertSoftly(
         softly -> {
           final String outputBucketName = "output";
-          final JobConfig jobConfig = new JobConfig(outputBucketName, 2019, 9, "filterSqlFile.sql");
+          final JobConfig jobConfig =
+              new JobConfig(outputBucketName, "2019", "9", "filterSqlFile.sql");
           final Either<ValidationFailure, JobConfig> jobConfigOrFailure = Either.right(jobConfig);
 
           when(mockAmazonS3.doesBucketExistV2(outputBucketName)).thenReturn(true);
@@ -46,7 +47,7 @@ public class JobConfigOutputValidatorTest {
   @Test
   public void whenOutputSuppliedThenS3QueriedToCheckOutputExists() {
     final String outputBucketName = "output";
-    final JobConfig jobConfig = new JobConfig(outputBucketName, 2019, 9, "filterSqlFile.sql");
+    final JobConfig jobConfig = new JobConfig(outputBucketName, "2019", "9", "filterSqlFile.sql");
     final Either<ValidationFailure, JobConfig> jobConfigOrFailure = Either.right(jobConfig);
 
     when(mockAmazonS3.doesBucketExistV2(outputBucketName)).thenReturn(true);
@@ -60,7 +61,7 @@ public class JobConfigOutputValidatorTest {
   public void whenOutputNotSuppliedThenReturnsUnvalidatedResult() {
     SoftAssertions.assertSoftly(
         softly -> {
-          final JobConfig jobConfig = new JobConfig(null, 2019, 9, "filterSqlFile.sql");
+          final JobConfig jobConfig = new JobConfig(null, "2019", "9", "filterSqlFile.sql");
           final Either<ValidationFailure, JobConfig> jobConfigOrFailure = Either.right(jobConfig);
 
           final Validated<ValidationFailure, JobConfig> unvalidatedResult =
@@ -79,7 +80,8 @@ public class JobConfigOutputValidatorTest {
     SoftAssertions.assertSoftly(
         softly -> {
           final String outputBucketName = "output";
-          final JobConfig jobConfig = new JobConfig(outputBucketName, 2019, 9, "filterSqlFile.sql");
+          final JobConfig jobConfig =
+              new JobConfig(outputBucketName, "2019", "9", "filterSqlFile.sql");
           final Either<ValidationFailure, JobConfig> jobConfigOrFailure = Either.right(jobConfig);
 
           when(mockAmazonS3.doesBucketExistV2(outputBucketName)).thenReturn(false);
@@ -100,7 +102,8 @@ public class JobConfigOutputValidatorTest {
     SoftAssertions.assertSoftly(
         softly -> {
           final String outputBucketName = "output";
-          final JobConfig jobConfig = new JobConfig(outputBucketName, 2019, 9, "filterSqlFile.sql");
+          final JobConfig jobConfig =
+              new JobConfig(outputBucketName, "2019", "9", "filterSqlFile.sql");
           final Either<ValidationFailure, JobConfig> jobConfigOrFailure = Either.right(jobConfig);
 
           when(mockAmazonS3.doesBucketExistV2(outputBucketName))

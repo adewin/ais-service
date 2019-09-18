@@ -36,11 +36,10 @@ public class OutcomeHandlingFunctionTest {
           "55336",
           "s3://bucket/file",
           new ValidationResult(Option.of(JobConfig.empty()), Collections.emptyList()),
+          true,
           new Object(),
           new Object(),
           new Object(),
-          null,
-          null,
           null);
 
   private final StepFunctionOutput stepFunctionOutput =

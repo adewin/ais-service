@@ -14,6 +14,7 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import uk.gov.ukho.ais.lambda.heatmap.job.model.HeatmapRequestOutcome;
 import uk.gov.ukho.ais.lambda.heatmap.job.model.JobConfig;
 import uk.gov.ukho.ais.lambda.heatmap.job.model.StepFunctionInput;
 import uk.gov.ukho.ais.lambda.heatmap.job.model.validation.ValidationFailure;
@@ -38,7 +39,7 @@ public class ValidationFunctionTest {
     SoftAssertions.assertSoftly(
         softly -> {
           final String jobConfigFile = "s3://bucket/job-config.json";
-          final JobConfig jobConfig = new JobConfig("output", 2019, 1, "filter.sql");
+          final JobConfig jobConfig = new JobConfig("output", "2019", "1", "filter.sql");
           final ValidationResult validationResult =
               new ValidationResult(
                   Option.of(jobConfig.withFilterSqlFile("s3://test-bucket/filter.sql")),
@@ -50,25 +51,56 @@ public class ValidationFunctionTest {
               .thenReturn(Validated.valid(jobConfig));
           when(mockValidationResultFactory.valid(jobConfig)).thenReturn(validationResult);
 
-          final ValidationResult result =
-              validationFunction.apply(new StepFunctionInput(jobConfigFile));
+          final HeatmapRequestOutcome result =
+              validationFunction.apply(new StepFunctionInput(jobConfigFile, "exec-id"));
 
-          softly.assertThat(result).isEqualToComparingFieldByFieldRecursively(validationResult);
+          softly
+              .assertThat(result.getJobConfig().orElse(null))
+              .isEqualToComparingFieldByFieldRecursively(validationResult);
+        });
+  }
+
+  @Test
+  public void whenJobConfigExistsThenExecutionIdAdded() {
+    SoftAssertions.assertSoftly(
+        softly -> {
+          final String jobConfigFile = "s3://bucket/job-config.json";
+          final JobConfig jobConfig = new JobConfig("output", "2019", "1", "filter.sql");
+          final ValidationResult validationResult =
+              new ValidationResult(
+                  Option.of(jobConfig.withFilterSqlFile("s3://test-bucket/filter.sql")),
+                  Collections.emptyList());
+          final Either<ValidationFailure, JobConfig> jobConfigInRepo = Either.right(jobConfig);
+
+          when(mockJobConfigRepository.getJobConfig(jobConfigFile)).thenReturn(jobConfigInRepo);
+          when(mockJobConfigValidationService.performValidation(jobConfigInRepo))
+              .thenReturn(Validated.valid(jobConfig));
+          when(mockValidationResultFactory.valid(jobConfig)).thenReturn(validationResult);
+
+          final HeatmapRequestOutcome result =
+              validationFunction.apply(new StepFunctionInput(jobConfigFile, "exec-id"));
+
+          softly.assertThat(result.getExecutionId()).isEqualTo("exec-id");
         });
   }
 
   @Test
   public void whenJobConfigSuppliedThenItIsRetrievedFromJobConfigRepo() {
     final String jobConfigFile = "s3://bucket/job-config.json";
-    final JobConfig jobConfig = new JobConfig("output", 2019, 1, "filter.sql");
+    final JobConfig jobConfig = new JobConfig("output", "2019", "1", "filter.sql");
+    final ValidationResult validationResult =
+        new ValidationResult(
+            Option.of(jobConfig.withFilterSqlFile("s3://test-bucket/filter.sql")),
+            Collections.emptyList());
 
     final Either<ValidationFailure, JobConfig> jobConfigInRepo = Either.right(jobConfig);
 
     when(mockJobConfigRepository.getJobConfig(jobConfigFile)).thenReturn(jobConfigInRepo);
     when(mockJobConfigValidationService.performValidation(jobConfigInRepo))
         .thenReturn(Validated.valid(jobConfig));
+    when(mockValidationResultFactory.valid(jobConfig)).thenReturn(validationResult);
 
-    validationFunction.apply(new StepFunctionInput(jobConfigFile));
+    validationFunction.apply(new StepFunctionInput(jobConfigFile, ""));
 
     verify(mockJobConfigRepository, times(1)).getJobConfig(jobConfigFile);
   }
@@ -76,14 +108,19 @@ public class ValidationFunctionTest {
   @Test
   public void whenJobConfigExistsThenItHasBeenValidated() {
     final String jobConfigFile = "s3://bucket/job-config.json";
-    final JobConfig jobConfig = new JobConfig("output", 2019, 1, "filter.sql");
+    final JobConfig jobConfig = new JobConfig("output", "2019", "1", "filter.sql");
     final Either<ValidationFailure, JobConfig> jobConfigInRepo = Either.right(jobConfig);
+    final ValidationResult validationResult =
+        new ValidationResult(
+            Option.of(jobConfig.withFilterSqlFile("s3://test-bucket/filter.sql")),
+            Collections.emptyList());
 
     when(mockJobConfigRepository.getJobConfig(jobConfigFile)).thenReturn(jobConfigInRepo);
     when(mockJobConfigValidationService.performValidation(jobConfigInRepo))
         .thenReturn(Validated.valid(jobConfig));
+    when(mockValidationResultFactory.valid(jobConfig)).thenReturn(validationResult);
 
-    validationFunction.apply(new StepFunctionInput(jobConfigFile));
+    validationFunction.apply(new StepFunctionInput(jobConfigFile, ""));
 
     verify(mockJobConfigValidationService, times(1)).performValidation(jobConfigInRepo);
   }

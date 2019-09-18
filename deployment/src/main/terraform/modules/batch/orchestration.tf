@@ -29,7 +29,6 @@ resource aws_sfn_state_machine batch_heatmap_step_fn {
     "Validate Input": {
       "Type": "Task",
       "Resource": "${var.validate_job_config_function_id}",
-      "ResultPath": "$.jobConfig",
       "Next": "Is Valid Request",
       "Catch": [{
         "ErrorEquals": ["States.ALL"],
@@ -58,6 +57,7 @@ resource aws_sfn_state_machine batch_heatmap_step_fn {
         "ResultPath": "$.heatmapGenerationFailure",
         "Next": "Complete"
       }],
+      "ResultPath": "$.generateHeatmaps",
       "Branches": [
         {
           "StartAt": "Submit 6hr/30km Heatmap",
@@ -140,7 +140,12 @@ resource aws_sfn_state_machine batch_heatmap_step_fn {
       "Type": "Task",
       "Resource": "${var.handle_step_function_outcome_function_id}",
       "ResultPath": "$",
-      "Next": "Determine Success"
+      "Next": "Determine Success",
+      "Catch": [{
+        "ErrorEquals": ["States.ALL"],
+        "ResultPath": "$.checkCompleteFail",
+        "Next": "Failure"
+      }]
     },
     "Determine Success": {
       "Type": "Choice",
@@ -210,6 +215,7 @@ module invoke_heatmap_state_machine_function {
   function_environment_variables = {
     STEP_FUNCTION_ID = aws_sfn_state_machine.batch_heatmap_step_fn.id
   }
+  memory = "512"
 }
 
 module start_heatmap_statemachine_permissions {

@@ -17,7 +17,7 @@ public class StepFunctionS3ObjectKeyServiceTest {
     SoftAssertions.assertSoftly(
         softly -> {
           final Clock testClock =
-              Clock.fixed(Instant.parse("2019-01-01T00:00:00Z"), ZoneId.of("UTC"));
+              Clock.fixed(Instant.parse("2019-04-11T00:00:00Z"), ZoneId.of("UTC"));
 
           final StepFunctionS3ObjectKeyService stepFunctionS3ObjectKeyService =
               new StepFunctionS3ObjectKeyService(testClock);
@@ -40,7 +40,7 @@ public class StepFunctionS3ObjectKeyServiceTest {
               .isEqualTo(
                   "completed/result=SUCCESS/input-file-name="
                       + inputFileBaseName
-                      + ".json/completion-time=2019-01-01T00_00_00/test-conf-2019-01-01T00_00_00.json");
+                      + ".json/completion-time=2019-04-11T00_00_00/test-conf-2019-04-11T00_00_00.json");
         });
   }
 }

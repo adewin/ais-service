@@ -33,8 +33,9 @@ dependencies {
     implementation("org.springframework.cloud:spring-cloud-function-adapter-aws:${Versions.springCloudFunction}")
     implementation("com.fasterxml.jackson.core:jackson-databind:${Versions.jacksonDatabind}")
     implementation(platform("com.amazonaws:aws-java-sdk-bom:${Versions.mavenAwsBom}"))
-    implementation("com.amazonaws:aws-lambda-java-events:${Versions.lambdaJavaCore}")
+    implementation("com.amazonaws:aws-lambda-java-events:${Versions.lambdaJavaEvents}")
     implementation("com.amazonaws:aws-java-sdk-stepfunctions")
+    implementation("com.amazonaws:aws-java-sdk-s3")
     implementation("com.oath.cyclops:cyclops:${Versions.cyclops}")
     implementation("com.oath.cyclops:cyclops-jackson-integration:${Versions.cyclops}")
 }
