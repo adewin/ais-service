@@ -171,7 +171,7 @@ public class HeatmapUserJourneyTest {
     List<String> keys = new ArrayList<>();
     ListObjectsV2Result listObjectsV2Result;
     do {
-      listObjectsV2Result = s3Client.listObjectsV2(inputJobSubmissionBucketName);
+      listObjectsV2Result = s3Client.listObjectsV2(inputJobSubmissionBucketName, "completed/");
 
       keys.addAll(
           listObjectsV2Result.getObjectSummaries().stream()
