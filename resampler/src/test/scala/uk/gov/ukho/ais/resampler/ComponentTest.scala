@@ -37,8 +37,7 @@ class ComponentTest extends IdiomaticMockito {
 
   val filterQuery = "SELECT * FROM table"
 
-  private val BZ2_EXTENSION: String = "bz2"
-
+  private final val BZ2_EXTENSION: String = "bz2"
   private final val DEFAULT_INTERPOLATION_METERS = 30000
   private final val DEFAULT_INTERPOLATION_TIME = 6 * 60 * 60 * 1000
 
@@ -136,9 +135,7 @@ class ComponentTest extends IdiomaticMockito {
         case Some(filePath) =>
           val csv = openCsvFile(filePath)
 
-          val expectedNumberOfPings = 6
-
-          softly.assertThat(csv.size).isEqualTo(expectedNumberOfPings)
+          softly.assertThat(csv.size).isEqualTo(6)
           softly
             .assertThat(csv.toArray)
             .containsExactlyElementsOf(expectedPings.asJava)
@@ -154,7 +151,7 @@ class ComponentTest extends IdiomaticMockito {
         interpolationTimeThresholdMilliseconds = DEFAULT_INTERPOLATION_TIME,
         interpolationDistanceThresholdMeters = DEFAULT_INTERPOLATION_METERS)
 
-      val expectedPings = Seq(
+      val pings = Seq(
         ("123456793",
          baseDateTime.toEpochSecond(ZoneOffset.UTC),
          -1.216151956,
@@ -177,7 +174,7 @@ class ComponentTest extends IdiomaticMockito {
          50.76944604)
       )
 
-      setDataReturnedFromDataSource(expectedPings)
+      setDataReturnedFromDataSource(pings)
 
       ResamplerOrchestrator.orchestrateResampling()
 
@@ -192,9 +189,8 @@ class ComponentTest extends IdiomaticMockito {
         case Some(filePath) =>
           val csv = openCsvFile(filePath)
 
-          val expectedNumberOfPings = 6
+          softly.assertThat(csv.size).isEqualTo(6)
 
-          softly.assertThat(csv.size).isEqualTo(expectedNumberOfPings)
         case None => softly.fail("csv file not found")
       }
     }
@@ -273,7 +269,7 @@ class ComponentTest extends IdiomaticMockito {
         .allMatch(
           _.startsWith(s"""
                |SELECT *
-               |FROM "database"."table"
+               |FROM ?
                |WHERE (
                |""".stripMargin)
         )

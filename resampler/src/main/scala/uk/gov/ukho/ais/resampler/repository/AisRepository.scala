@@ -55,16 +55,31 @@ object AisRepository {
           mutable.Queue((0 until DEFAULT_NUMBER_OF_BUCKETS)
             .map(bucket => s"""
                                 |SELECT *
-                                |FROM "${config.database}"."${config.table}"
+                                |FROM ?
                                 |WHERE (
-                                |(year = $year AND month = $month)
-                                |OR (year = $nextYear AND month = $nextMonth AND day=1)
-                                |OR (year = $prevYear AND month = $prevMonth AND day=$prevDay)
+                                |(year = ? AND month = ?)
+                                |OR (year = ? AND month = ? AND day = 1)
+                                |OR (year = ? AND month = ? AND day = ?)
                                 |)
-                                |AND mod(cast(mmsi as integer), $DEFAULT_NUMBER_OF_BUCKETS) = $bucket
+                                |AND mod(cast(mmsi as integer), ?) = ?
                                 |ORDER BY mmsi, acquisition_time
               """.stripMargin)
-            .map(sqlStatement => connection.prepareStatement(sqlStatement)): _*)
+            .map { sqlStatement =>
+              val preparedStatement = connection.prepareStatement(sqlStatement)
+
+              preparedStatement.setString(1, s"${config.database}.${config.table}")
+              preparedStatement.setInt(2, year)
+              preparedStatement.setInt(3, month)
+              preparedStatement.setInt(4, nextYear)
+              preparedStatement.setInt(5, nextMonth)
+              preparedStatement.setInt(6, prevYear)
+              preparedStatement.setInt(7, prevMonth)
+              preparedStatement.setInt(8, prevDay)
+              preparedStatement.setInt(9, DEFAULT_NUMBER_OF_BUCKETS)
+              preparedStatement.setInt(10, bucket)
+
+              preparedStatement
+            }: _*)
         }
 
         println(

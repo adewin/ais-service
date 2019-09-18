@@ -116,9 +116,9 @@ class AisRepositoryTest extends IdiomaticMockito {
       .allMatch { sqlStatement =>
         sqlStatement.startsWith("""
             |SELECT *
-            |FROM "database"."table"
+            |FROM ?
             |WHERE (
-            |(year = 2018 AND month = 1)
+            |(year = ? AND month = ?)
             |""".stripMargin)
       }
   }
