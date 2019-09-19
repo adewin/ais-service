@@ -55,6 +55,8 @@
         <cve>CVE-2015-9251</cve>
         <cve>CVE-2012-6708</cve>
         <cve>CVE-2019-11358</cve>
+        <cve>CVE-2019-14540</cve>
+        <cve>CVE-2019-16335</cve>
     </suppress>
     <suppress until="2019-10-01Z">
         <notes><![CDATA[
