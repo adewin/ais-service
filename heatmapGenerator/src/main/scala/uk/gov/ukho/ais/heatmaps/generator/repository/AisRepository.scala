@@ -19,10 +19,10 @@ class AisRepository(val dataSource: DataSource) {
                              year: Int,
                              month: Int): Iterator[Ping] =
     new Iterator[Ping] {
-      val connection: Connection = dataSource.getConnection()
-      var bucket: Int = 1
+      private val connection: Connection = dataSource.getConnection()
+      private var bucket: Int = 1
 
-      val sqlStatements: mutable.Queue[PreparedStatement] = {
+      private val sqlStatements: mutable.Queue[PreparedStatement] = {
         val (nextYear, nextMonth) = getNextMonth(year, month)
         val (prevYear, prevMonth, prevDay) =
           getLastDayOfPreviousMonth(year, month)
@@ -46,9 +46,9 @@ class AisRepository(val dataSource: DataSource) {
       println(s"Running query for bucket: $bucket")
       bucket += 1
 
-      var results: ResultSet = sqlStatements.dequeue().executeQuery()
+      private var results: ResultSet = sqlStatements.dequeue().executeQuery()
 
-      var _hasNext: Boolean = results.next()
+      private var _hasNext: Boolean = results.next()
 
       override def hasNext: Boolean = {
         if (!_hasNext) {
