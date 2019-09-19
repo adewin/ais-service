@@ -2,7 +2,6 @@ package uk.gov.ukho.ais.lambda.handleheatmapoutcome.result;
 
 import cyclops.control.Either;
 import cyclops.control.Option;
-import java.util.Collections;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -35,19 +34,15 @@ public class FailedStepFunctionOutputFactory {
 
   public StepFunctionOutput createStepFunctionOutput(
       final HeatmapRequestOutcome heatmapRequestOutcome) {
-    final String failureReason =
-        hasFailedValidation(heatmapRequestOutcome)
-            ? validationFailureReason
-            : determineFailureReasonForNonValidationFailure(heatmapRequestOutcome);
+    final String failureReason = determineFailureReason(heatmapRequestOutcome);
 
     final Either<List<ValidationFailure>, Object> error =
-        hasFailedValidation(heatmapRequestOutcome)
-            ? Either.left(
-                heatmapRequestOutcome
-                    .getValidationResult()
-                    .map(ValidationResult::getError)
-                    .orElse(Collections.emptyList()))
-            : Either.right(determineErrorForNonValidationFailure(heatmapRequestOutcome));
+        heatmapRequestOutcome
+            .getValidationResult()
+            .filter(validationResult -> !validationResult.isSuccess())
+            .map(ValidationResult::getError)
+            .map(Either::left)
+            .orElse(Either.right(determineErrorForNonValidationFailure(heatmapRequestOutcome)));
 
     return new StepFunctionOutput(
         heatmapRequestOutcome.getExecutionId(),
@@ -59,17 +54,21 @@ public class FailedStepFunctionOutputFactory {
   }
 
   public boolean hasFailed(final HeatmapRequestOutcome heatmapRequestOutcome) {
-    return hasFailedValidation(heatmapRequestOutcome)
+    return !hasPassedValidation(heatmapRequestOutcome)
         || heatmapRequestOutcome.getValidationFailure().isPresent()
         || heatmapRequestOutcome.getHeatmapGenerationFailure().isPresent()
         || heatmapRequestOutcome.getHeatmapAggregationFailure().isPresent();
   }
 
-  private String determineFailureReasonForNonValidationFailure(
-      final HeatmapRequestOutcome heatmapRequestOutcome) {
+  private String determineFailureReason(final HeatmapRequestOutcome heatmapRequestOutcome) {
     return heatmapRequestOutcome
-        .getValidationFailure()
-        .map(failure -> errorValidatingRequestFailureReason)
+        .getValidationResult()
+        .filter(validationResult -> !validationResult.isSuccess())
+        .map(validationResult -> validationFailureReason)
+        .orElseUse(
+            heatmapRequestOutcome
+                .getValidationFailure()
+                .map(failure -> errorValidatingRequestFailureReason))
         .orElseUse(
             heatmapRequestOutcome
                 .getHeatmapGenerationFailure()
@@ -90,10 +89,10 @@ public class FailedStepFunctionOutputFactory {
         .orElse("Unknown error");
   }
 
-  private boolean hasFailedValidation(final HeatmapRequestOutcome heatmapRequestOutcome) {
-    return !heatmapRequestOutcome
+  private boolean hasPassedValidation(final HeatmapRequestOutcome heatmapRequestOutcome) {
+    return heatmapRequestOutcome
         .getValidationResult()
         .map(ValidationResult::isSuccess)
-        .orElse(true);
+        .orElse(false);
   }
 }
