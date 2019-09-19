@@ -4,11 +4,11 @@ import java.sql.Timestamp
 import java.time.Instant
 import java.util.Comparator
 
-import uk.gov.ukho.ais.heatmaps.generator.Config
-import uk.gov.ukho.ais.heatmaps.generator.model.Ping
 import org.apache.commons.math3.util.Precision
 import org.assertj.core.api.SoftAssertions
 import org.junit.Test
+import uk.gov.ukho.ais.heatmaps.generator.Config
+import uk.gov.ukho.ais.heatmaps.generator.model.Ping
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable.ArrayBuffer

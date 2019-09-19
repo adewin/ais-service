@@ -1,10 +1,10 @@
 package uk.gov.ukho.ais.heatmaps.generator.processor
 
 import geotrellis.raster.{IntArrayTile, RasterExtent}
-import uk.gov.ukho.ais.heatmaps.generator.Config
-import uk.gov.ukho.ais.heatmaps.generator.model.Ping
 import org.assertj.core.api.SoftAssertions
 import org.junit.Test
+import uk.gov.ukho.ais.heatmaps.generator.Config
+import uk.gov.ukho.ais.heatmaps.generator.model.Ping
 import uk.gov.ukho.ais.heatmaps.generator.utility.TestPingCreator.ping
 
 import scala.collection.mutable.ArrayBuffer

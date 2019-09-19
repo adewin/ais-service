@@ -1,8 +1,8 @@
 package uk.gov.ukho.ais.heatmaps.generator.service
 
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
 import uk.gov.ukho.ais.heatmaps.generator.Config
-import org.assertj.core.api.Assertions.assertThat
 
 class GeoTiffS3KeyServiceTest {
 

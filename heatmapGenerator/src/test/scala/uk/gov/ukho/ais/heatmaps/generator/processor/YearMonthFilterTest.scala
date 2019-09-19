@@ -2,15 +2,15 @@ package uk.gov.ukho.ais.heatmaps.generator.processor
 
 import java.util.Comparator
 
-import uk.gov.ukho.ais.heatmaps.generator.model.Ping
-import uk.gov.ukho.ais.heatmaps.generator.utility.TestPingCreator.ping
 import org.apache.commons.math3.util.Precision
 import org.assertj.core.api.SoftAssertions
 import org.junit.Test
+import uk.gov.ukho.ais.heatmaps.generator.model.Ping
+import uk.gov.ukho.ais.heatmaps.generator.processor.YearMonthFilter.Filter
+import uk.gov.ukho.ais.heatmaps.generator.utility.TestPingCreator.ping
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable.ArrayBuffer
-import uk.gov.ukho.ais.heatmaps.generator.processor.YearMonthFilter.Filter
 
 class YearMonthFilterTest {
 

@@ -20,9 +20,7 @@ object Resampler {
     var outputQueue: mutable.Queue[Ping] = new mutable.Queue[Ping]()
     var pingCount: Long = 0
 
-    override def hasNext: Boolean = outputQueue.nonEmpty || pings.hasNext
-
-    override def next(): Ping = {
+    override def hasNext: Boolean = {
       while (outputQueue.isEmpty && pings.hasNext) {
         val currPing = pings.next()
 
@@ -35,15 +33,15 @@ object Resampler {
             lastAcquisitionTime
           )
         }
+
         prevPing = currPing
       }
 
-      if (outputQueue.isEmpty) {
-        throw new NoSuchElementException("Iterator is empty")
-      }
+      outputQueue.nonEmpty
+    }
 
+    override def next(): Ping = {
       lastAcquisitionTime = outputQueue.last.acquisitionTime.getTime
-
       outputQueue.dequeue()
     }
   }
@@ -68,13 +66,7 @@ object Resampler {
       prevPing,
       currPing,
       config.interpolationDistanceThresholdMeters) &&
-    isTimeBetweenPingsGreaterThanTimeStep(prevPing, currPing) &&
     prevPing.mmsi == currPing.mmsi
-  }
-
-  private def isTimeBetweenPingsGreaterThanTimeStep(prevPing: Ping,
-                                                    currPing: Ping): Boolean = {
-    currPing.acquisitionTime.getTime - prevPing.acquisitionTime.getTime > TIME_STEP
   }
 
   private def isDistanceBetweenPingsWithinThreshold(

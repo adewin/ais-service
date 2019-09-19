@@ -1,7 +1,7 @@
 package uk.gov.ukho.ais.heatmaps.generator.service
 
-import uk.gov.ukho.ais.heatmaps.generator.Config
 import javax.sql.DataSource
+import uk.gov.ukho.ais.heatmaps.generator.Config
 
 object AthenaDataSourceProvider {
   val DRIVER_CLASS: String = "com.simba.athena.jdbc.Driver"

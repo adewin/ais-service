@@ -2,12 +2,12 @@ package uk.gov.ukho.ais.heatmaps.generator.repository
 
 import java.sql.{Connection, PreparedStatement, ResultSet}
 
+import javax.sql.DataSource
 import uk.gov.ukho.ais.heatmaps.generator.model.Ping
 import uk.gov.ukho.ais.heatmaps.generator.utility.TimeUtilities.{
   getLastDayOfPreviousMonth,
   getNextMonth
 }
-import javax.sql.DataSource
 
 import scala.collection.mutable
 
